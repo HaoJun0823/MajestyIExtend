@@ -120,6 +120,8 @@ static int g_rollbackHitCount = 0;
 static int g_blitCount = 0;
 static int g_blitFailCount = 0;
 static int g_devDumpCount = 0;
+static int g_bgSaveCount = 0;
+static int g_bgRestoreCount = 0;
 
 // MISS/HIT/Rollback 去重
 static std::unordered_set<std::string> g_missSeen;
@@ -884,6 +886,50 @@ static void SafeSetFlag7(uint32_t* dwordBase) {
     } __except (EXCEPTION_EXECUTE_HANDLER) {}
 }
 
+// ===================== 背景保存/恢复 (残影修复) =====================
+struct SavedBg {
+    uint32_t pixelBuf = 0;
+    int x = 0, y = 0, w = 0, h = 0;
+    std::vector<uint8_t> pixels;
+};
+static std::unordered_map<int, SavedBg> g_savedBg;
+
+// 从屏幕像素缓冲区保存一块区域
+static void SafeSavePixels(uint32_t pixelBuf, int width, int height, int stride,
+    int bpp, int sx, int sy, int sw, int sh, uint8_t* dst) {
+    __try {
+        int bppb = bpp / 8;
+        int rowSize = sw * bppb;
+        uint8_t* base = (uint8_t*)pixelBuf;
+        for (int y = sy; y < sy + sh; y++) {
+            if (y < 0 || y >= height) { dst += rowSize; continue; }
+            int cs = sx > 0 ? sx : 0;
+            int ce = (sx + sw) < width ? (sx + sw) : width;
+            if (cs < ce)
+                memcpy(dst + (cs - sx) * bppb, base + y * stride + cs * bppb, (ce - cs) * bppb);
+            dst += rowSize;
+        }
+    } __except (EXCEPTION_EXECUTE_HANDLER) {}
+}
+
+// 将保存的像素写回屏幕缓冲区
+static void SafeRestorePixels(uint32_t pixelBuf, int width, int height, int stride,
+    int bpp, int dx, int dy, int dw, int dh, const uint8_t* src) {
+    __try {
+        int bppb = bpp / 8;
+        int rowSize = dw * bppb;
+        uint8_t* base = (uint8_t*)pixelBuf;
+        for (int y = dy; y < dy + dh; y++) {
+            if (y < 0 || y >= height) { src += rowSize; continue; }
+            int cs = dx > 0 ? dx : 0;
+            int ce = (dx + dw) < width ? (dx + dw) : width;
+            if (cs < ce)
+                memcpy(base + y * stride + cs * bppb, src + (cs - dx) * bppb, (ce - cs) * bppb);
+            src += rowSize;
+        }
+    } __except (EXCEPTION_EXECUTE_HANDLER) {}
+}
+
 // ===================== 直接像素缓冲区渲染 =====================
 static bool DirectBlitText(int thisPtr, int a2, int a3, int a4,
                            const wchar_t* wstr, int wlen) {
@@ -1078,21 +1124,6 @@ static bool DirectBlitText(int thisPtr, int a2, int a3, int a4,
             useAlpha ? "alpha" : "direct");
     }
 
-    // ★ 残影修复：渲染字形前用背景色填充整个文字区域，清除旧像素
-    if (g_cfg.fillBackground) {
-        int fillX = clipL;
-        int fillY = clipT;
-        int fillW = clipR - clipL;
-        int fillH = clipB - clipT;
-        if (fillW > 0 && fillH > 0) {
-            SafeFillBackground(rdi.pixelBuf, (int)rdi.width, (int)rdi.height, (int)rdi.stride,
-                (int)rdi.bpp, fillX, fillY, fillW, fillH, bgColor);
-            if (g_blitCount < 20)
-                LogWrite("[Blit %d] Background filled [%d,%d,%dx%d] bg=0x%X\n",
-                    g_blitCount, fillX, fillY, fillW, fillH, bgColor);
-        }
-    }
-
     // ★ 渲染：使用换行位置逐行绘制
     int curX = drawX;
     int curY = drawY;
@@ -1282,10 +1313,78 @@ static bool DirectBlitText(int thisPtr, int a2, int a3, int a4,
 int __fastcall Hooked_66E7B0(int ecx_this, int edx_unused, int a2, int a3, int a4) {
     g_callCount++;
 
-    // ★ 残影修复：强制开启文字自绘背景开关 (this[7] bit 1)
-    // 原版 sub_66E7B0 内部检查 (this[7] & 2)，若为 0 则只画字形不擦背景，导致旧字形残留
+    // ★ 残影修复：保存/恢复背景像素
+    // 1. 恢复上一帧保存的像素（擦除旧位置的文字残影）
+    // 2. 保存当前帧绘制区域的像素（纯地形，未被文字覆盖）
+    // 3. 然后正常绘制文字
     if (g_cfg.fillBackground && ecx_this) {
-        SafeSetFlag7((uint32_t*)ecx_this);
+        // 获取渲染设备信息
+        uint32_t renderObj = (uint32_t)a4;
+        if (!renderObj) SafeRead32(ADDR_7CA9E4, &renderObj);
+        if (renderObj) {
+            uint32_t pixelBuf = 0, devWidth = 0, devHeight = 0, devBpp = 0, devStride = 0;
+            SafeRead32(renderObj + OFF_PIXELBUF, &pixelBuf);
+            SafeRead32(renderObj + OFF_WIDTH, &devWidth);
+            SafeRead32(renderObj + OFF_HEIGHT, &devHeight);
+            SafeRead32(renderObj + OFF_BPP, &devBpp);
+            SafeRead32(renderObj + OFF_STRIDE, &devStride);
+
+            if (pixelBuf && devWidth && devHeight && devBpp && devStride) {
+                // 计算当前帧绘制区域
+                uint32_t* dwordBase = (uint32_t*)ecx_this;
+                int startX = (int)dwordBase[3] + a2;
+                int endX   = (int)dwordBase[5] + a2;
+                int startY = (int)dwordBase[4] + a3;
+                int endY   = (int)dwordBase[6] + a3;
+
+                // 扩展 endY 以适应 CJK 字体高度
+                // (使用与 DirectBlitText 相同的逻辑)
+                int textH = endY - startY;
+                // 估算: CJK 字体可能比原版高，多行时更明显
+                // 这里用 g_tmHeight 作为最小行高
+                if (g_tmHeight > textH) textH = g_tmHeight;
+                if (textH > (endY - startY)) endY = startY + textH;
+
+                int curX = startX;
+                int curY = startY;
+                int curW = endX - startX;
+                int curH = endY - startY;
+                // 裁剪到屏幕范围
+                if (curX < 0) { curW += curX; curX = 0; }
+                if (curY < 0) { curH += curY; curY = 0; }
+                if (curX + curW > (int)devWidth) curW = (int)devWidth - curX;
+                if (curY + curH > (int)devHeight) curH = (int)devHeight - curY;
+
+                // 1. 恢复旧背景
+                auto it = g_savedBg.find(ecx_this);
+                if (it != g_savedBg.end() && it->second.pixelBuf == pixelBuf) {
+                    SavedBg& old = it->second;
+                    if (old.w > 0 && old.h > 0 && old.pixels.size() > 0) {
+                        SafeRestorePixels(pixelBuf, (int)devWidth, (int)devHeight,
+                            (int)devStride, (int)devBpp,
+                            old.x, old.y, old.w, old.h, old.pixels.data());
+                        g_bgRestoreCount++;
+                    }
+                }
+
+                // 2. 保存当前帧背景
+                if (curW > 0 && curH > 0) {
+                    int bppb = (int)devBpp / 8;
+                    SavedBg bg;
+                    bg.pixelBuf = pixelBuf;
+                    bg.x = curX;
+                    bg.y = curY;
+                    bg.w = curW;
+                    bg.h = curH;
+                    bg.pixels.resize((size_t)curW * curH * bppb);
+                    SafeSavePixels(pixelBuf, (int)devWidth, (int)devHeight,
+                        (int)devStride, (int)devBpp,
+                        curX, curY, curW, curH, bg.pixels.data());
+                    g_savedBg[ecx_this] = std::move(bg);
+                    g_bgSaveCount++;
+                }
+            }
+        }
     }
 
     std::string enText;
@@ -1495,8 +1594,8 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
                 g_callCount, g_replacedCount, g_hitCount, (int)g_hitSeen.size(),
                 g_rollbackHitCount, (int)g_rollbackSeen.size(),
                 g_missCount, (int)g_missSeen.size());
-            fprintf(g_logFile, "  Blits=%d BlitFails=%d\n",
-                g_blitCount, g_blitFailCount);
+            fprintf(g_logFile, "  Blits=%d BlitFails=%d BgSaves=%d BgRestores=%d (map=%d)\n",
+                g_blitCount, g_blitFailCount, g_bgSaveCount, g_bgRestoreCount, (int)g_savedBg.size());
             fclose(g_logFile);
             g_logFile = nullptr;
         }
