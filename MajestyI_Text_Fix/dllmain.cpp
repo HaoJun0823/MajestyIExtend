@@ -1,8 +1,13 @@
-﻿// dllmain.cpp : Majesty HD Runtime Localization v5
+﻿// dllmain.cpp : Majesty HD Runtime Localization v6
 //
-// === 方案 (v5) ===
+// === 方案 (v6) ===
 // 外挂汉化: 不修改任何原文件, 运行时 hook 文本检索函数,
 // 查字典替换英文为中文.
+//
+// v6 关键变化: 改用 malloc 分配翻译后的 StrObj (含 BOM 哨兵),
+// 使 sub_628350 (StrObj 赋值函数) 的 free() 调用安全:
+//   wide 模式: free(data - 2) = free(malloc_base) ✓
+//   StrObj 本身也用 malloc 分配
 //
 // Hook 点:
 // 1. sub_64D6B0 @ 0x64D6B0 — __stdcall(int key) — IDTXT_ 文本检索
@@ -20,8 +25,10 @@
 //   [8] uint32_t extra  — 长度/hash
 //
 // 返回中文的方式:
-//   用 VirtualAlloc 分配永久内存, 构造 wide StrObj
-//   data 指向: [0xFF 0xFE] [wide string data] [0x00 0x00]
+//   用 malloc 分配内存, 构造 wide StrObj (与游戏 CRT 堆一致)
+//   data 指向: malloc_base+2, 前面 2 字节 = [0xFF 0xFE] BOM 哨兵
+//   后面: [wide string data] [0x00 0x00 null term]
+//   sub_628350 free(data-2) = free(malloc_base) 安全
 //   meta = wlen | 0x1000000  (wide 标志)
 //   extra = wlen
 //
@@ -299,87 +306,57 @@ static bool LoadDict(const char* path) {
 }
 
 // ===================== 内存管理 =====================
-// 用 VirtualAlloc 分配永久内存, 避免跨 CRT 堆问题
-// 分配的内存结构: [0xFF 0xFE] [wide string] [0x00 0x00]
-// 返回指向 0xFF 位置的指针 (data 指针)
-struct AllocatedStr {
-    void* base;      // VirtualAlloc 基址
-    void* data;      // data 指针 (base + 0 或 base + offset)
-    int totalSize;
-};
-
-// 简单的内存池: 预分配一个大块, 按需切分
-static constexpr int POOL_SIZE = 16 * 1024 * 1024; // 16MB 应该够用
-static uint8_t* g_poolBase = nullptr;
-static size_t g_poolOffset = 0;
+// v6: 改用 malloc 分配, 与游戏 CRT 堆一致
+// sub_628350 (StrObj 赋值) 会 free 目标的旧 data 指针:
+//   wide:  free(data - 2)   — data-2 处是 0xFEFF BOM 哨兵
+//   narrow: free(data)
+// 所以 wide 的 malloc 布局: [0xFF 0xFE] [wide string] [0x00 0x00]
+//   data 指针 = malloc_base + 2 (跳过 BOM)
+//   free(data - 2) = free(malloc_base) ✓
 
 static void InitPool() {
-    g_poolBase = (uint8_t*)VirtualAlloc(nullptr, POOL_SIZE, MEM_COMMIT, PAGE_READWRITE);
-    if (g_poolBase) {
-        // 填零
-        memset(g_poolBase, 0, POOL_SIZE);
-    }
+    // 不再使用 pool, 但保留空函数避免改 DllMain
 }
 
-// 从池中分配, 返回 data 指针
-// wide: 分配 2*len + 2 (null term), 不写 BOM (BOM 在 data-2 处, 由游戏逻辑管理)
-// 我们只分配纯 UTF-16LE 数据 + null terminator
-static void* PoolAllocWide(int wlen) {
-    if (!g_poolBase) return nullptr;
-    // 需要 wideBytes + 2 字节 null
-    int wideBytes = wlen * 2;
-    int need = wideBytes + 2;
-    // 4 字节对齐
-    need = (need + 3) & ~3;
-    if (g_poolOffset + need > POOL_SIZE) {
-        LogWrite("[ERROR] Pool exhausted! offset=%zu need=%d\n", g_poolOffset, need);
-        return nullptr;
-    }
-    uint8_t* p = g_poolBase + g_poolOffset;
-    g_poolOffset += need;
-    return p;
-}
-
-// 从池中分配 StrObj 结构
-static StrObj* PoolAllocStrObj() {
-    if (!g_poolBase) return nullptr;
-    int need = sizeof(StrObj);
-    need = (need + 3) & ~3;
-    if (g_poolOffset + need > POOL_SIZE) {
-        LogWrite("[ERROR] Pool exhausted (StrObj)! offset=%zu need=%d\n", g_poolOffset, need);
-        return nullptr;
-    }
-    StrObj* p = (StrObj*)(g_poolBase + g_poolOffset);
-    g_poolOffset += need;
-    return p;
-}
-
-// ===================== 构造 wide StrObj =====================
-// 从 wstring 构造 wide StrObj, data 指向池分配的永久内存
-// data 不含 BOM, 直接是 UTF-16LE + null terminator
-// StrObj 本身也从池分配, 避免 static 被覆盖
+// 用 malloc 分配 wide StrObj
+// 内存布局: [BOM 0xFFFE] [wide data] [null term 0x0000]
+// data 指针指向 BOM 之后的位置 (与游戏原生 wide StrObj 一致)
 static StrObj* MakeWideStrObj(const wchar_t* wstr, int wlen) {
     if (!wstr || wlen <= 0) return nullptr;
 
     int wideBytes = wlen * 2;
 
-    // 分配数据区
-    void* dataPtr = PoolAllocWide(wlen);
-    if (!dataPtr) return nullptr;
+    // 分配数据区: BOM(2) + wide data + null term(2)
+    int dataAllocSize = 2 + wideBytes + 2;
+    uint8_t* dataBase = (uint8_t*)malloc(dataAllocSize);
+    if (!dataBase) {
+        LogWrite("[ERROR] malloc failed for wide data (wlen=%d)\n", wlen);
+        return nullptr;
+    }
+
+    // 写 BOM 哨兵 (0xFF 0xFE = U+FEFF in UTF-16LE)
+    dataBase[0] = 0xFF;
+    dataBase[1] = 0xFE;
+
+    // data 指针指向 BOM 之后
+    uint8_t* dataPtr = dataBase + 2;
 
     // 复制 wide 字符串数据
     memcpy(dataPtr, wstr, wideBytes);
 
     // 写 null terminator
-    *((wchar_t*)((uint8_t*)dataPtr + wideBytes)) = 0;
+    *((wchar_t*)(dataPtr + wideBytes)) = 0;
 
-    // 分配 StrObj 结构本身
-    StrObj* obj = PoolAllocStrObj();
-    if (!obj) return nullptr;
+    // 分配 StrObj 结构本身 (也用 malloc, 让游戏可以 free)
+    StrObj* obj = (StrObj*)malloc(sizeof(StrObj));
+    if (!obj) {
+        free(dataBase);
+        LogWrite("[ERROR] malloc failed for StrObj\n");
+        return nullptr;
+    }
 
     obj->data = dataPtr;
     obj->meta = (uint32_t)wlen | 0x1000000;  // 长度 + wide 标志 (bit24)
-    // byte7 = (meta >> 24) & 0xFF = 0x01 (wide flag)
     obj->extra = (uint32_t)wlen;
 
     return obj;
@@ -834,21 +811,17 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
         // 打开日志文件
         g_logFile = fopen(logPath, "w");
         if (g_logFile) {
-            fprintf(g_logFile, "[MajestyHD Runtime Localization v5] DllMain ATTACH\n");
+            fprintf(g_logFile, "[MajestyHD Runtime Localization v6] DllMain ATTACH\n");
             fprintf(g_logFile, "  Exe path: %s\n", path);
             fprintf(g_logFile, "  Log path: %s\n", logPath);
-            fprintf(g_logFile, "  Strategy: runtime dict lookup, no file modification\n");
+            fprintf(g_logFile, "  Strategy: runtime dict lookup, malloc-based StrObj (sub_628350-safe)\n");
             fprintf(g_logFile, "  Hooks: sub_64D6B0 (IDTXT), sub_664660 (STRT idx), sub_6646F0 (STRT key), sub_64D5F0 (XML dict), sub_508480 (XML+CAM search)\n\n");
             fflush(g_logFile);
         }
 
-        // 初始化内存池
+        // 内存管理初始化 (v6: 不再需要 pool, 用 malloc)
+        // 但保留 InitPool 调用以兼容
         InitPool();
-        if (g_poolBase) {
-            LogWrite("[Pool] VirtualAlloc %d bytes at %p\n", POOL_SIZE, g_poolBase);
-        } else {
-            LogWrite("[ERROR] VirtualAlloc failed!\n");
-        }
 
         // 加载字典
         // 字典路径: DLL 同目录下的 dict.txt
