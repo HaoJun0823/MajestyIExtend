@@ -1019,7 +1019,13 @@ static bool DirectBlitText(int thisPtr, int a2, int a3, int a4,
     int clipL = startX > (int)rdi.clipL ? startX : (int)rdi.clipL;
     int clipT = startY > (int)rdi.clipT ? startY : (int)rdi.clipT;
     int clipR = endX < (int)rdi.clipR ? endX : (int)rdi.clipR;
-    int clipB = endY < (int)rdi.clipB ? endY : (int)rdi.clipB;
+    // ★ 修复：扩展 clipB 以适应 CJK 字体实际高度
+    // 原版 endY 基于小字体行高，CJK 字体更高，多行文本会超出 endY 被裁剪
+    int effectiveEndY = endY;
+    if (textHeight > (endY - startY)) {
+        effectiveEndY = startY + textHeight;
+    }
+    int clipB = effectiveEndY < (int)rdi.clipB ? effectiveEndY : (int)rdi.clipB;
     if (clipR > (int)rdi.width) clipR = (int)rdi.width;
     if (clipB > (int)rdi.height) clipB = (int)rdi.height;
 
