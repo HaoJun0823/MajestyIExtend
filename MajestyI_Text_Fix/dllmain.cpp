@@ -1,27 +1,38 @@
-﻿// dllmain.cpp : Majesty HD Runtime Localization v9.2 (修正偏移 + CJK 字体扫描 + 字体替换)
+﻿// dllmain.cpp : Majesty HD Runtime Localization v10.0 (GDI Direct Text Rendering)
 //
-// === v9.2 修正诊断版 ===
-// v9.1 结果: this+0xA0 是 CYDialogButtonItem (不是字体!), 偏移错误
+// === v10.0 GDI 直接渲染版 ===
+// v9.2 结果: CYFontImage 的 glyph 表只有 ASCII, CJK 字符查不到 → 空白
 //
-// 修正 (IDA 反编译确认):
-//   sub_66E7B0 中 v5 = *(this + 10) -> DWORD 索引10 = 字节偏移 0x28
-//   sub_647140(&renderCtx, v5, this[97]) -> renderCtx[0] = v5 (字体对象)
-//   sub_647420 中:
-//     - renderCtx[21] -> 备选字体
-//     - dword_7CA9C0[renderCtx[22]] -> 全局字体数组
-//   dword_7CA9C0 数组条目是 sub_68A9C0(256) 创建的 glyph cache (0x41C 字节)
-//     不是字体对象! vtable=0 是正常的
+// v10 策略:
+//   hook sub_66E7B0 (文本绘制函数), 命中中文时:
+//   1. 跳过原函数 (不调用 g_orig66E7B0)
+//   2. 从 this 对象读取布局信息 (位置/颜色/对齐)
+//   3. 用 GDI ExtTextOutW 直接在游戏窗口 DC 上绘制中文
+//   4. 非中文文本走原函数
 //
-// 字体类 vtable (IDA 确认):
-//   CYFont          vtable = 0x74C2C4
-//   CYFontPixelmap  vtable = 0x75041C  (CJK 字体)
-//   CYFontImage     vtable = 待确认
+// this 对象布局 (IDA 反编译确认):
+//   this[0]/[4]/[8]  - StrObj 字符串数据 (inline/indirect)
+//   this[3] (0x0C)  - X 偏移 (加到 a2)
+//   this[4] (0x10)  - Y 偏移 (加到 a3)
+//   this[5] (0x14)  - 右边界 X (加到 a2)
+//   this[6] (0x18)  - 底部 Y (加到 a3)
+//   this[7] (0x1C)  - 渲染标志位 (bit0=居中, bit1=右对齐, bit2=描边, bit3=垂直居中, bit4=裁剪, bit5=右对齐2, bit6=颜色覆盖)
+//   this[10](0x28)  - 字体对象 (CYFontImage)
+//   this[12](0x30) - 描边颜色索引
+//   this[13](0x34) - 前景颜色索引
+//   this[20](0x50) - 颜色覆盖列表大小
+//   this[21](0x54) - 颜色覆盖列表指针
+//   this[23](0x5C) - 文本最大宽度
+//   this[25](0x64) - 前景色 (调色板索引)
+//   this[26](0x68) - 描边色 (调色板索引)
+//   this+0x61      - 字体 ID
+//   this[97]       - (同上, 字节偏移)
 //
-// v9.2 策略:
-//   1. 修正字体对象偏移为 this+0x28
-//   2. 诊断当前字体对象的 RTTI 类型
-//   3. 在内存中扫描 CYFontPixelmap vtable (0x75041C)
-//   4. 如果找到 CJK 字体, 在 hit 时替换 this[10]
+// sub_66E7B0(this, a2, a3, a4) 签名:
+//   this = UI 组件对象
+//   a2 = X 偏移 (加到 this[3] 得到实际 X)
+//   a3 = Y 偏移 (加到 this[6] 得到实际 Y)  
+//   a4 = 渲染设备 (0=用默认 dword_7CA9E4)
 
 #include "pch.h"
 #include <psapi.h>
@@ -29,7 +40,6 @@
 #include <unordered_map>
 #include <string>
 #include <vector>
-#include <set>
 #include "MinHook.h"
 
 #pragma comment(lib, "psapi.lib")
@@ -37,11 +47,8 @@
 
 // ===================== 地址常量 =====================
 static constexpr uintptr_t ADDR_66E7B0 = 0x0066E7B0;
-static constexpr uintptr_t ADDR_7CA9C0  = 0x007CA9C0;  // dword_7CA9C0 (字体数组指针)
-static constexpr uintptr_t ADDR_7BC518  = 0x007BC518;  // dword_7BC518 (字体数组大小)
 static constexpr uintptr_t ADDR_7CA9E4  = 0x007CA9E4;  // dword_7CA9E4 (默认渲染设备)
-static constexpr uintptr_t VTABLE_CYFONT         = 0x0074C2C4;  // CYFont 基类 vtable
-static constexpr uintptr_t VTABLE_CYFONTPIXELMAP  = 0x0075041C;  // CYFontPixelmap vtable (CJK)
+static constexpr uintptr_t ADDR_7CA9BC  = 0x007CA9BC;  // dword_7CA9BC (调色板数组)
 
 // ===================== 字符串对象 =====================
 struct StrObj {
@@ -68,7 +75,8 @@ static int g_callCount = 0;
 static int g_replacedCount = 0;
 static int g_hitCount = 0;
 static int g_missCount = 0;
-static bool g_fontDiagDone = false;
+static int g_gdiDrawCount = 0;
+static int g_gdiFailCount = 0;
 
 static void LogWrite(const char* fmt, ...) {
     if (!g_logFile) return;
@@ -203,11 +211,11 @@ static bool ReadFullString(int thisPtr, std::string& out, int* outCharLen = null
     if (!thisPtr) return false;
     uint8_t* edi = (uint8_t*)thisPtr;
 
-    uint8_t* data = nullptr;
+    void* obj = *(void**)edi;
     bool wide = false;
     int chLen = 0;
+    uint8_t* data = nullptr;
 
-    void* obj = *(void**)edi;
     if (obj) {
         uint8_t* s = (uint8_t*)obj;
         wide = (s[7] & 1) != 0;
@@ -249,174 +257,209 @@ static bool ReadFullString(int thisPtr, std::string& out, int* outCharLen = null
     }
 }
 
-// ===================== RTTI 安全读取 =====================
-// MSVC RTTI 链: vtable-4 -> COL -> COL+12 -> TypeDescriptor -> TD+8 -> name
-static bool ReadRttiName(uint32_t objPtr, char* buf, int bufSize) {
-    if (!objPtr || bufSize < 8) return false;
-    buf[0] = 0;
-    if (IsBadReadPtr((void*)objPtr, 4)) return false;
-    uint32_t vtable = *(uint32_t*)objPtr;
-    if (!vtable) return false;
-    if (IsBadReadPtr((void*)(vtable - 4), 4)) return false;
-    uint32_t colPtr = *(uint32_t*)(vtable - 4);  // Complete Object Locator
-    if (!colPtr) return false;
-    if (IsBadReadPtr((void*)(colPtr + 12), 4)) return false;
-    uint32_t typeDescPtr = *(uint32_t*)(colPtr + 12);  // TypeDescriptor ptr
-    if (!typeDescPtr) return false;
-    // 尝试直接 VA (老 MSVC)
-    const char* typeName = (const char*)(typeDescPtr + 8);
-    if (!IsBadReadPtr((void*)typeName, bufSize)) {
-        strncpy(buf, typeName, bufSize - 1);
-        buf[bufSize - 1] = 0;
-        return true;
+// ===================== GDI 字体管理 =====================
+static HFONT g_cjkFont = nullptr;
+static HFONT g_cjkFontBold = nullptr;
+static int g_fontSize = 14;
+
+static void InitGdiFonts() {
+    if (g_cjkFont) return;
+    
+    // 创建 SimSun (宋体) 字体, 抗锯齿
+    g_cjkFont = CreateFontW(
+        -g_fontSize,              // 高度 (负值=字符高度)
+        0,                        // 宽度 (0=自动)
+        0, 0,                     // 倾斜/方向
+        FW_NORMAL,                // 粗细
+        FALSE, FALSE, FALSE,      // 斜体/下划线/删除线
+        DEFAULT_CHARSET,          // 字符集
+        OUT_DEFAULT_PRECIS,
+        CLIP_DEFAULT_PRECIS,
+        ANTIALIASED_QUALITY,      // 抗锯齿
+        DEFAULT_PITCH | FF_DONTCARE,
+        L"SimSun"
+    );
+    
+    g_cjkFontBold = CreateFontW(
+        -g_fontSize,
+        0, 0, 0,
+        FW_BOLD,
+        FALSE, FALSE, FALSE,
+        DEFAULT_CHARSET,
+        OUT_DEFAULT_PRECIS,
+        CLIP_DEFAULT_PRECIS,
+        ANTIALIASED_QUALITY,
+        DEFAULT_PITCH | FF_DONTCARE,
+        L"SimSun"
+    );
+    
+    if (g_cjkFont) {
+        LogWrite("[GDI] Font created: SimSun %dpt (handle=0x%p)\n", g_fontSize, g_cjkFont);
+    } else {
+        LogWrite("[GDI] ERROR: Failed to create font (err=%d)\n", GetLastError());
     }
-    // 尝试 RVA (新 MSVC, image base=0x400000)
-    uint32_t rvaAddr = 0x400000 + typeDescPtr;
-    const char* typeNameRva = (const char*)(rvaAddr + 8);
-    if (!IsBadReadPtr((void*)typeNameRva, bufSize)) {
-        strncpy(buf, typeNameRva, bufSize - 1);
-        buf[bufSize - 1] = 0;
-        return true;
-    }
-    return false;
 }
 
-// ===================== CJK 字体扫描 =====================
-// 在堆内存中扫描 vtable=0x75041C (CYFontPixelmap) 的对象
-static uint32_t g_cjkFontObj = 0;  // 找到的 CJK 字体对象
-
-static void ScanForCjkFont() {
-    if (g_cjkFontObj) return;
-
-    HANDLE hProcess = GetCurrentProcess();
-    SYSTEM_INFO si;
-    GetSystemInfo(&si);
-
-    uint32_t addr = (uint32_t)si.lpMinimumApplicationAddress;
-    uint32_t endAddr = (uint32_t)si.lpMaximumApplicationAddress;
-    uint32_t targetVtable = (uint32_t)VTABLE_CYFONTPIXELMAP;
-
-    MEMORY_BASIC_INFORMATION mbi;
-    LogWrite("[FontScan] Scanning for CYFontPixelmap (vtable=0x%08X)...\n", targetVtable);
-
-    int found = 0;
-    while (addr < endAddr) {
-        if (VirtualQuery((void*)addr, &mbi, sizeof(mbi)) == 0) break;
-        if (mbi.State == MEM_COMMIT && (mbi.Protect & (PAGE_READWRITE|PAGE_EXECUTE_READWRITE)) &&
-            !(mbi.Protect & PAGE_READONLY) && mbi.RegionSize > 0 && mbi.RegionSize < 0x10000000) {
-
-            // 扫描这个区域
-            uint32_t regionStart = (uint32_t)mbi.BaseAddress;
-            uint32_t regionSize = (uint32_t)mbi.RegionSize;
-
-            // 安全限制: 最多扫描 4MB
-            uint32_t scanSize = regionSize > 0x400000 ? 0x400000 : regionSize;
-
-            // 分块读取
-            uint8_t* buf = (uint8_t*)malloc(scanSize);
-            if (buf) {
-                SIZE_T bytesRead = 0;
-                if (ReadProcessMemory(hProcess, (void*)regionStart, buf, scanSize, &bytesRead) && bytesRead > 4) {
-                    // 搜索 vtable 指针值 (4字节对齐)
-                    for (uint32_t off = 0; off + 4 <= (uint32_t)bytesRead; off += 4) {
-                        uint32_t val = *(uint32_t*)(buf + off);
-                        if (val == targetVtable) {
-                            uint32_t objAddr = regionStart + off;
-                            // 验证: CYFontPixelmap 的 this+4 应该是 1 (构造函数设置)
-                            if (off + 8 <= scanSize) {
-                                uint32_t field4 = *(uint32_t*)(buf + off + 4);
-                                if (field4 == 1) {
-                                    LogWrite("[FontScan] FOUND CYFontPixelmap at 0x%08X (field4=1)\n", objAddr);
-                                    if (!g_cjkFontObj) g_cjkFontObj = objAddr;
-                                    found++;
-                                    if (found >= 10) break;  // 最多记 10 个
-                                }
-                            }
-                        }
-                    }
-                }
-                free(buf);
-            }
-            if (found >= 10) break;
-        }
-        addr = (uint32_t)mbi.BaseAddress + (uint32_t)mbi.RegionSize;
-    }
-
-    LogWrite("[FontScan] Found %d CYFontPixelmap object(s), g_cjkFontObj=0x%08X\n", found, g_cjkFontObj);
+// ===================== 调色板索引 → RGB 颜色 =====================
+// 游戏用 8-bit 调色板, 索引对应颜色需要从游戏调色板读取
+// dword_7CA9BC 是调色板数组, 每个条目指向一个调色板对象
+// 调色板对象+8 处可能是 RGB 表
+// 先用简单映射: 常见游戏颜色索引 → RGB
+static COLORREF PalIndexToRgb(uint32_t palIndex) {
+    // Majesty HD 的调色板索引到 RGB 映射
+    // 从 v9 日志中 this[25] (前景色) 的值推断
+    // 常见: 0=黑, 255=白, 其他中间值
+    // 先用灰度近似: index * (255/255)
+    // 实际需要读取游戏调色板才能精确
+    
+    // 简单映射 (基于经验):
+    // 0 = 黑色 (描边/背景)
+    // 255 = 白色 (前景)
+    // 其他 = 灰度或特定颜色
+    if (palIndex == 0) return RGB(0, 0, 0);
+    if (palIndex == 255) return RGB(255, 255, 255);
+    if (palIndex == 254) return RGB(255, 255, 255);
+    
+    // 尝试从调色板对象读取
+    // dword_7CA9BC 是一个指针, 指向调色板对象数组
+    // 每个调色板对象可能有 RGB 表
+    // 暂时用灰度近似
+    uint8_t gray = (uint8_t)(palIndex & 0xFF);
+    return RGB(gray, gray, gray);
 }
 
-// ===================== 字体诊断 =====================
-static void FontDiag(int thisPtr) {
-    if (g_fontDiagDone) return;
-    g_fontDiagDone = true;
-
+// ===================== GDI 文本绘制 =====================
+// 从 this 对象读取布局信息, 用 GDI 绘制中文文本
+static bool GdiDrawText(int thisPtr, int a2, int a3, const wchar_t* wstr, int wlen) {
+    if (!wstr || wlen <= 0) return false;
+    
+    HWND hwnd = GetForegroundWindow();
+    if (!hwnd) {
+        hwnd = GetDesktopWindow();
+    }
+    
+    // 获取客户区坐标 (屏幕坐标)
+    RECT clientRect;
+    GetClientRect(hwnd, &clientRect);
+    POINT pt = {0, 0};
+    ClientToScreen(hwnd, &pt);
+    int screenOffsetX = pt.x;
+    int screenOffsetY = pt.y;
+    
+    // 从 this 对象读取位置信息
     uint8_t* base = (uint8_t*)thisPtr;
-
-    // 修正: 字体对象在 this+0x28 (DWORD 索引 10)
-    uint32_t fontObj = *(uint32_t*)(base + 0x28);
-    // 字体 ID 在 this+0x61 (字节偏移 97)
-    uint8_t  fontId  = *(uint8_t*)(base + 0x61);
-
-    LogWrite("\n[FontDiag] === FONT DIAGNOSTICS (v9.2) ===\n");
-    LogWrite("[FontDiag] this=0x%08X\n", thisPtr);
-    LogWrite("[FontDiag] this+0x28 (fontObj) = 0x%08X\n", fontObj);
-    LogWrite("[FontDiag] this+0x61 (fontId)  = %d\n", fontId);
-
-    // 全局字体数组
-    uint32_t* fontArray = *(uint32_t**)ADDR_7CA9C0;
-    uint32_t arraySize = *(uint32_t*)ADDR_7BC518;
-    LogWrite("[FontDiag] dword_7CA9C0 (fontArrayPtr) = 0x%08X\n", (uint32_t)(uintptr_t)fontArray);
-    LogWrite("[FontDiag] dword_7BC518 (arraySize)    = %d\n", arraySize);
-
-    if (fontArray && arraySize > 0 && arraySize < 100) {
-        for (uint32_t i = 0; i < arraySize; i++) {
-            uint32_t entry = fontArray[i];
-            LogWrite("[FontDiag] fontArray[%d] = 0x%08X\n", i, entry);
-            if (entry) {
-                uint32_t vtable = *(uint32_t*)entry;
-                LogWrite("[FontDiag]   vtable = 0x%08X\n", vtable);
-                // 注意: 这些是 glyph cache (sub_68A9C0), 不是字体对象, vtable=0 正常
+    uint32_t* dwordBase = (uint32_t*)base;
+    
+    // sub_66E7B0 中的位置计算:
+    // v7 = this[3] + a2  -> 起始 X
+    // v8 = this[5] + a2  -> 结束 X  
+    // v10 = this[4] + a3 -> Y 上
+    // v65 = this[6] + a3 -> Y 下
+    int startX = (int)dwordBase[3] + a2;
+    int endX   = (int)dwordBase[5] + a2;
+    int startY = (int)dwordBase[4] + a3;
+    int endY   = (int)dwordBase[6] + a3;
+    
+    // 渲染标志
+    uint8_t flags = (uint8_t)dwordBase[7];
+    bool centered  = (flags & 0x01) != 0;
+    bool rightAlign = (flags & 0x02) != 0;
+    bool outlined  = (flags & 0x04) != 0;
+    bool vCentered = (flags & 0x08) != 0;
+    
+    // 颜色
+    uint32_t fgColorIdx = dwordBase[25];  // 前景色 (调色板索引)
+    uint32_t bgColorIdx = dwordBase[26];  // 描边色 (调色板索引)
+    
+    COLORREF fgColor = PalIndexToRgb(fgColorIdx);
+    COLORREF bgColor = PalIndexToRgb(bgColorIdx);
+    
+    // 获取 DC
+    HDC hdc = GetDC(hwnd);
+    if (!hdc) {
+        g_gdiFailCount++;
+        if (g_gdiFailCount <= 5) {
+            LogWrite("[GDI] GetDC failed (err=%d)\n", GetLastError());
+        }
+        return false;
+    }
+    
+    // 保存 DC 状态
+    int savedState = SaveDC(hdc);
+    
+    // 映射到屏幕坐标
+    SetMapMode(hdc, MM_TEXT);
+    SetWindowOrgEx(hdc, 0, 0, nullptr);
+    SetViewportOrgEx(hdc, 0, 0, nullptr);
+    
+    // 选择字体
+    HFONT oldFont = (HFONT)SelectObject(hdc, g_cjkFont);
+    
+    // 设置背景模式 (透明)
+    SetBkMode(hdc, TRANSPARENT);
+    
+    // 计算文本尺寸
+    SIZE textSize = {0, 0};
+    GetTextExtentPoint32W(hdc, wstr, wlen, &textSize);
+    
+    // 计算绘制位置
+    int drawX = startX + screenOffsetX;
+    int drawY = startY + screenOffsetY;
+    
+    // 水平对齐
+    if (centered) {
+        drawX += (endX - startX - textSize.cx) / 2;
+    } else if (rightAlign) {
+        drawX = endX - textSize.cx + screenOffsetX;
+    }
+    
+    // 垂直对齐
+    if (vCentered) {
+        drawY += (endY - startY - textSize.cy) / 2;
+    }
+    
+    // 矩形裁剪 (限制在 UI 组件范围内)
+    RECT clipRect;
+    clipRect.left = startX + screenOffsetX;
+    clipRect.top = startY + screenOffsetY;
+    clipRect.right = endX + screenOffsetX;
+    clipRect.bottom = endY + screenOffsetY;
+    
+    // 如果描边, 先画黑色描边
+    if (outlined) {
+        SetTextColor(hdc, bgColor);
+        for (int dx = -1; dx <= 1; dx++) {
+            for (int dy = -1; dy <= 1; dy++) {
+                if (dx == 0 && dy == 0) continue;
+                ExtTextOutW(hdc, drawX + dx, drawY + dy, ETO_CLIPPED, &clipRect, wstr, wlen, nullptr);
             }
         }
     }
-
-    // fontObj 详细信息
-    if (fontObj) {
-        uint32_t vtable = *(uint32_t*)fontObj;
-        LogWrite("[FontDiag] fontObj vtable = 0x%08X\n", vtable);
-        char nameBuf[65] = {0};
-        if (ReadRttiName(fontObj, nameBuf, sizeof(nameBuf))) {
-            LogWrite("[FontDiag] fontObj RTTI name = %s\n", nameBuf);
-        } else {
-            LogWrite("[FontDiag] (fontObj RTTI read failed)\n");
-        }
-        // 检查是否是已知的字体 vtable
-        if (vtable == VTABLE_CYFONT) {
-            LogWrite("[FontDiag] -> CYFont (base class, 英文字体)\n");
-        } else if (vtable == VTABLE_CYFONTPIXELMAP) {
-            LogWrite("[FontDiag] -> CYFontPixelmap (CJK 字体!)\n");
-        }
-        // 前 64 字节 hex dump
-        LogWrite("[FontDiag] fontObj bytes: ");
-        for (int i = 0; i < 64; i++) {
-            fprintf(g_logFile, "%02X ", ((uint8_t*)fontObj)[i]);
-        }
-        fprintf(g_logFile, "\n");
+    
+    // 前景色绘制
+    SetTextColor(hdc, fgColor);
+    ExtTextOutW(hdc, drawX, drawY, ETO_CLIPPED, &clipRect, wstr, wlen, nullptr);
+    
+    // 恢复 DC 状态
+    SelectObject(hdc, oldFont);
+    RestoreDC(hdc, savedState);
+    ReleaseDC(hwnd, hdc);
+    
+    g_gdiDrawCount++;
+    if (g_gdiDrawCount <= 20) {
+        LogWrite("[GDI Draw %d] pos=(%d,%d) clip=[%d,%d,%d,%d] flags=0x%02X fg=%d bg=%d text='%.*ls'\n",
+            g_gdiDrawCount, drawX, drawY,
+            clipRect.left, clipRect.top, clipRect.right, clipRect.bottom,
+            flags, fgColorIdx, bgColorIdx,
+            (wlen < 30 ? wlen : 30), wstr);
     }
-
-    // 扫描 CJK 字体
-    ScanForCjkFont();
-
-    LogWrite("[FontDiag] === END FONT DIAGNOSTICS ===\n\n");
-    fflush(g_logFile);
+    
+    return true;
 }
 
 // ===================== Hook sub_66E7B0 =====================
 int __fastcall Hooked_66E7B0(int ecx_this, int edx_unused, int a2, int a3, int a4) {
     g_callCount++;
-
-    // 字体诊断 (仅首次)
-    FontDiag(ecx_this);
 
     // 读取完整字符串
     std::string enText;
@@ -448,44 +491,23 @@ int __fastcall Hooked_66E7B0(int ecx_this, int edx_unused, int a2, int a3, int a
             g_hitCount, enText.substr(0, 60).c_str(), entry.cnWcharCount);
     }
 
-    // 构造临时 inline wide StrObj
-    uint8_t* edi = (uint8_t*)ecx_this;
-
-    uint32_t origThis0 = *(uint32_t*)edi;
-    uint32_t origThis4 = *(uint32_t*)(edi + 4);
-    uint32_t origThis8 = *(uint32_t*)(edi + 8);
-
-    // 如果找到 CJK 字体, 同时替换字体对象 (this+0x28)
-    uint32_t origFontObj = 0;
-    bool fontReplaced = false;
-    if (g_cjkFontObj) {
-        origFontObj = *(uint32_t*)(edi + 0x28);
-        if (origFontObj != g_cjkFontObj) {
-            *(uint32_t*)(edi + 0x28) = g_cjkFontObj;
-            fontReplaced = true;
-            if (g_hitCount <= 10) {
-                LogWrite("  [FontRepl] 0x%08X -> 0x%08X\n", origFontObj, g_cjkFontObj);
-            }
+    // 用 GDI 直接绘制中文, 跳过原函数
+    const wchar_t* wstr = (const wchar_t*)entry.cnUtf16LE.data();
+    int wlen = entry.cnWcharCount;
+    
+    bool drawn = GdiDrawText(ecx_this, a2, a3, wstr, wlen);
+    if (!drawn) {
+        // GDI 绘制失败, 回退到原函数 (会显示空白, 但不会崩溃)
+        if (g_gdiFailCount <= 5) {
+            LogWrite("[GDI] Draw failed, falling back to original (will be blank)\n");
         }
+        return g_orig66E7B0(ecx_this, edx_unused, a2, a3, a4);
     }
-
-    *(uint32_t*)edi = 0;
-    *(uint32_t*)(edi + 4) = (uint32_t)(uintptr_t)entry.cnUtf16LE.data();
-    *(uint32_t*)(edi + 8) = 1;
 
     g_replacedCount++;
-
-    int result = g_orig66E7B0(ecx_this, edx_unused, a2, a3, a4);
-
-    // 还原 this
-    *(uint32_t*)edi = origThis0;
-    *(uint32_t*)(edi + 4) = origThis4;
-    *(uint32_t*)(edi + 8) = origThis8;
-    if (fontReplaced) {
-        *(uint32_t*)(edi + 0x28) = origFontObj;
-    }
-
-    return result;
+    
+    // 返回字符数 (原函数返回 v15 = 字符索引)
+    return wlen;
 }
 
 // ===================== Hook 安装 =====================
@@ -547,10 +569,10 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
 
         g_logFile = fopen(logPath, "w");
         if (g_logFile) {
-            fprintf(g_logFile, "[MajestyHD Runtime Localization v9.2 CJK字体扫描] DllMain ATTACH\n");
+            fprintf(g_logFile, "[MajestyHD Runtime Localization v10.0 GDI Direct Rendering] DllMain ATTACH\n");
             fprintf(g_logFile, "  Exe path: %s\n", path);
             fprintf(g_logFile, "  Log path: %s\n", logPath);
-            fprintf(g_logFile, "  Strategy: hook sub_66E7B0 + font scan + font replace\n\n");
+            fprintf(g_logFile, "  Strategy: hook sub_66E7B0 + GDI ExtTextOutW for CJK\n\n");
             fflush(g_logFile);
         }
 
@@ -569,6 +591,9 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
             LogWrite("[ERROR] Failed to load dict from %s\n", dictPath);
         }
 
+        // 初始化 GDI 字体
+        InitGdiFonts();
+
         if (InstallHooks()) {
             LogWrite("\n[Init] Hook installed successfully\n");
         } else {
@@ -579,12 +604,16 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
 
     } else if (dwReason == DLL_PROCESS_DETACH) {
         if (g_logFile) {
-            fprintf(g_logFile, "\n[DllMain] DETACH (v9.2)\n");
+            fprintf(g_logFile, "\n[DllMain] DETACH (v10.0)\n");
             fprintf(g_logFile, "  Calls=%d Replaced=%d Hits=%d Misses=%d\n",
                 g_callCount, g_replacedCount, g_hitCount, g_missCount);
+            fprintf(g_logFile, "  GDI Draws=%d GDI Fails=%d\n",
+                g_gdiDrawCount, g_gdiFailCount);
             fclose(g_logFile);
             g_logFile = nullptr;
         }
+        if (g_cjkFont) { DeleteObject(g_cjkFont); g_cjkFont = nullptr; }
+        if (g_cjkFontBold) { DeleteObject(g_cjkFontBold); g_cjkFontBold = nullptr; }
     }
     return TRUE;
 }
