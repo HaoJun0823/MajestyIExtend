@@ -1,14 +1,19 @@
-﻿// dllmain.cpp : Majesty HD Runtime Localization v14.1 (Dirty Rect Diagnosis)
+﻿// dllmain.cpp : Majesty HD Runtime Localization v15.0 (BG LRU Erase)
 //
-// v14.1: v14.0 全屏脏矩形方案仍重影 -> 增加三处诊断，定案根因
-//   (a) DirectBlitText 提交 sub_673FB0 前后各读 [mgr+layer*4+0x34]，打印 delta
-//       期望 delta==1（提交被入队）。delta==0 = 提交被丢弃/图层错/坐标系错。
-//   (b) hook sub_5D7720 入口（cdecl 5 参），数每帧调用次数
-//       期望 DirectBlit 提交后 sub_5D7720 至少多调一次。=0 = 引擎消费链路没工作。
-//   (c) 打印 sub_5D7720 入口 arg1 vs [0x7CA9E8]（DirectBlit 设备）
-//       不一致 = 设备/surface 错位，引擎合成对象与 DirectBlit 设备不是同一个。
-//   每 1 秒汇总一行日志；DETACH 打印总账。
-//   修复不在这版做——这版只采集证据。
+// v14.1 诊断定案: 全屏脏矩形思路走不通。
+//   日志铁证: submitZero=94%(提交几乎全被合并丢弃) + compose 105/s 但 DirectBlit
+//   的字不在引擎重绘源里 → 让引擎"全屏重绘来擦旧字"在原理上不可能成功。
+//   用户截图: 文字随单位/相机移动时, 旧位置像素残留 = 拖影; 等距栅格下呈斜向。
+//
+// v15.0 方案 C(治标证实思路): DirectBlit 内部闭环擦除, 完全绕开引擎。
+//   画字前: 将 clip 区域背景 memcpy 缓存到堆(key=精确位置)
+//           → 若同位置画过(上一帧), 先把缓存背景写回 pixelBuf(擦掉旧字)
+//           → 再把当前(已擦)背景重新缓存, 然后才画新字
+//   移走的位置: LRU 过期(约 2 帧未更新)后, 在后续 DirectBlit 时把缓存背景写回
+//            → 补擦残留拖影
+//   预期: 任何时刻 front surface 上的文字 = 最新一帧, 拖影被背景恢复覆盖。
+//   风险: 若引擎在 DirectBlit 后重画同一区域, 恢复会闪 1 帧 — 跑一局验证。
+//   v14.1 诊断代码保留(对照)。修复不依赖引擎脏矩形(sub_673FB0/sub_454500)。
 
 #include "pch.h"
 #include <psapi.h>
@@ -844,6 +849,148 @@ static bool GetRenderDevInfo(int a4, RenderDevInfo& info) {
     return true;
 }
 
+// ===================== v15.0: 旧字背景 LRU 擦除 =====================
+// 原理: DirectBlit 直写 front surface, 引擎(合成/脏矩形)不会重绘该区域 → 旧字残留。
+// 做法: 画字前把整块 clip 区域背景缓存到堆(key=精确位置); 同位置再画时
+//       先写回缓存背景(擦旧字) 再重存当前(干净)背景 然后画新字;
+//       移走的位置由过期 slot 恢复补擦(LRU, 约 2 帧未更新即恢复释放)。
+#define V15_SLOTS 1024
+#define V15_MAX_BUF (192 * 1024)
+#define V15_EXPIRE_TICKS 48   // ~2 帧(每帧 ~20 blit)。移走后 2 帧内补擦
+#define V15_SCAN_INTERVAL 8   // 每 8 次 blit 扫一轮过期
+
+struct V15Slot {
+    int l, t, r, b;       // 缓存矩形(已按 clip 归一)
+    int rowBytes;         // 一行字节数 = w*bppB
+    int bppB;             // bytes per pixel
+    int lastTick;
+    uint8_t* buf;
+};
+static V15Slot g_v15[V15_SLOTS];
+static int  g_v15Tick = 0;
+static int  g_v15Scan = 0;
+static int  g_v15Hits = 0;     // 恢复命中(擦旧字)
+static int  g_v15New = 0;      // 新建缓存
+static int  g_v15Clean = 0;    // 过期补擦
+static int  g_v15Skip = 0;     // 超尺寸/无内存跳过
+static int  g_v15Full = 0;     // slot 满
+static int  g_v15OOR = 0;      // 区域越界 clamp 计数
+
+// 把 slot 缓存背景写回 pixelBuf 的 clip 可见部分(擦旧字)。行级 clamp 防越界。
+static void V15WriteBack(const V15Slot& s, const RenderDevInfo& rdi) {
+    uint8_t* px = (uint8_t*)rdi.pixelBuf;
+    int h = s.b - s.t;
+    for (int yy = 0; yy < h; yy++) {
+        int dy = s.t + yy;
+        if (dy < 0 || dy >= (int)rdi.height) continue;
+        // 仅恢复设备可见行
+        if (dy < (int)rdi.clipT || dy >= (int)rdi.clipB) continue;
+        int x0 = s.l, x1 = s.r;
+        if (x0 < (int)rdi.clipL) x0 = rdi.clipL;
+        if (x1 > (int)rdi.clipR) x1 = rdi.clipR;
+        if (x0 < 0) x0 = 0;
+        if (x1 > (int)rdi.width) x1 = rdi.width;
+        if (x1 <= x0) continue;
+        memcpy(px + dy * rdi.stride + x0 * s.bppB,
+               s.buf + (size_t)yy * s.rowBytes + (size_t)(x0 - s.l) * s.bppB,
+               (size_t)(x1 - x0) * s.bppB);
+    }
+}
+
+// 把 pixelBuf 的 clip 区域背景保存进 slot.buf(全矩形宽, 含不可见列)
+static bool V15Capture(V15Slot& s, const RenderDevInfo& rdi) {
+    uint8_t* px = (uint8_t*)rdi.pixelBuf;
+    int h = s.b - s.t, w = s.r - s.l;
+    s.rowBytes = w * s.bppB;
+    for (int yy = 0; yy < h; yy++) {
+        int dy = s.t + yy;
+        uint8_t* dstRow = s.buf + (size_t)yy * s.rowBytes;
+        if (dy < 0 || dy >= (int)rdi.height) { memset(dstRow, 0, s.rowBytes); continue; }
+        // 行内 x 区间裁剪(避免越界), 区间外填 0
+        int x0 = s.l, x1 = s.r;
+        if (x0 < 0) x0 = 0;
+        if (x1 > (int)rdi.width) x1 = rdi.width;
+        if (x0 < s.l) memset(dstRow, 0, (size_t)(x0 - s.l) * s.bppB);
+        if (x1 < s.r) memset(dstRow + (size_t)(x1 - s.l) * s.bppB, 0, (size_t)(s.r - x1) * s.bppB);
+        if (x1 > x0) {
+            memcpy(dstRow + (size_t)(x0 - s.l) * s.bppB,
+                   px + dy * rdi.stride + (size_t)x0 * s.bppB,
+                   (size_t)(x1 - x0) * s.bppB);
+        }
+    }
+    return true;
+}
+
+// 过期扫描: 把超过 V15_EXPIRE_TICKS 未更新的 slot 恢复(擦掉移走残留)并释放
+static void V15Expire(const RenderDevInfo& rdi) {
+    for (int i = 0; i < V15_SLOTS; i++) {
+        V15Slot& s = g_v15[i];
+        if (!s.buf) continue;
+        if (g_v15Tick - s.lastTick <= V15_EXPIRE_TICKS) continue;
+        __try {
+            V15WriteBack(s, rdi);
+        } __except (EXCEPTION_EXECUTE_HANDLER) {}
+        free(s.buf);
+        s.buf = nullptr;
+        g_v15Clean++;
+    }
+}
+
+// 主入口: restore(命中→擦旧字) + capture(重存干净背景)。必须在画字前调用。
+static void V15EraseOldText(int l, int t, int r, int b, const RenderDevInfo& rdi) {
+    if (r <= l || b <= t) return;
+    if (!rdi.pixelBuf || !rdi.stride) return;
+    int bppB = (int)(rdi.bpp / 8);
+    if (bppB < 1 || bppB > 4) return;
+    int w = r - l, h = b - t;
+    if (w <= 0 || h <= 0) return;
+    if ((size_t)w * h * bppB > V15_MAX_BUF) { g_v15Skip++; return; }
+
+    g_v15Tick++;
+    g_v15Scan++;
+    if ((g_v15Scan & (V15_SCAN_INTERVAL - 1)) == 0) {
+        __try { V15Expire(rdi); } __except (EXCEPTION_EXECUTE_HANDLER) {}
+    }
+
+    // 1) 查找精确匹配位置 → 命中则先写回背景(擦旧字), 再重存干净背景
+    for (int i = 0; i < V15_SLOTS; i++) {
+        V15Slot& s = g_v15[i];
+        if (!s.buf) continue;
+        if (s.l != l || s.t != t || s.r != r || s.b != b) continue;
+        __try {
+            V15WriteBack(s, rdi);          // 擦旧字
+            V15Capture(s, rdi);            // 重存当前(干净)背景
+        } __except (EXCEPTION_EXECUTE_HANDLER) {}
+        s.lastTick = g_v15Tick;
+        g_v15Hits++;
+        return;
+    }
+
+    // 2) 未命中 → 找空 slot 新建缓存(保存当前背景)
+    int freeIdx = -1;
+    for (int i = 0; i < V15_SLOTS; i++) {
+        if (!g_v15[i].buf) { freeIdx = i; break; }
+    }
+    if (freeIdx < 0) { g_v15Full++; return; }
+    V15Slot& s = g_v15[freeIdx];
+    memset(&s, 0, sizeof(s));
+    s.buf = (uint8_t*)malloc((size_t)w * h * bppB);
+    if (!s.buf) { g_v15Skip++; return; }
+    s.l = l; s.t = t; s.r = r; s.b = b;
+    s.bppB = bppB;
+    s.rowBytes = w * bppB;
+    s.lastTick = g_v15Tick;
+    bool ok = false;
+    __try { ok = V15Capture(s, rdi); } __except (EXCEPTION_EXECUTE_HANDLER) { ok = false; }
+    if (!ok) {
+        free(s.buf);
+        s.buf = nullptr;
+        g_v15Skip++;
+        return;
+    }
+    g_v15New++;
+}
+
 // ===================== RGB565 颜色编码 =====================
 static uint16_t RGB565(uint8_t r, uint8_t g, uint8_t b) {
     return (uint16_t)(((r >> 3) << 11) | ((g >> 2) << 5) | (b >> 3));
@@ -1197,6 +1344,21 @@ static bool DirectBlitText(int thisPtr, int a2, int a3, int a4,
         } else {
             g_dirtyMgrNull++;
         }
+    }
+
+    // ★ v15.0 方案 C: 画字前擦除同位置旧字 + 缓存干净背景
+    //   顺序: V15EraseOldText(恢复同位置背景→擦旧字) 必须先于任何画像素
+    {
+        // 用文本实际落地区域(与画字裁剪一致), 略外扩描边余量
+        int eL = clipL, eT = clipT, eR = clipR, eB = clipB;
+        int ow = outlined ? (g_cfg.outlineWidth > 0 ? g_cfg.outlineWidth : 1) : 0;
+        if (eL - ow > 0) eL -= ow;
+        if (eT - ow > 0) eT -= ow;
+        if (eR + ow < (int)rdi.width) eR += ow;
+        if (eB + ow < (int)rdi.height) eB += ow;
+        // 注意: 这里不能包 __try(DirectBlitText 有 std::vector 需对象展开 → C2712)
+        //       V15EraseOldText 内部已有 __try 保护
+        V15EraseOldText(eL, eT, eR, eB, rdi);
     }
 
     // ★ 渲染：使用换行位置逐行绘制
@@ -1565,7 +1727,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
         g_hitLogFile = fopen(hitLogPath, "w");
         g_rollbackLogFile = fopen(rollbackLogPath, "w");
         if (g_logFile) {
-            fprintf(g_logFile, "[MajestyHD Runtime Localization v14.1 Dirty Rect Diagnosis] DllMain ATTACH\n");
+            fprintf(g_logFile, "[MajestyHD Runtime Localization v15.0 BG-LRU Erase] DllMain ATTACH\n");
             fprintf(g_logFile, "  Exe path: %s\n", path);
             fprintf(g_logFile, "  Log path: %s\n", logPath);
             fprintf(g_logFile, "  Miss log: %s\n", missLogPath);
@@ -1628,7 +1790,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
         fflush(g_logFile);
     } else if (dwReason == DLL_PROCESS_DETACH) {
         if (g_logFile) {
-            fprintf(g_logFile, "\n[DllMain] DETACH (v14.1)\n");
+            fprintf(g_logFile, "\n[DllMain] DETACH (v15.0)\n");
             fprintf(g_logFile, "  Calls=%d Replaced=%d Hits=%d (unique=%d) Rollback=%d (unique=%d) Misses=%d (unique=%d)\n",
                 g_callCount, g_replacedCount, g_hitCount, (int)g_hitSeen.size(),
                 g_rollbackHitCount, (int)g_rollbackSeen.size(),
@@ -1641,6 +1803,9 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
             fprintf(g_logFile, "  SubmitDelta: ok=%d zero=%d weird=%d  DirtyMgr: nonNull=%d null=%d\n",
                 g_dirtyDeltaOK, g_dirtyDeltaZero, g_dirtyDeltaWeird,
                 g_dirtyMgrNonNull, g_dirtyMgrNull);
+            // v15.0 总账
+            fprintf(g_logFile, "  BG-LRU(v15): hits=%d new=%d clean=%d skip=%d full=%d oor=%d\n",
+                g_v15Hits, g_v15New, g_v15Clean, g_v15Skip, g_v15Full, g_v15OOR);
             fclose(g_logFile);
             g_logFile = nullptr;
         }
