@@ -843,6 +843,50 @@ static uint16_t RGB565(uint8_t r, uint8_t g, uint8_t b) {
     return (uint16_t)(((r >> 3) << 11) | ((g >> 2) << 5) | (b >> 3));
 }
 
+// ===================== 背景保存/恢复 (残影修复) =====================
+// 独立 C 函数，避免 C++ 对象展开与 __try 冲突
+
+static void SafeSavePixels(uint32_t pixelBuf, int width, int height, int stride,
+    int bpp, int sx, int sy, int sw, int sh, uint8_t* dst) {
+    __try {
+        int bppb = bpp / 8;
+        int rowSize = sw * bppb;
+        uint8_t* base = (uint8_t*)pixelBuf;
+        for (int y = sy; y < sy + sh; y++) {
+            if (y < 0 || y >= height) { dst += rowSize; continue; }
+            int cs = sx > 0 ? sx : 0;
+            int ce = (sx + sw) < width ? (sx + sw) : width;
+            if (cs < ce)
+                memcpy(dst + (cs - sx) * bppb, base + y * stride + cs * bppb, (ce - cs) * bppb);
+            dst += rowSize;
+        }
+    } __except (EXCEPTION_EXECUTE_HANDLER) {}
+}
+
+static void SafeRestorePixels(uint32_t pixelBuf, int width, int height, int stride,
+    int bpp, int dx, int dy, int dw, int dh, const uint8_t* src) {
+    __try {
+        int bppb = bpp / 8;
+        int rowSize = dw * bppb;
+        uint8_t* base = (uint8_t*)pixelBuf;
+        for (int y = dy; y < dy + dh; y++) {
+            if (y < 0 || y >= height) { src += rowSize; continue; }
+            int cs = dx > 0 ? dx : 0;
+            int ce = (dx + dw) < width ? (dx + dw) : width;
+            if (cs < ce)
+                memcpy(base + y * stride + cs * bppb, src + (cs - dx) * bppb, (ce - cs) * bppb);
+            src += rowSize;
+        }
+    } __except (EXCEPTION_EXECUTE_HANDLER) {}
+}
+
+struct SavedBg {
+    uint32_t pixelBuf = 0;
+    int x = 0, y = 0, w = 0, h = 0;
+    std::vector<uint8_t> pixels;
+};
+static std::unordered_map<int, SavedBg> g_savedBg;
+
 // ===================== 直接像素缓冲区渲染 =====================
 static bool DirectBlitText(int thisPtr, int a2, int a3, int a4,
                            const wchar_t* wstr, int wlen) {
@@ -1035,6 +1079,42 @@ static bool DirectBlitText(int thisPtr, int a2, int a3, int a4,
             flags, fgColor, bgColor, rdi.bpp,
             g_cfg.renderMode ? "GRAY8" : "BITMAP",
             useAlpha ? "alpha" : "direct");
+    }
+
+    // ★ 残影修复：在渲染文字前，先恢复旧位置像素，再保存当前位置像素
+    // 这解决了移动单位文字残影问题：旧位置字形被恢复的原地形像素覆盖
+    {
+        int bgX = clipL;
+        int bgY = clipT;
+        int bgW = clipR - clipL;
+        int bgH = clipB - clipT;
+
+        // 1. 恢复上一帧保存的像素（擦除旧位置文字残影）
+        auto it = g_savedBg.find(thisPtr);
+        if (it != g_savedBg.end() && it->second.pixelBuf == rdi.pixelBuf) {
+            SavedBg& old = it->second;
+            if (old.w > 0 && old.h > 0 && old.pixels.size() > 0) {
+                SafeRestorePixels(rdi.pixelBuf, (int)rdi.width, (int)rdi.height,
+                    (int)rdi.stride, (int)rdi.bpp,
+                    old.x, old.y, old.w, old.h, old.pixels.data());
+            }
+        }
+
+        // 2. 保存当前位置的像素（纯地形，未被文字覆盖）
+        if (bgW > 0 && bgH > 0) {
+            int bppb = (int)rdi.bpp / 8;
+            SavedBg bg;
+            bg.pixelBuf = rdi.pixelBuf;
+            bg.x = bgX;
+            bg.y = bgY;
+            bg.w = bgW;
+            bg.h = bgH;
+            bg.pixels.resize((size_t)bgW * bgH * bppb);
+            SafeSavePixels(rdi.pixelBuf, (int)rdi.width, (int)rdi.height,
+                (int)rdi.stride, (int)rdi.bpp,
+                bgX, bgY, bgW, bgH, bg.pixels.data());
+            g_savedBg[thisPtr] = std::move(bg);
+        }
     }
 
     // ★ 渲染：使用换行位置逐行绘制
