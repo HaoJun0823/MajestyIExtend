@@ -314,19 +314,35 @@ static bool LoadDict(const char* path) {
 }
 
 // ===================== 内存管理 =====================
-// v6: 改用 malloc 分配, 与游戏 CRT 堆一致
-// sub_628350 (StrObj 赋值) 会 free 目标的旧 data 指针:
-//   wide:  free(data - 2)   — data-2 处是 0xFEFF BOM 哨兵
-//   narrow: free(data)
-// 所以 wide 的 malloc 布局: [0xFF 0xFE] [wide string] [0x00 0x00]
-//   data 指针 = malloc_base + 2 (跳过 BOM)
-//   free(data - 2) = free(malloc_base) ✓
+// v6.2: 改用游戏 CRT (MSVCR90.dll) 的 malloc/free
+// 游戏 exe 链接 MSVCR90.dll 的 malloc/free (IAT 地址 0x735440/0x73543C)
+// 我们的 DLL 用 VS2017 UCRT 的 malloc/free, 堆管理器不同
+// 游戏用 MSVCR90 free() 释放我们 UCRT malloc() 分配的指针 → 堆损坏 → 死循环
+// 修复: 运行时从 MSVCR90.dll 获取 malloc/free 函数指针
+
+// 游戏的 CRT malloc/free 函数指针
+typedef void* (*CrtMalloc_t)(size_t);
+typedef void (*CrtFree_t)(void*);
+static CrtMalloc_t g_crtMalloc = nullptr;
+static CrtFree_t g_crtFree = nullptr;
 
 static void InitPool() {
-    // 不再使用 pool, 但保留空函数避免改 DllMain
+    // 从 MSVCR90.dll 获取游戏使用的 malloc/free
+    HMODULE hMsvcr = GetModuleHandleA("MSVCR90.dll");
+    if (!hMsvcr) {
+        // 尝试加载
+        hMsvcr = LoadLibraryA("MSVCR90.dll");
+    }
+    if (hMsvcr) {
+        g_crtMalloc = (CrtMalloc_t)GetProcAddress(hMsvcr, "malloc");
+        g_crtFree = (CrtFree_t)GetProcAddress(hMsvcr, "free");
+        LogWrite("[CRT] MSVCR90.dll loaded: malloc=%p free=%p\n", g_crtMalloc, g_crtFree);
+    } else {
+        LogWrite("[CRT] ERROR: MSVCR90.dll not found! Falling back to UCRT malloc/free\n");
+    }
 }
 
-// 用 malloc 分配 wide StrObj
+// 用游戏 CRT 的 malloc 分配 wide StrObj
 // 内存布局: [BOM 0xFFFE] [wide data] [null term 0x0000]
 // data 指针指向 BOM 之后的位置 (与游戏原生 wide StrObj 一致)
 static StrObj* MakeWideStrObj(const wchar_t* wstr, int wlen) {
@@ -336,7 +352,8 @@ static StrObj* MakeWideStrObj(const wchar_t* wstr, int wlen) {
 
     // 分配数据区: BOM(2) + wide data + null term(2)
     int dataAllocSize = 2 + wideBytes + 2;
-    uint8_t* dataBase = (uint8_t*)malloc(dataAllocSize);
+    CrtMalloc_t pMalloc = g_crtMalloc ? g_crtMalloc : malloc;
+    uint8_t* dataBase = (uint8_t*)pMalloc(dataAllocSize);
     if (!dataBase) {
         LogWrite("[ERROR] malloc failed for wide data (wlen=%d)\n", wlen);
         return nullptr;
@@ -355,10 +372,10 @@ static StrObj* MakeWideStrObj(const wchar_t* wstr, int wlen) {
     // 写 null terminator
     *((wchar_t*)(dataPtr + wideBytes)) = 0;
 
-    // 分配 StrObj 结构本身 (也用 malloc, 让游戏可以 free)
-    StrObj* obj = (StrObj*)malloc(sizeof(StrObj));
+    // 分配 StrObj 结构本身 (也用游戏 CRT malloc, 让游戏可以 free)
+    StrObj* obj = (StrObj*)pMalloc(sizeof(StrObj));
     if (!obj) {
-        free(dataBase);
+        if (g_crtFree) g_crtFree(dataBase); else free(dataBase);
         LogWrite("[ERROR] malloc failed for StrObj\n");
         return nullptr;
     }
@@ -723,12 +740,13 @@ int __stdcall Hooked_521A60(int a1, int a2, int a3) {
         obj->meta = translated->meta;
         obj->extra = translated->extra;
 
-        // 释放旧 data (由游戏 sub_628350 分配, 用同一 CRT 堆, free 安全)
+        // 释放旧 data (由游戏 sub_628350 分配, 用游戏 CRT free)
         if (oldData && oldLen > 0) {
+            CrtFree_t pFree = g_crtFree ? g_crtFree : free;
             if (oldIsWide) {
-                free((uint8_t*)oldData - 2);
+                pFree((uint8_t*)oldData - 2);
             } else {
-                free(oldData);
+                pFree(oldData);
             }
         }
 
