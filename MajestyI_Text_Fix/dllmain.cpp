@@ -1,9 +1,10 @@
-﻿// dllmain.cpp : Majesty HD Runtime Localization v13.0 (Dirty Rect)
+﻿// dllmain.cpp : Majesty HD Runtime Localization v14.0 (Full-Screen Dirty Rect)
 //
-// v13.0: 脏矩形方案修复残影
-//   移除废弃的 save/restore 像素方案
-//   在 DirectBlitText 中检测文字位置变化，将旧位置提交到游戏脏矩形系统
-//   游戏地形渲染器在同一帧自动重绘旧位置，覆盖残影
+// v14.0: 全屏脏矩形方案修复残影
+//   在 DirectBlitText 每次文字渲染时，调用 sub_673FB0 把整个可见区域标记为脏矩形
+//   游戏同帧在 sub_454500 中读取脏矩形列表并调用 sub_5D7720 全屏重绘，覆盖残影
+//   sub_673FB0 内部自动做: 可见性检查 -> 屏幕->世界坐标转换 -> sub_673680 提交
+//   废弃 v13.0 局部脏矩形方案（坐标空间不匹配: 直接调 sub_673680 传屏幕坐标无效）
 
 #include "pch.h"
 #include <psapi.h>
@@ -28,9 +29,9 @@ static constexpr uintptr_t ADDR_7CA9E4  = 0x007CA9E4;
 static constexpr uintptr_t EXPECTED_VT  = 0x00741CAC;
 
 // 脏矩形系统地址
-static constexpr uintptr_t ADDR_DIRTY_MGR  = 0x007C12FC;  // dword_7C12FC: 脏矩形管理器
-static constexpr uintptr_t ADDR_LAYER_IDX  = 0x007C5228;  // dword_7C5228: 当前图层索引
-static constexpr uintptr_t ADDR_ADD_DIRTY  = 0x00673680;  // sub_673680: 添加脏矩形
+static constexpr uintptr_t ADDR_DIRTY_MGR    = 0x007C12FC;  // dword_7C12FC: 脏矩形管理器
+static constexpr uintptr_t ADDR_LAYER_IDX    = 0x007C5228;  // dword_7C5228: 当前图层索引
+static constexpr uintptr_t ADDR_SUBMIT_DIRTY = 0x00673FB0;  // sub_673FB0: 提交脏矩形(带可见性检查+坐标转换)
 
 // CYOffportIMP 字段偏移
 static constexpr uint32_t OFF_PIXELBUF  = 16;
@@ -845,25 +846,22 @@ static uint16_t RGB565(uint8_t r, uint8_t g, uint8_t b) {
 }
 
 // ===================== 脏矩形系统 =====================
-// sub_673680: __thiscall char sub_673680(int *this, int *rect, int layerIdx)
+// sub_673FB0: __thiscall char sub_673FB0(int *this, int *rect, int layerIdx)
 // this = 脏矩形管理器 (dword_7C12FC)
 // rect = 指向 {left, top, right, bottom} 的指针 (屏幕坐标)
 // layerIdx = 图层索引 (dword_7C5228)
-typedef char (__thiscall *AddDirtyRect_t)(int thisPtr, int* rect, int layerIdx);
-static AddDirtyRect_t g_addDirtyRect = (AddDirtyRect_t)ADDR_ADD_DIRTY;
+// 内部自动做: 可见性检查(与视图边界相交) -> 屏幕->世界坐标转换 -> sub_673680 提交
+typedef char (__thiscall *SubmitDirtyRect_t)(int thisPtr, int* rect, int layerIdx);
+static SubmitDirtyRect_t g_submitDirty = (SubmitDirtyRect_t)ADDR_SUBMIT_DIRTY;
 
-// 旧文字位置跟踪（用于检测移动并标记脏矩形）
-struct OldTextPos {
-    int l, t, r, b;       // 屏幕坐标
-    uint32_t pixelBuf;     // 渲染表面（用于验证一致性）
-};
-static std::unordered_map<int, OldTextPos> g_oldTextPos;
+// 全屏脏矩形提交计数（用于日志统计）
 static int g_dirtyRectCount = 0;
 
 // 独立 C 函数包装 __try（避免 C++ 对象展开冲突）
-static void SafeAddDirtyRect(uint32_t dirtyMgr, int* rect, int layerIdx) {
+static void SafeSubmitFullscreenDirty(uint32_t dirtyMgr, int width, int height, int layerIdx) {
+    int rect[4] = { 0, 0, width, height };  // 整个可见区域 (屏幕坐标)
     __try {
-        g_addDirtyRect((int)dirtyMgr, rect, layerIdx);
+        g_submitDirty((int)dirtyMgr, rect, layerIdx);
         g_dirtyRectCount++;
     } __except (EXCEPTION_EXECUTE_HANDLER) {}
 }
@@ -1062,43 +1060,18 @@ static bool DirectBlitText(int thisPtr, int a2, int a3, int a4,
             useAlpha ? "alpha" : "direct");
     }
 
-    // ★ 残影修复 (v13.0): 脏矩形方案
-    // 检测文字位置变化，将旧位置提交到游戏脏矩形系统
-    // 游戏的地形渲染器会在同一帧内重绘该区域，覆盖旧位置的文字残影
+    // ★ 残影修复 (v14.0): 全屏脏矩形方案
+    // 每次文字渲染时，调用 sub_673FB0 把整个可见区域标记为脏矩形
+    // 游戏同帧在 sub_454500 中读取脏矩形列表并调用 sub_5D7720 全屏重绘，覆盖残影
+    // sub_673FB0 内部自动做可见性检查 + 屏幕->世界坐标转换（v13.0 直接调 sub_673680
+    // 传屏幕坐标导致坐标空间不匹配，残影无法覆盖 —— 本次已修复）
     {
-        int newL = clipL, newT = clipT, newR = clipR, newB = clipB;
-
-        auto it = g_oldTextPos.find(thisPtr);
-        if (it != g_oldTextPos.end() && it->second.pixelBuf == rdi.pixelBuf) {
-            OldTextPos& old = it->second;
-            // 只有位置变化时才标记脏矩形
-            // (位置没变=文字没移动，旧位置不需要重绘)
-            if (old.l != newL || old.t != newT || old.r != newR || old.b != newB) {
-                uint32_t dirtyMgr = 0;
-                int layerIdx = 0;
-                if (SafeRead32(ADDR_DIRTY_MGR, &dirtyMgr) && dirtyMgr &&
-                    SafeRead32(ADDR_LAYER_IDX, (uint32_t*)&layerIdx)) {
-                    // 扩展边界以覆盖描边/抗锯齿溢出
-                    int margin = g_cfg.enableOutline ? (g_cfg.outlineWidth + 2) : 2;
-                    int rect[4] = {
-                        old.l - margin,
-                        old.t - margin,
-                        old.r + margin,
-                        old.b + margin
-                    };
-                    SafeAddDirtyRect(dirtyMgr, rect, layerIdx);
-                }
-            }
+        uint32_t dirtyMgr = 0;
+        int layerIdx = 0;
+        if (SafeRead32(ADDR_DIRTY_MGR, &dirtyMgr) && dirtyMgr &&
+            SafeRead32(ADDR_LAYER_IDX, (uint32_t*)&layerIdx)) {
+            SafeSubmitFullscreenDirty(dirtyMgr, (int)rdi.width, (int)rdi.height, layerIdx);
         }
-
-        // 保存当前位置供下一帧比较
-        OldTextPos pos;
-        pos.l = newL;
-        pos.t = newT;
-        pos.r = newR;
-        pos.b = newB;
-        pos.pixelBuf = rdi.pixelBuf;
-        g_oldTextPos[thisPtr] = pos;
     }
 
     // ★ 渲染：使用换行位置逐行绘制
@@ -1452,7 +1425,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
         g_hitLogFile = fopen(hitLogPath, "w");
         g_rollbackLogFile = fopen(rollbackLogPath, "w");
         if (g_logFile) {
-            fprintf(g_logFile, "[MajestyHD Runtime Localization v13.0 Dirty Rect] DllMain ATTACH\n");
+            fprintf(g_logFile, "[MajestyHD Runtime Localization v14.0 Full-Screen Dirty] DllMain ATTACH\n");
             fprintf(g_logFile, "  Exe path: %s\n", path);
             fprintf(g_logFile, "  Log path: %s\n", logPath);
             fprintf(g_logFile, "  Miss log: %s\n", missLogPath);
@@ -1515,12 +1488,12 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
         fflush(g_logFile);
     } else if (dwReason == DLL_PROCESS_DETACH) {
         if (g_logFile) {
-            fprintf(g_logFile, "\n[DllMain] DETACH (v13.0)\n");
+            fprintf(g_logFile, "\n[DllMain] DETACH (v14.0)\n");
             fprintf(g_logFile, "  Calls=%d Replaced=%d Hits=%d (unique=%d) Rollback=%d (unique=%d) Misses=%d (unique=%d)\n",
                 g_callCount, g_replacedCount, g_hitCount, (int)g_hitSeen.size(),
                 g_rollbackHitCount, (int)g_rollbackSeen.size(),
                 g_missCount, (int)g_missSeen.size());
-            fprintf(g_logFile, "  Blits=%d BlitFails=%d DirtyRects=%d\n",
+            fprintf(g_logFile, "  Blits=%d BlitFails=%d FullScreenDirty=%d\n",
                 g_blitCount, g_blitFailCount, g_dirtyRectCount);
             fclose(g_logFile);
             g_logFile = nullptr;
