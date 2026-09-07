@@ -1,29 +1,40 @@
-﻿// dllmain.cpp : Majesty HD Runtime Localization v8.0 (翻译替换版)
+﻿// dllmain.cpp : Majesty HD Runtime Localization v9.0 (绘制函数 hook)
 //
-// === 方案 (v8.0) ===
-// 外挂汉化: hook sub_66CA70 渲染核心, a1==0 时替换 this 字符串为中文
+// === 方案 (v9.0) ===
+// 外挂汉化: hook sub_66E7B0 (真正的文本绘制函数), 在入口替换 this 字符串为中文
 //
-// v8.0 翻译替换:
-//   - hook sub_66CA70 入口
+// v8 分析结果:
+//   sub_66CA70 是测量函数, 不是绘制函数 → v8 替换无效 (只改变测量, 不改变绘制)
+//   sub_66E7B0 是真正的文本绘制函数 (0x717 bytes, 15 callers)
+//     - 内部逐字符调用 sub_647420 (实际字符 blit, 调 renderContext->vtable[10])
+//     - 调用 sub_66CA70 (测量) + sub_66C7D0 (推进) + sub_647020 (设位置)
+//     - this 对象的 StrObj 布局与 sub_66CA70 完全相同
+//   sub_647420: 实际字符绘制, 调 renderContext vtable[10](char, x, y, ...)
+//
+// v9.0 策略:
+//   - hook sub_66E7B0 入口 (0x0066E7B0)
 //   - 读取 this 字符串(英文原文)
-//   - 查词典, 命中且 a1==0 时:
-//     构造临时 wide StrObj, 替换 this 的字符串指针
-//     调原函数渲染中文, 渲染后还原 this
-//   - a1!=0 (分片长文本) 暂不替换, 直接调原函数
+//   - 查词典, 命中时:
+//     构造临时 inline wide StrObj, 替换 this 的字符串指针
+//     调原函数绘制中文 (测量+绘制均使用中文), 绘制后还原 this
 //   - 未命中或读取失败: 直接调原函数
+//   - 无 a1==0 过滤 (sub_66E7B0 不分片, 总是绘制完整字符串)
 //
-// sub_66CA70 字符串布局 (反汇编确认):
-//   __thiscall(this, a1=startIdx, a2..a6)  ret 0x18
-//   this(edi):
-//     this[0] 非空 => StrObj*, [0]=data, [4]=meta(低24位长,bit24 wide), [7]&1=wide
-//     this[0]==0   => this[4]=data, this[8]==1?wide:narrow (inline 形式)
-//   esi(a1) = 起始索引: narrow=字节索引, wide=字符索引
-//   逐字符: wide -> mov cx, [ecx+esi*2];  narrow -> movzx cx, [esi+edx]
+// sub_66E7B0 入口字节 (SEH prologue):
+//   6A FF              push -1
+//   68 E8 46 72 00     push offset SEH_66E7B0
+//   64 A1 00 00 00 00  mov eax, fs:0
+//   MinHook 需要 5+ 字节, 取前 7 字节 (2 条指令) 做 trampoline
+//   push -1 和 push offset 均为立即数, 可安全重定位
+//
+// StrObj 布局 (sub_66E7B0 与 sub_66CA70 相同):
+//   this[0] 非空 => StrObj*, [0]=data, [4]=meta(低24位长,bit24 wide), [7]&1=wide
+//   this[0]==0   => this[4]=data, this[8]==1?wide:narrow (inline 形式)
 //
 // 替换策略:
 //   构造 inline wide StrObj: 设 this[0]=0, this[4]=cnData(wchar*), this[8]=1
 //   原函数走 inline wide 路径: cmp [edi+8],1 -> je wide -> mov cx,[ecx+esi*2]
-//   临时数据在 DLL 全局 buffer, 生命周期覆盖渲染调用
+//   临时数据在 DLL 全局 buffer, 生命周期覆盖绘制调用
 //
 // 字典文件: scripts/dict.txt (UTF-8, 格式: 英文\t中文\n)
 
@@ -40,7 +51,7 @@
 #pragma intrinsic(_ReturnAddress)
 
 // ===================== 地址常量 =====================
-static constexpr uintptr_t ADDR_66CA70 = 0x0066CA70;
+static constexpr uintptr_t ADDR_66E7B0 = 0x0066E7B0;
 
 // ===================== 字符串对象 =====================
 struct StrObj {
@@ -59,16 +70,17 @@ static std::unordered_map<std::string, DictEntry> g_dict;
 static int g_dictCount = 0;
 
 // ===================== 原始函数指针 =====================
-typedef int (__fastcall *OrigRender_t)(int ecx_this, int edx_unused, int a1, int a2, int a3, int a4, int a5, int a6);
-static OrigRender_t g_orig66CA70 = nullptr;
+// sub_66E7B0 是 __thiscall(this, a2, a3, a4)
+// 用 __fastcall 捕获 ecx=this, edx 忽略
+typedef int (__fastcall *OrigDraw_t)(int ecx_this, int edx_unused, int a2, int a3, int a4);
+static OrigDraw_t g_orig66E7B0 = nullptr;
 
 // ===================== Debug 日志 =====================
 static FILE* g_logFile = nullptr;
 static int g_callCount = 0;
 static int g_replacedCount = 0;
-static int g_skippedNonZeroIdx = 0;
-static int g_missCount = 0;
 static int g_hitCount = 0;
+static int g_missCount = 0;
 
 static void LogWrite(const char* fmt, ...) {
     if (!g_logFile) return;
@@ -255,15 +267,9 @@ static bool ReadFullString(int thisPtr, std::string& out, int* outCharLen = null
     }
 }
 
-// ===================== Hook sub_66CA70 (翻译替换) =====================
-int __fastcall Hooked_66CA70(int ecx_this, int edx_unused, int a1, int a2, int a3, int a4, int a5, int a6) {
+// ===================== Hook sub_66E7B0 (绘制函数, 翻译替换) =====================
+int __fastcall Hooked_66E7B0(int ecx_this, int edx_unused, int a2, int a3, int a4) {
     g_callCount++;
-
-    // a1 != 0: 分片长文本, 暂不替换
-    if (a1 != 0) {
-        g_skippedNonZeroIdx++;
-        return g_orig66CA70(ecx_this, edx_unused, a1, a2, a3, a4, a5, a6);
-    }
 
     // 读取完整字符串
     std::string enText;
@@ -272,7 +278,7 @@ int __fastcall Hooked_66CA70(int ecx_this, int edx_unused, int a1, int a2, int a
     bool readOk = ReadFullString(ecx_this, enText, &chLen, &wide);
 
     if (!readOk || enText.empty()) {
-        return g_orig66CA70(ecx_this, edx_unused, a1, a2, a3, a4, a5, a6);
+        return g_orig66E7B0(ecx_this, edx_unused, a2, a3, a4);
     }
 
     // 查词典
@@ -280,17 +286,18 @@ int __fastcall Hooked_66CA70(int ecx_this, int edx_unused, int a1, int a2, int a
     if (it == g_dict.end()) {
         // 未命中
         g_missCount++;
-        if (g_missCount <= 40) {
-            LogWrite("[MISS] \"%s\"\n", enText.substr(0, 80).c_str());
+        if (g_missCount <= 60) {
+            LogWrite("[MISS] \"%s\" (wide=%d chLen=%d)\n",
+                enText.substr(0, 80).c_str(), (int)wide, chLen);
         }
-        return g_orig66CA70(ecx_this, edx_unused, a1, a2, a3, a4, a5, a6);
+        return g_orig66E7B0(ecx_this, edx_unused, a2, a3, a4);
     }
 
     // 命中! 替换为中文
     g_hitCount++;
     const DictEntry& entry = it->second;
 
-    if (g_hitCount <= 50) {
+    if (g_hitCount <= 80) {
         LogWrite("[HIT %d] \"%s\" -> cn(wchars=%d)\n",
             g_hitCount, enText.substr(0, 60).c_str(), entry.cnWcharCount);
     }
@@ -311,8 +318,8 @@ int __fastcall Hooked_66CA70(int ecx_this, int edx_unused, int a1, int a2, int a
 
     g_replacedCount++;
 
-    // 调原函数渲染中文
-    int result = g_orig66CA70(ecx_this, edx_unused, a1, a2, a3, a4, a5, a6);
+    // 调原函数绘制中文
+    int result = g_orig66E7B0(ecx_this, edx_unused, a2, a3, a4);
 
     // 还原 this
     *(uint32_t*)edi = origThis0;
@@ -324,10 +331,17 @@ int __fastcall Hooked_66CA70(int ecx_this, int edx_unused, int a1, int a2, int a
 
 // ===================== Hook 安装 =====================
 static bool InstallHooks() {
-    uint8_t* p66CA70 = (uint8_t*)ADDR_66CA70;
+    uint8_t* p66E7B0 = (uint8_t*)ADDR_66E7B0;
 
-    LogWrite("[Verify] sub_66CA70 bytes: %02X %02X %02X %02X %02X\n",
-        p66CA70[0], p66CA70[1], p66CA70[2], p66CA70[3], p66CA70[4]);
+    // 验证入口字节: 应为 6A FF (push -1, SEH prologue)
+    LogWrite("[Verify] sub_66E7B0 bytes: %02X %02X %02X %02X %02X %02X %02X\n",
+        p66E7B0[0], p66E7B0[1], p66E7B0[2], p66E7B0[3], p66E7B0[4], p66E7B0[5], p66E7B0[6]);
+
+    if (p66E7B0[0] != 0x6A || p66E7B0[1] != 0xFF) {
+        LogWrite("[ERROR] sub_66E7B0 byte mismatch: expected 6A FF, got %02X %02X\n",
+            p66E7B0[0], p66E7B0[1]);
+        return false;
+    }
 
     MH_STATUS status = MH_Initialize();
     if (status != MH_OK && status != MH_ERROR_ALREADY_INITIALIZED) {
@@ -335,17 +349,17 @@ static bool InstallHooks() {
         return false;
     }
 
-    status = MH_CreateHook((LPVOID)ADDR_66CA70, (LPVOID)&Hooked_66CA70, (LPVOID*)&g_orig66CA70);
+    status = MH_CreateHook((LPVOID)ADDR_66E7B0, (LPVOID)&Hooked_66E7B0, (LPVOID*)&g_orig66E7B0);
     if (status != MH_OK) {
-        LogWrite("[Hook] MH_CreateHook(66CA70) failed: %s\n", MH_StatusToString(status));
+        LogWrite("[Hook] MH_CreateHook(66E7B0) failed: %s\n", MH_StatusToString(status));
         return false;
     }
-    status = MH_EnableHook((LPVOID)ADDR_66CA70);
+    status = MH_EnableHook((LPVOID)ADDR_66E7B0);
     if (status != MH_OK) {
-        LogWrite("[Hook] MH_EnableHook(66CA70) failed: %s\n", MH_StatusToString(status));
+        LogWrite("[Hook] MH_EnableHook(66E7B0) failed: %s\n", MH_StatusToString(status));
         return false;
     }
-    LogWrite("[Hook] sub_66CA70 hooked, trampoline=%p\n", g_orig66CA70);
+    LogWrite("[Hook] sub_66E7B0 hooked, trampoline=%p\n", g_orig66E7B0);
 
     return true;
 }
@@ -376,10 +390,10 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
 
         g_logFile = fopen(logPath, "w");
         if (g_logFile) {
-            fprintf(g_logFile, "[MajestyHD Runtime Localization v8.0 翻译替换] DllMain ATTACH\n");
+            fprintf(g_logFile, "[MajestyHD Runtime Localization v9.0 绘制函数Hook] DllMain ATTACH\n");
             fprintf(g_logFile, "  Exe path: %s\n", path);
             fprintf(g_logFile, "  Log path: %s\n", logPath);
-            fprintf(g_logFile, "  Strategy: hook sub_66CA70, replace this string with CN on a1==0\n\n");
+            fprintf(g_logFile, "  Strategy: hook sub_66E7B0 (real draw func), replace this string with CN\n\n");
             fflush(g_logFile);
         }
 
@@ -411,8 +425,8 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
     } else if (dwReason == DLL_PROCESS_DETACH) {
         if (g_logFile) {
             fprintf(g_logFile, "\n[DllMain] DETACH\n");
-            fprintf(g_logFile, "  Calls=%d Replaced=%d Skipped(a1!=0)=%d Hits=%d Misses=%d\n",
-                g_callCount, g_replacedCount, g_skippedNonZeroIdx, g_hitCount, g_missCount);
+            fprintf(g_logFile, "  Calls=%d Replaced=%d Hits=%d Misses=%d\n",
+                g_callCount, g_replacedCount, g_hitCount, g_missCount);
             fclose(g_logFile);
             g_logFile = nullptr;
         }
