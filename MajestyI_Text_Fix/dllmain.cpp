@@ -16,6 +16,7 @@
 #include <unordered_set>
 #include <string>
 #include <vector>
+#include <algorithm>
 #include "MinHook.h"
 
 #pragma comment(lib, "psapi.lib")
@@ -505,8 +506,16 @@ static bool LoadRollbackJson(const char* path) {
     return g_rollbackCount > 0;
 }
 
+// ===================== Rollback 排序比较 =====================
+// 按 key 长度降序排列，长短语优先匹配，避免短词破坏长短语内部
+static bool RollbackSortByLengthDesc(const std::pair<std::string,std::string>& a,
+                                      const std::pair<std::string,std::string>& b) {
+    return a.first.size() > b.first.size();
+}
+
 // ===================== Rollback 词汇替换 =====================
 // 对 UTF-8 英文文本做大小写不敏感的子串替换，返回替换后的 UTF-8 文本
+// g_rollback 按 key 长度降序排列，长短语优先匹配
 static bool RollbackReplace(const std::string& enText, std::string& outUtf8) {
     outUtf8 = enText;
     bool anyReplaced = false;
@@ -1396,6 +1405,9 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
         // 加载 rollback 词汇表
         if (LoadRollbackJson(rollbackPath)) {
             LogWrite("[Rollback] Loaded %d entries from %s\n", g_rollbackCount, rollbackPath);
+            // 按 key 长度降序排列，长短语优先匹配
+            std::sort(g_rollback.begin(), g_rollback.end(), RollbackSortByLengthDesc);
+            LogWrite("[Rollback] Sorted by key length (descending) for longest-match-first\n");
         } else {
             LogWrite("[Rollback] No rollback.json found or empty: %s\n", rollbackPath);
         }
