@@ -1,4 +1,4 @@
-﻿// dllmain.cpp : Majesty HD Runtime Localization v15.0 (BG LRU Erase)
+﻿// dllmain.cpp : Majesty HD Runtime Localization v16.0 (Motion Sampling)
 //
 // v14.1 诊断定案: 全屏脏矩形思路走不通。
 //   日志铁证: submitZero=94%(提交几乎全被合并丢弃) + compose 105/s 但 DirectBlit
@@ -11,9 +11,18 @@
 //           → 再把当前(已擦)背景重新缓存, 然后才画新字
 //   移走的位置: LRU 过期(约 2 帧未更新)后, 在后续 DirectBlit 时把缓存背景写回
 //            → 补擦残留拖影
-//   预期: 任何时刻 front surface 上的文字 = 最新一帧, 拖影被背景恢复覆盖。
-//   风险: 若引擎在 DirectBlit 后重画同一区域, 恢复会闪 1 帧 — 跑一局验证。
-//   v14.1 诊断代码保留(对照)。修复不依赖引擎脏矩形(sub_673FB0/sub_454500)。
+//   实测结果(v15.0 DETACH): hits=11768(同位置擦除大量执行) new=447(位置变化极少)
+//   + 用户观察"单位移动标签留原地"+"动过才消失(静态帧缓存)"
+//   → 推论: 拖影产生于引擎不调用文字绘制的期间(滚动/增量刷新移动了 DirectBlit
+//     像素), v15 的擦除钩子(DirectBlit 内)在整个拖影产生期间从未被触发。
+//
+// v16.0 本版: 采集 Motion 数据验证上述推论 —— 全量记录每次 DirectBlit 的
+//   (文本, clip 位置), 输出 scripts/motion.log。
+//   用户跑 60 秒(含相机平移 + 单位移动), 分析:
+//     (a) 平移/移动期间 DirectBlit 是否被调用? 位置连续 or 突变/静止?
+//     (b) 同一文本的位置变化模式 → 决定修复 hook 点(帧末重画 / 滚动补偿 /
+//         引擎文字重画时机)。
+//   保留 v15.0 擦除代码(BG-LRU)作为对照, 行为不变。
 
 #include "pch.h"
 #include <psapi.h>
@@ -152,6 +161,33 @@ static void LogWrite(const char* fmt, ...) {
     vfprintf(g_logFile, fmt, args);
     va_end(args);
     fflush(g_logFile);
+}
+
+// ===================== v16.0: Motion 采样 =====================
+// 目的: 采集 DirectBlitText 每次调用的 (文本, clip 位置) —— 判断拖影文字
+//       在相机平移/单位移动时是否被引擎重画(位置是否连续变化)。
+//   若平移期间 DirectBlit 几乎不被调用 / 位置突变 → 拖影 = 引擎滚动静态像素,
+//       DirectBlit 内部擦除(v15)永远没有触发机会 → 需换 hook 点。
+//   若平移期间位置连续平滑变化 → DirectBlit 在跟随画字, v15 擦除应有效但没效
+//       → 需查 v15 内部缺陷(WriteBack 目标/时序)。
+// 文件: scripts/motion.log (与主日志同目录)。全量记录, 512 行 flush 一次。
+static FILE* g_motionFile = nullptr;
+static int   g_motionLines = 0;
+
+static void MotionLog(int thisPtr, int blitNo, const wchar_t* wstr, int wlen,
+                      int l, int t, int r, int b, uint32_t fg, uint8_t flags) {
+    if (!g_motionFile || !wstr || wlen <= 0) return;
+    // 文本摘要: 前 10 个码元 → UTF-8 (防超长文本刷爆日志)
+    char txt[64] = {0};
+    int take = (wlen < 10) ? wlen : 10;
+    WideCharToMultiByte(CP_UTF8, 0, wstr, take, txt, sizeof(txt) - 1, nullptr, nullptr);
+    // 控制字符转义, 防止换行破坏行结构
+    for (char* p = txt; *p; p++) {
+        if ((uint8_t)*p < 0x20) *p = '?';
+    }
+    fprintf(g_motionFile, "[M] b=%d this=0x%X t='%s' c=(%d,%d,%d,%d) f=0x%X fl=0x%02X\n",
+        blitNo, thisPtr, txt, l, t, r, b, fg, flags);
+    if ((++g_motionLines & 511) == 0) fflush(g_motionFile);
 }
 
 // HIT 日志（去重，输出到 hit.log，含英文→中文映射）
@@ -1321,6 +1357,10 @@ static bool DirectBlitText(int thisPtr, int a2, int a3, int a4,
     if (clipR > (int)rdi.width) clipR = (int)rdi.width;
     if (clipB > (int)rdi.height) clipB = (int)rdi.height;
 
+    // v16.0: motion 采样 — 记录每次绘制的文本与位置(分析移动模式)
+    //        g_blitCount 此时是本次 blit 的序号(0 起), 与 pos 日志一致
+    MotionLog(thisPtr, g_blitCount, wstr, wlen, clipL, clipT, clipR, clipB, fgColor, flags);
+
     if (g_blitCount < 20) {
         LogWrite("[Blit %d] pos=(%d,%d) clip=[%d,%d,%d,%d] flags=0x%02X fg=0x%X bg=0x%X bpp=%u fmt=%s blend=%s\n",
             g_blitCount, drawX, drawY, clipL, clipT, clipR, clipB,
@@ -1726,10 +1766,14 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
         g_missLogFile = fopen(missLogPath, "w");
         g_hitLogFile = fopen(hitLogPath, "w");
         g_rollbackLogFile = fopen(rollbackLogPath, "w");
+        char motionLogPath[MAX_PATH];
+        sprintf_s(motionLogPath, "%smotion.log", dllDir);
+        g_motionFile = fopen(motionLogPath, "w");
         if (g_logFile) {
-            fprintf(g_logFile, "[MajestyHD Runtime Localization v15.0 BG-LRU Erase] DllMain ATTACH\n");
+            fprintf(g_logFile, "[MajestyHD Runtime Localization v16.0 Motion Sampling] DllMain ATTACH\n");
             fprintf(g_logFile, "  Exe path: %s\n", path);
             fprintf(g_logFile, "  Log path: %s\n", logPath);
+            fprintf(g_logFile, "  Motion log: %s\n", motionLogPath);
             fprintf(g_logFile, "  Miss log: %s\n", missLogPath);
             fprintf(g_logFile, "  Hit log: %s\n", hitLogPath);
             fprintf(g_logFile, "  Rollback log: %s\n", rollbackLogPath);
@@ -1790,7 +1834,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
         fflush(g_logFile);
     } else if (dwReason == DLL_PROCESS_DETACH) {
         if (g_logFile) {
-            fprintf(g_logFile, "\n[DllMain] DETACH (v15.0)\n");
+            fprintf(g_logFile, "\n[DllMain] DETACH (v16.0)\n");
             fprintf(g_logFile, "  Calls=%d Replaced=%d Hits=%d (unique=%d) Rollback=%d (unique=%d) Misses=%d (unique=%d)\n",
                 g_callCount, g_replacedCount, g_hitCount, (int)g_hitSeen.size(),
                 g_rollbackHitCount, (int)g_rollbackSeen.size(),
@@ -1806,9 +1850,12 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
             // v15.0 总账
             fprintf(g_logFile, "  BG-LRU(v15): hits=%d new=%d clean=%d skip=%d full=%d oor=%d\n",
                 g_v15Hits, g_v15New, g_v15Clean, g_v15Skip, g_v15Full, g_v15OOR);
+            // v16.0 总账
+            fprintf(g_logFile, "  Motion: lines=%d\n", g_motionLines);
             fclose(g_logFile);
             g_logFile = nullptr;
         }
+        if (g_motionFile) { fclose(g_motionFile); g_motionFile = nullptr; }
         if (g_missLogFile) { fclose(g_missLogFile); g_missLogFile = nullptr; }
         if (g_hitLogFile) { fclose(g_hitLogFile); g_hitLogFile = nullptr; }
         if (g_rollbackLogFile) { fclose(g_rollbackLogFile); g_rollbackLogFile = nullptr; }
