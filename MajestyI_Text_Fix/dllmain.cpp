@@ -1,17 +1,21 @@
-﻿// dllmain.cpp : Majesty HD Runtime Localization v10.0 (GDI Direct Text Rendering)
+﻿// dllmain.cpp : Majesty HD Runtime Localization v10.1 (GDI on DirectDraw Surface)
 //
-// === v10.0 GDI 直接渲染版 ===
-// v9.2 结果: CYFontImage 的 glyph 表只有 ASCII, CJK 字符查不到 → 空白
+// === v10.1 DirectDraw Surface GetDC 方案 ===
+// v10.0 结果: GDI 画在窗口 DC 上被 DirectDraw Flip 覆盖 → 不可见
 //
-// v10 策略:
+// v10.1 策略:
 //   hook sub_66E7B0 (文本绘制函数), 命中中文时:
 //   1. 跳过原函数 (不调用 g_orig66E7B0)
 //   2. 从 this 对象读取布局信息 (位置/颜色/对齐)
-//   3. 用 GDI ExtTextOutW 直接在游戏窗口 DC 上绘制中文
-//   4. 非中文文本走原函数
+//   3. 从 dword_7CA9EC (back buffer CYDDOffport) 获取 IDirectDrawSurface
+//   4. 调用 IDirectDrawSurface::GetDC() 获取 DirectDraw surface 的 DC
+//   5. 用 GDI ExtTextOutW 在 DirectDraw surface DC 上绘制中文
+//   6. 调用 IDirectDrawSurface::ReleaseDC() 释放 DC
+//   7. 非中文文本走原函数
 //
 // this 对象布局 (IDA 反编译确认):
 //   this[0]/[4]/[8]  - StrObj 字符串数据 (inline/indirect)
+//   this[2] (0x08)  - 字符串模式 (1=UTF-16, 其他=ANSI)
 //   this[3] (0x0C)  - X 偏移 (加到 a2)
 //   this[4] (0x10)  - Y 偏移 (加到 a3)
 //   this[5] (0x14)  - 右边界 X (加到 a2)
@@ -28,6 +32,10 @@
 //   this+0x61      - 字体 ID
 //   this[97]       - (同上, 字节偏移)
 //
+// DirectDraw surface 获取:
+//   dword_7CA9E8 = primary surface CYDDOffport (this[33] = IDirectDrawSurface* offset 132)
+//   dword_7CA9EC = back buffer CYDDOffport
+//
 // sub_66E7B0(this, a2, a3, a4) 签名:
 //   this = UI 组件对象
 //   a2 = X 偏移 (加到 this[3] 得到实际 X)
@@ -37,18 +45,26 @@
 #include "pch.h"
 #include <psapi.h>
 #include <intrin.h>
+#include <ddraw.h>       // DirectDraw interfaces
 #include <unordered_map>
 #include <string>
 #include <vector>
 #include "MinHook.h"
 
 #pragma comment(lib, "psapi.lib")
+// 不链接 ddraw.lib: 只通过 vtable 指针调用 GetDC/ReleaseDC, 不需要导入符号
 #pragma intrinsic(_ReturnAddress)
 
 // ===================== 地址常量 =====================
-static constexpr uintptr_t ADDR_66E7B0 = 0x0066E7B0;
-static constexpr uintptr_t ADDR_7CA9E4  = 0x007CA9E4;  // dword_7CA9E4 (默认渲染设备)
+static constexpr uintptr_t ADDR_66E7B0  = 0x0066E7B0;
+static constexpr uintptr_t ADDR_7CA9E4   = 0x007CA9E4;  // dword_7CA9E4 (默认渲染设备)
 static constexpr uintptr_t ADDR_7CA9BC  = 0x007CA9BC;  // dword_7CA9BC (调色板数组)
+static constexpr uintptr_t ADDR_7CA9E8  = 0x007CA9E8;  // dword_7CA9E8 (primary surface CYDDOffport)
+static constexpr uintptr_t ADDR_7CA9EC  = 0x007CA9EC;  // dword_7CA9EC (back buffer CYDDOffport)
+
+// ===================== DirectDraw 函数指针类型 =====================
+typedef HRESULT (__stdcall *DDSURFACE_GETDC)(IDirectDrawSurface*, HDC*);
+typedef HRESULT (__stdcall *DDSURFACE_RELEASEDC)(IDirectDrawSurface*, HDC);
 
 // ===================== 字符串对象 =====================
 struct StrObj {
@@ -77,6 +93,12 @@ static int g_hitCount = 0;
 static int g_missCount = 0;
 static int g_gdiDrawCount = 0;
 static int g_gdiFailCount = 0;
+static int g_surfaceFailCount = 0;
+
+// ===================== surface 缓存 =====================
+static IDirectDrawSurface* g_cachedBackSurface = nullptr;
+static IDirectDrawSurface* g_cachedPrimarySurface = nullptr;
+static int g_surfaceCacheMissCount = 0;
 
 static void LogWrite(const char* fmt, ...) {
     if (!g_logFile) return;
@@ -265,7 +287,6 @@ static int g_fontSize = 14;
 static void InitGdiFonts() {
     if (g_cjkFont) return;
     
-    // 创建 SimSun (宋体) 字体, 抗锯齿
     g_cjkFont = CreateFontW(
         -g_fontSize,              // 高度 (负值=字符高度)
         0,                        // 宽度 (0=自动)
@@ -301,55 +322,109 @@ static void InitGdiFonts() {
 }
 
 // ===================== 调色板索引 → RGB 颜色 =====================
-// 游戏用 8-bit 调色板, 索引对应颜色需要从游戏调色板读取
-// dword_7CA9BC 是调色板数组, 每个条目指向一个调色板对象
-// 调色板对象+8 处可能是 RGB 表
-// 先用简单映射: 常见游戏颜色索引 → RGB
 static COLORREF PalIndexToRgb(uint32_t palIndex) {
-    // Majesty HD 的调色板索引到 RGB 映射
-    // 从 v9 日志中 this[25] (前景色) 的值推断
-    // 常见: 0=黑, 255=白, 其他中间值
-    // 先用灰度近似: index * (255/255)
-    // 实际需要读取游戏调色板才能精确
-    
-    // 简单映射 (基于经验):
-    // 0 = 黑色 (描边/背景)
-    // 255 = 白色 (前景)
-    // 其他 = 灰度或特定颜色
     if (palIndex == 0) return RGB(0, 0, 0);
     if (palIndex == 255) return RGB(255, 255, 255);
     if (palIndex == 254) return RGB(255, 255, 255);
-    
-    // 尝试从调色板对象读取
-    // dword_7CA9BC 是一个指针, 指向调色板对象数组
-    // 每个调色板对象可能有 RGB 表
-    // 暂时用灰度近似
     uint8_t gray = (uint8_t)(palIndex & 0xFF);
     return RGB(gray, gray, gray);
 }
 
-// ===================== GDI 文本绘制 =====================
-// 从 this 对象读取布局信息, 用 GDI 绘制中文文本
+// ===================== 获取 DirectDraw surface =====================
+// 从全局变量 dword_7CA9EC (back buffer) 或 dword_7CA9E8 (primary) 获取
+// CYDDOffport 对象, 然后从 this[33] (字节偏移 132) 获取 IDirectDrawSurface*
+static IDirectDrawSurface* GetBackBufferSurface() {
+    // 优先使用缓存
+    if (g_cachedBackSurface) {
+        // 验证缓存是否有效 (检查 vtable 指针非空)
+        void* vt = *(void**)g_cachedBackSurface;
+        if (vt) return g_cachedBackSurface;
+        g_cachedBackSurface = nullptr;
+    }
+
+    // 从 dword_7CA9EC 获取 back buffer CYDDOffport
+    uint32_t cyDDOffport = *(uint32_t*)ADDR_7CA9EC;
+    if (!cyDDOffport) {
+        // 尝试 primary
+        cyDDOffport = *(uint32_t*)ADDR_7CA9E8;
+        if (!cyDDOffport) {
+            if (g_surfaceFailCount < 10) {
+                LogWrite("[Surface] Both back and primary CYDDOffport are null\n");
+            }
+            g_surfaceFailCount++;
+            return nullptr;
+        }
+    }
+
+    // CYDDOffport[33] (字节偏移 132) = IDirectDrawSurface*
+    IDirectDrawSurface* surface = *(IDirectDrawSurface**)(cyDDOffport + 132);
+    if (!surface) {
+        if (g_surfaceFailCount < 10) {
+            LogWrite("[Surface] IDirectDrawSurface* at CYDDOffport+132 is null (CYDDOffport=0x%X)\n", cyDDOffport);
+        }
+        g_surfaceFailCount++;
+        return nullptr;
+    }
+
+    // 缓存
+    g_cachedBackSurface = surface;
+    LogWrite("[Surface] Cached back buffer surface: %p (CYDDOffport=0x%X)\n", surface, cyDDOffport);
+    return surface;
+}
+
+// ===================== GDI 文本绘制 (DirectDraw surface) =====================
 static bool GdiDrawText(int thisPtr, int a2, int a3, const wchar_t* wstr, int wlen) {
     if (!wstr || wlen <= 0) return false;
-    
-    HWND hwnd = GetForegroundWindow();
-    if (!hwnd) {
-        hwnd = GetDesktopWindow();
+
+    // 获取 DirectDraw surface
+    IDirectDrawSurface* surface = GetBackBufferSurface();
+    if (!surface) {
+        g_gdiFailCount++;
+        return false;
     }
+
+    // 调用 IDirectDrawSurface::GetDC
+    // vtable slot 8 = GetDC (3rd method after QueryInterface/AddRef/Release)
+    // IDirectDrawSurface vtable: 0=QueryInterface, 1=AddRef, 2=Release,
+    //   3=AddAttachedSurface, 4=AddOverlayDirtyRect, 5=Blt, 6=BltBatch,
+    //   7=BltFast, 8=DeleteAttachedSurface, 9=EnumAttachedZBuffers,
+    //   10=Flip, 11=GetAttachedSurface, 12=GetBltStatus, 13=GetCaps,
+    //   14=GetClipper, 15=GetColorKey, 16=GetDC, 17=GetFlipStatus,
+    //   18=GetOverlayPosition, 19=GetPalette, 20=GetPixelFormat,
+    //   21=GetSurfaceDesc, 22=Initialize, 23=IsLost, 24=Lock,
+    //   25=ReleaseDC, 26=Restore, 27=SetClipper, 28=SetColorKey,
+    //   29=SetOverlayPosition, 30=SetPalette, 31=Unlock, 32=UpdateOverlay,
+    //   33=UpdateOverlayDisplay, 34=UpdateOverlayZBuffer
+    //
+    // vtable offset: GetDC = slot 16, byte offset = 16*4 = 64
+    //                ReleaseDC = slot 25, byte offset = 25*4 = 100
     
-    // 获取客户区坐标 (屏幕坐标)
-    RECT clientRect;
-    GetClientRect(hwnd, &clientRect);
-    POINT pt = {0, 0};
-    ClientToScreen(hwnd, &pt);
-    int screenOffsetX = pt.x;
-    int screenOffsetY = pt.y;
-    
+    void** vtable = *(void***)surface;
+    DDSURFACE_GETDC pGetDC = (DDSURFACE_GETDC)vtable[16];
+    DDSURFACE_RELEASEDC pReleaseDC = (DDSURFACE_RELEASEDC)vtable[25];
+
+    HDC hdc = nullptr;
+    HRESULT hr = pGetDC(surface, &hdc);
+    if (FAILED(hr) || !hdc) {
+        if (g_gdiFailCount < 10) {
+            LogWrite("[GDI] Surface GetDC failed: hr=0x%08X\n", (unsigned)hr);
+        }
+        g_gdiFailCount++;
+        return false;
+    }
+
+    // 保存 DC 状态
+    int savedState = SaveDC(hdc);
+
+    // === 坐标系说明 ===
+    // DirectDraw surface DC 的坐标系是 surface 像素坐标 (0,0 = 左上角)
+    // 游戏的绘制坐标是客户区坐标, 应该与 surface 坐标一致 (全屏模式)
+    // 但如果窗口模式, surface 坐标可能需要偏移
+
     // 从 this 对象读取位置信息
     uint8_t* base = (uint8_t*)thisPtr;
     uint32_t* dwordBase = (uint32_t*)base;
-    
+
     // sub_66E7B0 中的位置计算:
     // v7 = this[3] + a2  -> 起始 X
     // v8 = this[5] + a2  -> 结束 X  
@@ -359,72 +434,59 @@ static bool GdiDrawText(int thisPtr, int a2, int a3, const wchar_t* wstr, int wl
     int endX   = (int)dwordBase[5] + a2;
     int startY = (int)dwordBase[4] + a3;
     int endY   = (int)dwordBase[6] + a3;
-    
+
     // 渲染标志
     uint8_t flags = (uint8_t)dwordBase[7];
     bool centered  = (flags & 0x01) != 0;
     bool rightAlign = (flags & 0x02) != 0;
     bool outlined  = (flags & 0x04) != 0;
     bool vCentered = (flags & 0x08) != 0;
-    
+
     // 颜色
     uint32_t fgColorIdx = dwordBase[25];  // 前景色 (调色板索引)
     uint32_t bgColorIdx = dwordBase[26];  // 描边色 (调色板索引)
-    
+
     COLORREF fgColor = PalIndexToRgb(fgColorIdx);
     COLORREF bgColor = PalIndexToRgb(bgColorIdx);
-    
-    // 获取 DC
-    HDC hdc = GetDC(hwnd);
-    if (!hdc) {
-        g_gdiFailCount++;
-        if (g_gdiFailCount <= 5) {
-            LogWrite("[GDI] GetDC failed (err=%d)\n", GetLastError());
-        }
-        return false;
-    }
-    
-    // 保存 DC 状态
-    int savedState = SaveDC(hdc);
-    
-    // 映射到屏幕坐标
+
+    // 映射
     SetMapMode(hdc, MM_TEXT);
     SetWindowOrgEx(hdc, 0, 0, nullptr);
     SetViewportOrgEx(hdc, 0, 0, nullptr);
-    
+
     // 选择字体
     HFONT oldFont = (HFONT)SelectObject(hdc, g_cjkFont);
-    
-    // 设置背景模式 (透明)
+
+    // 透明背景
     SetBkMode(hdc, TRANSPARENT);
-    
+
     // 计算文本尺寸
     SIZE textSize = {0, 0};
     GetTextExtentPoint32W(hdc, wstr, wlen, &textSize);
-    
+
     // 计算绘制位置
-    int drawX = startX + screenOffsetX;
-    int drawY = startY + screenOffsetY;
-    
+    int drawX = startX;
+    int drawY = startY;
+
     // 水平对齐
     if (centered) {
         drawX += (endX - startX - textSize.cx) / 2;
     } else if (rightAlign) {
-        drawX = endX - textSize.cx + screenOffsetX;
+        drawX = endX - textSize.cx;
     }
-    
+
     // 垂直对齐
     if (vCentered) {
         drawY += (endY - startY - textSize.cy) / 2;
     }
-    
-    // 矩形裁剪 (限制在 UI 组件范围内)
+
+    // 矩形裁剪
     RECT clipRect;
-    clipRect.left = startX + screenOffsetX;
-    clipRect.top = startY + screenOffsetY;
-    clipRect.right = endX + screenOffsetX;
-    clipRect.bottom = endY + screenOffsetY;
-    
+    clipRect.left = startX;
+    clipRect.top = startY;
+    clipRect.right = endX;
+    clipRect.bottom = endY;
+
     // 如果描边, 先画黑色描边
     if (outlined) {
         SetTextColor(hdc, bgColor);
@@ -435,16 +497,18 @@ static bool GdiDrawText(int thisPtr, int a2, int a3, const wchar_t* wstr, int wl
             }
         }
     }
-    
+
     // 前景色绘制
     SetTextColor(hdc, fgColor);
     ExtTextOutW(hdc, drawX, drawY, ETO_CLIPPED, &clipRect, wstr, wlen, nullptr);
-    
+
     // 恢复 DC 状态
     SelectObject(hdc, oldFont);
     RestoreDC(hdc, savedState);
-    ReleaseDC(hwnd, hdc);
-    
+
+    // 释放 DC
+    pReleaseDC(surface, hdc);
+
     g_gdiDrawCount++;
     if (g_gdiDrawCount <= 20) {
         LogWrite("[GDI Draw %d] pos=(%d,%d) clip=[%d,%d,%d,%d] flags=0x%02X fg=%d bg=%d text='%.*ls'\n",
@@ -491,7 +555,7 @@ int __fastcall Hooked_66E7B0(int ecx_this, int edx_unused, int a2, int a3, int a
             g_hitCount, enText.substr(0, 60).c_str(), entry.cnWcharCount);
     }
 
-    // 用 GDI 直接绘制中文, 跳过原函数
+    // 用 GDI 在 DirectDraw surface 上绘制中文, 跳过原函数
     const wchar_t* wstr = (const wchar_t*)entry.cnUtf16LE.data();
     int wlen = entry.cnWcharCount;
     
@@ -569,10 +633,10 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
 
         g_logFile = fopen(logPath, "w");
         if (g_logFile) {
-            fprintf(g_logFile, "[MajestyHD Runtime Localization v10.0 GDI Direct Rendering] DllMain ATTACH\n");
+            fprintf(g_logFile, "[MajestyHD Runtime Localization v10.1 DirectDraw Surface GetDC] DllMain ATTACH\n");
             fprintf(g_logFile, "  Exe path: %s\n", path);
             fprintf(g_logFile, "  Log path: %s\n", logPath);
-            fprintf(g_logFile, "  Strategy: hook sub_66E7B0 + GDI ExtTextOutW for CJK\n\n");
+            fprintf(g_logFile, "  Strategy: hook sub_66E7B0 + IDirectDrawSurface::GetDC + GDI ExtTextOutW\n\n");
             fflush(g_logFile);
         }
 
@@ -604,11 +668,11 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
 
     } else if (dwReason == DLL_PROCESS_DETACH) {
         if (g_logFile) {
-            fprintf(g_logFile, "\n[DllMain] DETACH (v10.0)\n");
+            fprintf(g_logFile, "\n[DllMain] DETACH (v10.1)\n");
             fprintf(g_logFile, "  Calls=%d Replaced=%d Hits=%d Misses=%d\n",
                 g_callCount, g_replacedCount, g_hitCount, g_missCount);
-            fprintf(g_logFile, "  GDI Draws=%d GDI Fails=%d\n",
-                g_gdiDrawCount, g_gdiFailCount);
+            fprintf(g_logFile, "  GDI Draws=%d GDI Fails=%d Surface Fails=%d\n",
+                g_gdiDrawCount, g_gdiFailCount, g_surfaceFailCount);
             fclose(g_logFile);
             g_logFile = nullptr;
         }
