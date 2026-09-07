@@ -1,31 +1,18 @@
-﻿// dllmain.cpp : Majesty HD Runtime Localization v6.4
+﻿// dllmain.cpp : Majesty HD Runtime Localization v6.5
 //
-// === 方案 (v6.4) ===
+// === 方案 (v6.5) ===
 // 外挂汉化: 不修改任何原文件, 运行时 hook 字符串赋值函数 sub_628350
 //
-// v6.4 核心改变: 放弃 hook 6 个文本检索函数, 改为 hook sub_628350 本身
+// v6.5 核心改变: 在 v6.4 基础上加返回地址过滤, 只翻译 XML 文本加载
 //
-// sub_628350 是 __thiscall(this, src), 每次游戏给 StrObj 赋值时调用:
-//   - 先 free this->data (旧数据)
-//   - 再从 src 复制数据到 this->data (新 malloc)
+// v6.4 基础: hook sub_628350, 用栈上临时 wide StrObj 让游戏自己 malloc/free
+// v6.5 过滤: 检查 [esp] 返回地址, 只在来自 sub_659820 (XML 文本提取)
+//           的调用时翻译, 跳过 GPL 脚本字符串赋值
 //
-// 我们的做法:
-//   - hook sub_628350, 在调用原函数前检查 src
-//   - 如果 src 是 narrow 英文且命中字典:
-//     构造栈上临时 wide StrObj (data 指向栈上 UTF-16 数据)
-//     用临时 StrObj 作为 src 调用原函数
-//     游戏 sub_628350 会:
-//       1. free this->data (旧英文数据, 游戏自己分配的, 安全)
-//       2. malloc 新 data (游戏 CRT 堆, 安全)
-//       3. 从我们的栈上临时 StrObj memcpy 数据 (只读, 不 free)
-//   - 如果未命中: 直接调原函数, 不干预
-//
-// 优点: 所有 malloc/free 都由游戏自己完成, 无跨 CRT 堆问题
-//
-// 字符串对象布局 (12 字节):
-//   [0] void*    data   — 数据指针 (wide: 前2字节有 BOM 哨兵 0xFFFE)
-//   [4] uint32_t meta   — 低3字节=长度, bit24(0x1000000)=wide标志
-//   [8] uint32_t extra  — 真实字符串长度
+// sub_659820 内部有两处 call sub_628350:
+//   0x659896 — XML 节点有文本时
+//   0x6598C4 — XML 节点为空时
+// 只有返回地址在这两个位置附近的才翻译
 //
 // 字典文件: scripts/dict.txt (UTF-8, 格式: 英文\t中文\n)
 
@@ -224,15 +211,42 @@ static bool ExtractTextFromStrObj(StrObj* obj, std::string& out) {
     }
 }
 
+// ===================== 返回地址过滤 =====================
+// sub_659820 内部调用 sub_628350 的两个 call site:
+//   0x659896 — call sub_628350 (XML 节点有文本)
+//   0x6598C4 — call sub_628350 (XML 节点为空, 赋空 StrObj)
+// 返回地址 = call 指令的下一条指令地址
+//   从 0x659896 调用: 返回地址 = 0x65989B
+//   从 0x6598C4 调用: 返回地址 = 0x6598C9
+static constexpr uintptr_t XML_CALLSITE_1_RET = 0x65989B;
+static constexpr uintptr_t XML_CALLSITE_2_RET = 0x6598C9;
+
 // ===================== Hook sub_628350 =====================
 // __thiscall(this, src) — 游戏字符串赋值
 // ecx = this (目标 StrObj), [esp+4] = src (源 StrObj*)
 // 用 __fastcall 模拟: ecx=this, edx=unused, stack arg=src
+//
+// v6.5: 只在来自 sub_659820 的调用时翻译, 跳过 GPL 脚本字符串
 int __fastcall Hooked_628350(int ecx_this, int edx_unused, int src) {
     g_callCount++;
 
+    // v6.5: 检查返回地址, 只在来自 sub_659820 的调用时翻译
+    // __fastcall: ecx=arg0, edx=unused, stack arg=src
+    // 栈布局: [esp] = return addr, [esp+4] = src
+    uintptr_t retAddr;
+    __asm {
+        mov eax, [esp]
+        mov retAddr, eax
+    }
+
+    bool fromXml = (retAddr == XML_CALLSITE_1_RET || retAddr == XML_CALLSITE_2_RET);
+
+    if (!fromXml) {
+        // 不是来自 XML 文本提取, 直接调原函数
+        return g_orig628350(ecx_this, edx_unused, src);
+    }
+
     StrObj* srcObj = (StrObj*)src;
-    StrObj* thisObj = (StrObj*)ecx_this;
 
     // 如果 src 是 wide (已经是中文), pass-through
     if (srcObj && (*(uint8_t*)((char*)srcObj + 7) & 1) != 0) {
@@ -264,12 +278,8 @@ int __fastcall Hooked_628350(int ecx_this, int edx_unused, int src) {
     int wlen = (int)wcn.size();
 
     // 栈上分配: BOM(2) + wide data + null term(2)
-    // 需要保持 4 字节对齐
     int wideBytes = wlen * 2;
     int dataAllocSize = 2 + wideBytes + 2;
-    // 在栈上分配, 用 VLA 或 _alloca
-    // 但 MSVC 不支持 VLA, 用 _alloca
-    // 注意: alloca 在函数返回前有效, sub_628350 是同步调用, 安全
     uint8_t* dataBase = (uint8_t*)_alloca(dataAllocSize);
 
     // 写 BOM 哨兵 (0xFF 0xFE)
@@ -298,12 +308,6 @@ int __fastcall Hooked_628350(int ecx_this, int edx_unused, int src) {
     }
 
     // 调用原 sub_628350, 用栈上临时 StrObj 作为 src
-    // 游戏会:
-    //   1. free this->data (旧英文, 游戏分配的, 安全)
-    //   2. malloc 新 data (游戏 CRT, 安全)
-    //   3. 从 tmpObj.data 复制数据 (只读 memcpy, 不 free, 安全)
-    // 注意: 游戏判断 src 是否 wide 时用 byte[7] bit0, 我们设了 meta bit24
-    // 但 byte[7] 是 meta 的最高字节 = 0x01 (因为 0x1000000), bit0=1, 所以 wide 检测正确
     return g_orig628350(ecx_this, edx_unused, (int)&tmpObj);
 }
 
@@ -361,10 +365,10 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
 
         g_logFile = fopen(logPath, "w");
         if (g_logFile) {
-            fprintf(g_logFile, "[MajestyHD Runtime Localization v6.4] DllMain ATTACH\n");
+            fprintf(g_logFile, "[MajestyHD Runtime Localization v6.5] DllMain ATTACH\n");
             fprintf(g_logFile, "  Exe path: %s\n", path);
             fprintf(g_logFile, "  Log path: %s\n", logPath);
-            fprintf(g_logFile, "  Strategy: hook sub_628350 (StrObj assign), stack-based temp wide StrObj\n");
+            fprintf(g_logFile, "  Strategy: hook sub_628350 with return-addr filter (XML-only)\n");
             fprintf(g_logFile, "  All malloc/free by game CRT, no cross-CRT issues\n\n");
             fflush(g_logFile);
         }
