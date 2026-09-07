@@ -1,24 +1,27 @@
-﻿// dllmain.cpp : Majesty HD Runtime Localization v9.1 (绘制函数 hook + 字体诊断)
+﻿// dllmain.cpp : Majesty HD Runtime Localization v9.2 (修正偏移 + CJK 字体扫描 + 字体替换)
 //
-// === v9.1 诊断版 ===
-// v9.0 结果: hook sub_66E7B0 成功(59 hits, 不卡死), 但中文显示空白
-// 原因: 字符绘制时用的字体(英文字体)没有 CJK 字形
+// === v9.2 修正诊断版 ===
+// v9.1 结果: this+0xA0 是 CYDialogButtonItem (不是字体!), 偏移错误
 //
-// 字体机制 (IDA 分析):
-//   sub_647140(this, fontObj, fontID) 初始化 renderContext
-//     - this[0] = fontObj (来自 sub_66E7B0 的 this[40], 偏移 0xA0)
-//     - this[22] = fontID (来自 sub_66E7B0 的 this[97], 字节偏移 0x61)
-//   sub_647420(绘制单字符):
-//     - 优先用 renderContext[21] (如果非空)
-//     - 否则用 dword_7CA9C0[renderContext[22]] (全局字体数组)
-//   dword_7CA9C0: 全局字体数组, dword_7BC518=1 (只有1个字体, 索引0)
-//   字体类: CYFont(基类) / CYFontPixelmap / CYFontImage
-//   CAM 加载: sub_6C5AB0 在 FONT section 时创建 CYFontPixelmap
+// 修正 (IDA 反编译确认):
+//   sub_66E7B0 中 v5 = *(this + 10) -> DWORD 索引10 = 字节偏移 0x28
+//   sub_647140(&renderCtx, v5, this[97]) -> renderCtx[0] = v5 (字体对象)
+//   sub_647420 中:
+//     - renderCtx[21] -> 备选字体
+//     - dword_7CA9C0[renderCtx[22]] -> 全局字体数组
+//   dword_7CA9C0 数组条目是 sub_68A9C0(256) 创建的 glyph cache (0x41C 字节)
+//     不是字体对象! vtable=0 是正常的
 //
-// v9.1 策略:
-//   - 保持 v9 的字符串替换逻辑
-//   - 增加诊断: 打印 this+40(字体对象) / this+97(字体ID) / dword_7CA9C0 数组内容
-//   - 尝试: 命中时同时修改 this+97 为 0 (确保用全局数组索引0的字体)
+// 字体类 vtable (IDA 确认):
+//   CYFont          vtable = 0x74C2C4
+//   CYFontPixelmap  vtable = 0x75041C  (CJK 字体)
+//   CYFontImage     vtable = 待确认
+//
+// v9.2 策略:
+//   1. 修正字体对象偏移为 this+0x28
+//   2. 诊断当前字体对象的 RTTI 类型
+//   3. 在内存中扫描 CYFontPixelmap vtable (0x75041C)
+//   4. 如果找到 CJK 字体, 在 hit 时替换 this[10]
 
 #include "pch.h"
 #include <psapi.h>
@@ -36,6 +39,9 @@
 static constexpr uintptr_t ADDR_66E7B0 = 0x0066E7B0;
 static constexpr uintptr_t ADDR_7CA9C0  = 0x007CA9C0;  // dword_7CA9C0 (字体数组指针)
 static constexpr uintptr_t ADDR_7BC518  = 0x007BC518;  // dword_7BC518 (字体数组大小)
+static constexpr uintptr_t ADDR_7CA9E4  = 0x007CA9E4;  // dword_7CA9E4 (默认渲染设备)
+static constexpr uintptr_t VTABLE_CYFONT         = 0x0074C2C4;  // CYFont 基类 vtable
+static constexpr uintptr_t VTABLE_CYFONTPIXELMAP  = 0x0075041C;  // CYFontPixelmap vtable (CJK)
 
 // ===================== 字符串对象 =====================
 struct StrObj {
@@ -275,6 +281,70 @@ static bool ReadRttiName(uint32_t objPtr, char* buf, int bufSize) {
     return false;
 }
 
+// ===================== CJK 字体扫描 =====================
+// 在堆内存中扫描 vtable=0x75041C (CYFontPixelmap) 的对象
+static uint32_t g_cjkFontObj = 0;  // 找到的 CJK 字体对象
+
+static void ScanForCjkFont() {
+    if (g_cjkFontObj) return;
+
+    HANDLE hProcess = GetCurrentProcess();
+    SYSTEM_INFO si;
+    GetSystemInfo(&si);
+
+    uint32_t addr = (uint32_t)si.lpMinimumApplicationAddress;
+    uint32_t endAddr = (uint32_t)si.lpMaximumApplicationAddress;
+    uint32_t targetVtable = (uint32_t)VTABLE_CYFONTPIXELMAP;
+
+    MEMORY_BASIC_INFORMATION mbi;
+    LogWrite("[FontScan] Scanning for CYFontPixelmap (vtable=0x%08X)...\n", targetVtable);
+
+    int found = 0;
+    while (addr < endAddr) {
+        if (VirtualQuery((void*)addr, &mbi, sizeof(mbi)) == 0) break;
+        if (mbi.State == MEM_COMMIT && (mbi.Protect & (PAGE_READWRITE|PAGE_EXECUTE_READWRITE)) &&
+            !(mbi.Protect & PAGE_READONLY) && mbi.RegionSize > 0 && mbi.RegionSize < 0x10000000) {
+
+            // 扫描这个区域
+            uint32_t regionStart = (uint32_t)mbi.BaseAddress;
+            uint32_t regionSize = (uint32_t)mbi.RegionSize;
+
+            // 安全限制: 最多扫描 4MB
+            uint32_t scanSize = regionSize > 0x400000 ? 0x400000 : regionSize;
+
+            // 分块读取
+            uint8_t* buf = (uint8_t*)malloc(scanSize);
+            if (buf) {
+                SIZE_T bytesRead = 0;
+                if (ReadProcessMemory(hProcess, (void*)regionStart, buf, scanSize, &bytesRead) && bytesRead > 4) {
+                    // 搜索 vtable 指针值 (4字节对齐)
+                    for (uint32_t off = 0; off + 4 <= (uint32_t)bytesRead; off += 4) {
+                        uint32_t val = *(uint32_t*)(buf + off);
+                        if (val == targetVtable) {
+                            uint32_t objAddr = regionStart + off;
+                            // 验证: CYFontPixelmap 的 this+4 应该是 1 (构造函数设置)
+                            if (off + 8 <= scanSize) {
+                                uint32_t field4 = *(uint32_t*)(buf + off + 4);
+                                if (field4 == 1) {
+                                    LogWrite("[FontScan] FOUND CYFontPixelmap at 0x%08X (field4=1)\n", objAddr);
+                                    if (!g_cjkFontObj) g_cjkFontObj = objAddr;
+                                    found++;
+                                    if (found >= 10) break;  // 最多记 10 个
+                                }
+                            }
+                        }
+                    }
+                }
+                free(buf);
+            }
+            if (found >= 10) break;
+        }
+        addr = (uint32_t)mbi.BaseAddress + (uint32_t)mbi.RegionSize;
+    }
+
+    LogWrite("[FontScan] Found %d CYFontPixelmap object(s), g_cjkFontObj=0x%08X\n", found, g_cjkFontObj);
+}
+
 // ===================== 字体诊断 =====================
 static void FontDiag(int thisPtr) {
     if (g_fontDiagDone) return;
@@ -282,12 +352,14 @@ static void FontDiag(int thisPtr) {
 
     uint8_t* base = (uint8_t*)thisPtr;
 
-    uint32_t fontObj = *(uint32_t*)(base + 160);  // this+0xA0
-    uint8_t  fontId  = *(uint8_t*)(base + 97);    // this+0x61
+    // 修正: 字体对象在 this+0x28 (DWORD 索引 10)
+    uint32_t fontObj = *(uint32_t*)(base + 0x28);
+    // 字体 ID 在 this+0x61 (字节偏移 97)
+    uint8_t  fontId  = *(uint8_t*)(base + 0x61);
 
-    LogWrite("\n[FontDiag] === FONT DIAGNOSTICS ===\n");
+    LogWrite("\n[FontDiag] === FONT DIAGNOSTICS (v9.2) ===\n");
     LogWrite("[FontDiag] this=0x%08X\n", thisPtr);
-    LogWrite("[FontDiag] this+0xA0 (fontObj) = 0x%08X\n", fontObj);
+    LogWrite("[FontDiag] this+0x28 (fontObj) = 0x%08X\n", fontObj);
     LogWrite("[FontDiag] this+0x61 (fontId)  = %d\n", fontId);
 
     // 全局字体数组
@@ -303,12 +375,7 @@ static void FontDiag(int thisPtr) {
             if (entry) {
                 uint32_t vtable = *(uint32_t*)entry;
                 LogWrite("[FontDiag]   vtable = 0x%08X\n", vtable);
-                char nameBuf[65] = {0};
-                if (ReadRttiName(entry, nameBuf, sizeof(nameBuf))) {
-                    LogWrite("[FontDiag]   RTTI name = %s\n", nameBuf);
-                } else {
-                    LogWrite("[FontDiag]   (RTTI read failed)\n");
-                }
+                // 注意: 这些是 glyph cache (sub_68A9C0), 不是字体对象, vtable=0 正常
             }
         }
     }
@@ -323,6 +390,12 @@ static void FontDiag(int thisPtr) {
         } else {
             LogWrite("[FontDiag] (fontObj RTTI read failed)\n");
         }
+        // 检查是否是已知的字体 vtable
+        if (vtable == VTABLE_CYFONT) {
+            LogWrite("[FontDiag] -> CYFont (base class, 英文字体)\n");
+        } else if (vtable == VTABLE_CYFONTPIXELMAP) {
+            LogWrite("[FontDiag] -> CYFontPixelmap (CJK 字体!)\n");
+        }
         // 前 64 字节 hex dump
         LogWrite("[FontDiag] fontObj bytes: ");
         for (int i = 0; i < 64; i++) {
@@ -330,6 +403,10 @@ static void FontDiag(int thisPtr) {
         }
         fprintf(g_logFile, "\n");
     }
+
+    // 扫描 CJK 字体
+    ScanForCjkFont();
+
     LogWrite("[FontDiag] === END FONT DIAGNOSTICS ===\n\n");
     fflush(g_logFile);
 }
@@ -378,6 +455,20 @@ int __fastcall Hooked_66E7B0(int ecx_this, int edx_unused, int a2, int a3, int a
     uint32_t origThis4 = *(uint32_t*)(edi + 4);
     uint32_t origThis8 = *(uint32_t*)(edi + 8);
 
+    // 如果找到 CJK 字体, 同时替换字体对象 (this+0x28)
+    uint32_t origFontObj = 0;
+    bool fontReplaced = false;
+    if (g_cjkFontObj) {
+        origFontObj = *(uint32_t*)(edi + 0x28);
+        if (origFontObj != g_cjkFontObj) {
+            *(uint32_t*)(edi + 0x28) = g_cjkFontObj;
+            fontReplaced = true;
+            if (g_hitCount <= 10) {
+                LogWrite("  [FontRepl] 0x%08X -> 0x%08X\n", origFontObj, g_cjkFontObj);
+            }
+        }
+    }
+
     *(uint32_t*)edi = 0;
     *(uint32_t*)(edi + 4) = (uint32_t)(uintptr_t)entry.cnUtf16LE.data();
     *(uint32_t*)(edi + 8) = 1;
@@ -390,6 +481,9 @@ int __fastcall Hooked_66E7B0(int ecx_this, int edx_unused, int a2, int a3, int a
     *(uint32_t*)edi = origThis0;
     *(uint32_t*)(edi + 4) = origThis4;
     *(uint32_t*)(edi + 8) = origThis8;
+    if (fontReplaced) {
+        *(uint32_t*)(edi + 0x28) = origFontObj;
+    }
 
     return result;
 }
@@ -453,10 +547,10 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
 
         g_logFile = fopen(logPath, "w");
         if (g_logFile) {
-            fprintf(g_logFile, "[MajestyHD Runtime Localization v9.1 字体诊断] DllMain ATTACH\n");
+            fprintf(g_logFile, "[MajestyHD Runtime Localization v9.2 CJK字体扫描] DllMain ATTACH\n");
             fprintf(g_logFile, "  Exe path: %s\n", path);
             fprintf(g_logFile, "  Log path: %s\n", logPath);
-            fprintf(g_logFile, "  Strategy: hook sub_66E7B0 + font diagnostics\n\n");
+            fprintf(g_logFile, "  Strategy: hook sub_66E7B0 + font scan + font replace\n\n");
             fflush(g_logFile);
         }
 
@@ -485,7 +579,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
 
     } else if (dwReason == DLL_PROCESS_DETACH) {
         if (g_logFile) {
-            fprintf(g_logFile, "\n[DllMain] DETACH\n");
+            fprintf(g_logFile, "\n[DllMain] DETACH (v9.2)\n");
             fprintf(g_logFile, "  Calls=%d Replaced=%d Hits=%d Misses=%d\n",
                 g_callCount, g_replacedCount, g_hitCount, g_missCount);
             fclose(g_logFile);
