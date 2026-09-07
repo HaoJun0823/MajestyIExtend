@@ -70,6 +70,9 @@ struct Config {
     // 描边
     bool     enableOutline;    // 强制开启描边
     int      outlineWidth;     // 描边宽度 (像素)
+
+    // 残影修复
+    bool     fillBackground;   // true=文字渲染前填充背景色块清除旧字形
 };
 static Config g_cfg;
 
@@ -205,6 +208,7 @@ static void LoadConfig(const char* iniPath) {
     g_cfg.wrapWidthAdjust = 0;
     g_cfg.enableOutline = false;
     g_cfg.outlineWidth = 1;
+    g_cfg.fillBackground = true;  // 默认开启残影修复
 
     char buf[260];
 
@@ -239,6 +243,9 @@ static void LoadConfig(const char* iniPath) {
     g_cfg.enableOutline = GetPrivateProfileIntA("Outline", "Enable", 0, iniPath) != 0;
     g_cfg.outlineWidth = GetPrivateProfileIntA("Outline", "Width", 1, iniPath);
 
+    // [Fix]
+    g_cfg.fillBackground = GetPrivateProfileIntA("Fix", "FillBackground", 1, iniPath) != 0;
+
     LogWrite("[Config] FontFile=%s FontName=%s FontSize=%d FontWeight=%d\n",
         g_cfg.fontFile[0] ? g_cfg.fontFile : "(none)", g_cfg.fontName, g_cfg.fontSize, g_cfg.fontWeight);
     LogWrite("[Config] RenderMode=%d BlendMode=%d Quality=%d\n",
@@ -249,6 +256,7 @@ static void LoadConfig(const char* iniPath) {
         g_cfg.yOffset, g_cfg.xOffset, g_cfg.lineSpacing, g_cfg.wrapWidth, g_cfg.wrapWidthAdjust);
     LogWrite("[Config] Outline=%d OutlineWidth=%d\n",
         (int)g_cfg.enableOutline, g_cfg.outlineWidth);
+    LogWrite("[Config] FillBackground=%d\n", (int)g_cfg.fillBackground);
 }
 
 // ===================== 字典加载 =====================
@@ -843,6 +851,39 @@ static uint16_t RGB565(uint8_t r, uint8_t g, uint8_t b) {
     return (uint16_t)(((r >> 3) << 11) | ((g >> 2) << 5) | (b >> 3));
 }
 
+// ===================== SEH 安全辅助函数 =====================
+// 独立 C 函数，避免 C++ 对象展开与 __try 冲突
+
+static void SafeFillBackground(uint32_t pixelBuf, int width, int height, int stride,
+    int bpp, int fillX, int fillY, int fillW, int fillH, uint32_t bgColor) {
+    __try {
+        uint8_t* fillBase = (uint8_t*)pixelBuf;
+        for (int fy = fillY; fy < fillY + fillH; fy++) {
+            if (fy < 0 || fy >= height) continue;
+            uint8_t* row = fillBase + fy * stride;
+            for (int fx = fillX; fx < fillX + fillW; fx++) {
+                if (fx < 0 || fx >= width) continue;
+                switch (bpp) {
+                    case 8:  row[fx] = (uint8_t)bgColor; break;
+                    case 16: *(uint16_t*)(row + fx * 2) = (uint16_t)bgColor; break;
+                    case 24:
+                        row[fx * 3]     = (uint8_t)(bgColor);
+                        row[fx * 3 + 1] = (uint8_t)(bgColor >> 8);
+                        row[fx * 3 + 2] = (uint8_t)(bgColor >> 16);
+                        break;
+                    case 32: *(uint32_t*)(row + fx * 4) = bgColor; break;
+                }
+            }
+        }
+    } __except (EXCEPTION_EXECUTE_HANDLER) {}
+}
+
+static void SafeSetFlag7(uint32_t* dwordBase) {
+    __try {
+        dwordBase[7] |= 2;
+    } __except (EXCEPTION_EXECUTE_HANDLER) {}
+}
+
 // ===================== 直接像素缓冲区渲染 =====================
 static bool DirectBlitText(int thisPtr, int a2, int a3, int a4,
                            const wchar_t* wstr, int wlen) {
@@ -1037,6 +1078,21 @@ static bool DirectBlitText(int thisPtr, int a2, int a3, int a4,
             useAlpha ? "alpha" : "direct");
     }
 
+    // ★ 残影修复：渲染字形前用背景色填充整个文字区域，清除旧像素
+    if (g_cfg.fillBackground) {
+        int fillX = clipL;
+        int fillY = clipT;
+        int fillW = clipR - clipL;
+        int fillH = clipB - clipT;
+        if (fillW > 0 && fillH > 0) {
+            SafeFillBackground(rdi.pixelBuf, (int)rdi.width, (int)rdi.height, (int)rdi.stride,
+                (int)rdi.bpp, fillX, fillY, fillW, fillH, bgColor);
+            if (g_blitCount < 20)
+                LogWrite("[Blit %d] Background filled [%d,%d,%dx%d] bg=0x%X\n",
+                    g_blitCount, fillX, fillY, fillW, fillH, bgColor);
+        }
+    }
+
     // ★ 渲染：使用换行位置逐行绘制
     int curX = drawX;
     int curY = drawY;
@@ -1225,6 +1281,12 @@ static bool DirectBlitText(int thisPtr, int a2, int a3, int a4,
 // ===================== Hook sub_66E7B0 =====================
 int __fastcall Hooked_66E7B0(int ecx_this, int edx_unused, int a2, int a3, int a4) {
     g_callCount++;
+
+    // ★ 残影修复：强制开启文字自绘背景开关 (this[7] bit 1)
+    // 原版 sub_66E7B0 内部检查 (this[7] & 2)，若为 0 则只画字形不擦背景，导致旧字形残留
+    if (g_cfg.fillBackground && ecx_this) {
+        SafeSetFlag7((uint32_t*)ecx_this);
+    }
 
     std::string enText;
     bool wide = false;
