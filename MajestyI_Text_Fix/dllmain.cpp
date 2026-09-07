@@ -1,13 +1,12 @@
-﻿// dllmain.cpp : Majesty HD Runtime Localization v12.2 (SplitLog + WrapWidth)
+﻿// dllmain.cpp : Majesty HD Runtime Localization v12.3 (JSON Dict + WrapAdjust)
 //
-// v12.2: 日志拆分 + 换行宽度可配
+// v12.3: JSON 词典 + WrapWidth 微调
 //
-// v12.1 结果: 中文显示正确，自动换行有效
-// v12.2 改进:
-//   1. 换行宽度可通过 INI [Position] WrapWidth 配置 (0=自动, >0=固定像素宽度)
-//   2. 日志拆分为三个文件：主日志(初始化/配置/错误) / miss.log(MISS去重) / hit.log(HIT去重)
-//   3. MISS/HIT 去重：每个英文 key 只输出一次
-//   4. MISS 日志不截断，输出完整 key（便于补充词典）
+// v12.2 结果: 日志拆分有效，换行宽度可配
+// v12.3 改进:
+//   1. 词典格式从 tab 分隔文本改为 JSON（可靠、无歧义、支持特殊字符）
+//   2. 新增 WrapWidthAdjust: auto 模式下对自动宽度做 +/- 微调
+//   3. 兼容旧 dict.txt（如果 dict.json 不存在则回退加载 dict.txt）
 
 #include "pch.h"
 #include <psapi.h>
@@ -64,6 +63,7 @@ struct Config {
     int      xOffset;          // X 偏移微调 (像素)
     int      lineSpacing;      // 额外行间距 (像素, 加在 tmHeight 上)
     int      wrapWidth;        // 自动换行宽度 (0=自动用 endX-startX, >0=固定像素宽度)
+    int      wrapWidthAdjust;  // auto 模式下对自动宽度的微调 (+/- 像素)
 
     // 描边
     bool     enableOutline;    // 强制开启描边
@@ -175,6 +175,7 @@ static void LoadConfig(const char* iniPath) {
     g_cfg.xOffset = 0;
     g_cfg.lineSpacing = 0;
     g_cfg.wrapWidth = 0;
+    g_cfg.wrapWidthAdjust = 0;
     g_cfg.enableOutline = false;
     g_cfg.outlineWidth = 1;
 
@@ -205,6 +206,7 @@ static void LoadConfig(const char* iniPath) {
     g_cfg.xOffset = GetPrivateProfileIntA("Position", "XOffset", 0, iniPath);
     g_cfg.lineSpacing = GetPrivateProfileIntA("Position", "LineSpacing", 0, iniPath);
     g_cfg.wrapWidth = GetPrivateProfileIntA("Position", "WrapWidth", 0, iniPath);
+    g_cfg.wrapWidthAdjust = GetPrivateProfileIntA("Position", "WrapWidthAdjust", 0, iniPath);
 
     // [Outline]
     g_cfg.enableOutline = GetPrivateProfileIntA("Outline", "Enable", 0, iniPath) != 0;
@@ -216,8 +218,8 @@ static void LoadConfig(const char* iniPath) {
         g_cfg.renderMode, g_cfg.blendMode, g_cfg.quality);
     LogWrite("[Config] FgColor=0x%X BgColor=0x%X Override=%d\n",
         g_cfg.fgColor, g_cfg.bgColor, (int)g_cfg.overrideColor);
-    LogWrite("[Config] YOffset=%d XOffset=%d LineSpacing=%d WrapWidth=%d\n",
-        g_cfg.yOffset, g_cfg.xOffset, g_cfg.lineSpacing, g_cfg.wrapWidth);
+    LogWrite("[Config] YOffset=%d XOffset=%d LineSpacing=%d WrapWidth=%d WrapWidthAdjust=%d\n",
+        g_cfg.yOffset, g_cfg.xOffset, g_cfg.lineSpacing, g_cfg.wrapWidth, g_cfg.wrapWidthAdjust);
     LogWrite("[Config] Outline=%d OutlineWidth=%d\n",
         (int)g_cfg.enableOutline, g_cfg.outlineWidth);
 }
@@ -246,7 +248,158 @@ static int RemoveZeroWidthChars(char* data, int len) {
     return write;
 }
 
-static bool LoadDict(const char* path) {
+// ---- JSON 解析器 (极简手写，只处理 {"key":"value",...} 结构) ----
+// JSON 字符串转义解码
+static int JsonDecodeString(const char* src, int srcLen, char* dst, int dstMax) {
+    int w = 0;
+    for (int i = 0; i < srcLen && w < dstMax - 1; i++) {
+        if (src[i] == '\\' && i + 1 < srcLen) {
+            char c = src[i+1];
+            switch (c) {
+                case 'n': dst[w++] = '\n'; i++; break;
+                case 't': dst[w++] = '\t'; i++; break;
+                case 'r': dst[w++] = '\r'; i++; break;
+                case '"': dst[w++] = '"'; i++; break;
+                case '\\': dst[w++] = '\\'; i++; break;
+                case '/': dst[w++] = '/'; i++; break;
+                case 'b': dst[w++] = '\b'; i++; break;
+                case 'f': dst[w++] = '\f'; i++; break;
+                case 'u': {
+                    if (i + 5 < srcLen) {
+                        char hex[5] = { src[i+2], src[i+3], src[i+4], src[i+5], 0 };
+                        unsigned cp = (unsigned)strtoul(hex, nullptr, 16);
+                        if (cp < 0x80) {
+                            dst[w++] = (char)cp;
+                        } else if (cp < 0x800) {
+                            dst[w++] = (char)(0xC0 | (cp >> 6));
+                            dst[w++] = (char)(0x80 | (cp & 0x3F));
+                        } else {
+                            dst[w++] = (char)(0xE0 | (cp >> 12));
+                            dst[w++] = (char)(0x80 | ((cp >> 6) & 0x3F));
+                            dst[w++] = (char)(0x80 | (cp & 0x3F));
+                        }
+                        i += 5;
+                    }
+                    break;
+                }
+                default: dst[w++] = c; i++; break;
+            }
+        } else {
+            dst[w++] = src[i];
+        }
+    }
+    dst[w] = '\0';
+    return w;
+}
+
+// 跳过空白
+static int SkipWhitespace(const char* s, int pos, int len) {
+    while (pos < len) {
+        char c = s[pos];
+        if (c != ' ' && c != '\t' && c != '\r' && c != '\n') break;
+        pos++;
+    }
+    return pos;
+}
+
+// 解析 JSON 字符串 (从 pos 开始的 "..."), 返回字符串结束后的位置
+static int ParseJsonString(const char* s, int pos, int len, char* out, int outMax) {
+    if (pos >= len || s[pos] != '"') return -1;
+    pos++; // skip opening quote
+    int start = pos;
+    // find closing quote (handle escapes)
+    while (pos < len) {
+        if (s[pos] == '\\' && pos + 1 < len) { pos += 2; continue; }
+        if (s[pos] == '"') break;
+        pos++;
+    }
+    if (pos >= len) return -1;
+    int strLen = pos - start;
+    JsonDecodeString(s + start, strLen, out, outMax);
+    pos++; // skip closing quote
+    return pos;
+}
+
+static bool LoadDictJson(const char* path) {
+    FILE* f = fopen(path, "rb");
+    if (!f) return false;
+    fseek(f, 0, SEEK_END);
+    long fileSize = ftell(f);
+    fseek(f, 0, SEEK_SET);
+    if (fileSize <= 0) { fclose(f); return false; }
+    if (fileSize > 16 * 1024 * 1024) {
+        LogWrite("[Dict] JSON file too large: %ld bytes\n", fileSize);
+        fclose(f); return false;
+    }
+    std::vector<char> buf(fileSize + 1, 0);
+    fread(buf.data(), 1, fileSize, f);
+    fclose(f);
+    int len = (int)fileSize;
+    LogWrite("[Dict] JSON file size: %ld bytes\n", fileSize);
+
+    int pos = SkipWhitespace(buf.data(), 0, len);
+    if (pos >= len || buf[pos] != '{') {
+        LogWrite("[Dict] JSON: expected '{' at pos %d\n", pos);
+        return false;
+    }
+    pos++; // skip '{'
+    pos = SkipWhitespace(buf.data(), pos, len);
+
+    char enKey[8192];
+    char cnValue[8192];
+
+    while (pos < len) {
+        // expect string key or '}'
+        pos = SkipWhitespace(buf.data(), pos, len);
+        if (pos >= len) break;
+        if (buf[pos] == '}') { pos++; break; }
+        if (buf[pos] == ',') { pos++; continue; }
+
+        // parse key
+        int newPos = ParseJsonString(buf.data(), pos, len, enKey, sizeof(enKey));
+        if (newPos < 0) {
+            LogWrite("[Dict] JSON: parse key failed at pos %d (char 0x%02X)\n", pos, (unsigned char)buf[pos]);
+            break;
+        }
+        pos = newPos;
+
+        // skip whitespace + colon
+        pos = SkipWhitespace(buf.data(), pos, len);
+        if (pos >= len || buf[pos] != ':') {
+            LogWrite("[Dict] JSON: expected ':' at pos %d\n", pos);
+            break;
+        }
+        pos++; // skip ':'
+        pos = SkipWhitespace(buf.data(), pos, len);
+
+        // parse value
+        newPos = ParseJsonString(buf.data(), pos, len, cnValue, sizeof(cnValue));
+        if (newPos < 0) {
+            LogWrite("[Dict] JSON: parse value failed for key '%.80s' at pos %d\n", enKey, pos);
+            break;
+        }
+        pos = newPos;
+
+        // store entry
+        std::string enStr(enKey);
+        std::string cnStr(cnValue);
+        int wlen = MultiByteToWideChar(CP_UTF8, 0, cnStr.c_str(), (int)cnStr.size(), nullptr, 0);
+        if (wlen > 0) {
+            DictEntry entry;
+            entry.cnWcharCount = wlen;
+            entry.cnUtf16LE.resize((wlen + 1) * 2);
+            MultiByteToWideChar(CP_UTF8, 0, cnStr.c_str(), (int)cnStr.size(),
+                (wchar_t*)entry.cnUtf16LE.data(), wlen);
+            *(wchar_t*)(entry.cnUtf16LE.data() + wlen * 2) = 0;
+            g_dict[enStr] = std::move(entry);
+            g_dictCount++;
+        }
+    }
+    return g_dictCount > 0;
+}
+
+// 旧格式兼容: tab 分隔文本
+static bool LoadDictTxt(const char* path) {
     FILE* f = fopen(path, "rb");
     if (!f) return false;
     fseek(f, 0, SEEK_END);
@@ -599,7 +752,7 @@ static bool DirectBlitText(int thisPtr, int a2, int a3, int a4,
     int textHeight = g_tmHeight;
     int maxLineWidth = 0;
     int curLineWidth = 0;
-    int availWidth = (g_cfg.wrapWidth > 0) ? g_cfg.wrapWidth : (endX - startX);
+    int availWidth = (g_cfg.wrapWidth > 0) ? g_cfg.wrapWidth : (endX - startX + g_cfg.wrapWidthAdjust);
     if (availWidth <= 0) availWidth = rdi.width - startX;
 
     // 字符宽度缓存
@@ -1000,7 +1153,9 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
         char logPath[MAX_PATH];
         sprintf_s(logPath, "%sMajestyI_TextFix.log", dllDir);
         char dictPath[MAX_PATH];
-        sprintf_s(dictPath, "%sdict.txt", dllDir);
+        sprintf_s(dictPath, "%sdict.json", dllDir);
+        char dictTxtPath[MAX_PATH];
+        sprintf_s(dictTxtPath, "%sdict.txt", dllDir);
         char iniPath[MAX_PATH];
         sprintf_s(iniPath, "%sMajestyI_TextFix.ini", dllDir);
 
@@ -1012,12 +1167,12 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
         g_missLogFile = fopen(missLogPath, "w");
         g_hitLogFile = fopen(hitLogPath, "w");
         if (g_logFile) {
-            fprintf(g_logFile, "[MajestyHD Runtime Localization v12.2 SplitLog+WrapWidth] DllMain ATTACH\n");
+            fprintf(g_logFile, "[MajestyHD Runtime Localization v12.3 JSON Dict+WrapAdjust] DllMain ATTACH\n");
             fprintf(g_logFile, "  Exe path: %s\n", path);
             fprintf(g_logFile, "  Log path: %s\n", logPath);
             fprintf(g_logFile, "  Miss log: %s\n", missLogPath);
             fprintf(g_logFile, "  Hit log: %s\n", hitLogPath);
-            fprintf(g_logFile, "  Dict path: %s\n", dictPath);
+            fprintf(g_logFile, "  Dict path: %s (json) / %s (txt fallback)\n", dictPath, dictTxtPath);
             fprintf(g_logFile, "  INI path: %s\n", iniPath);
             fprintf(g_logFile, "  Strategy: hook sub_66E7B0 + CYOffportIMP pixel buffer + INI config\n\n");
             fflush(g_logFile);
@@ -1026,10 +1181,20 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
         // 加载 INI 配置
         LoadConfig(iniPath);
 
-        if (LoadDict(dictPath)) {
-            LogWrite("[Dict] Loaded %d entries from %s\n", g_dictCount, dictPath);
+        // 加载词典: 优先 JSON, 回退 tab 分隔 txt
+        bool dictLoaded = false;
+        if (LoadDictJson(dictPath)) {
+            LogWrite("[Dict] Loaded %d entries from JSON: %s\n", g_dictCount, dictPath);
+            dictLoaded = true;
         } else {
-            LogWrite("[ERROR] Failed to load dict from %s\n", dictPath);
+            LogWrite("[Dict] JSON not found or invalid, trying txt fallback: %s\n", dictTxtPath);
+            if (LoadDictTxt(dictTxtPath)) {
+                LogWrite("[Dict] Loaded %d entries from txt: %s\n", g_dictCount, dictTxtPath);
+                dictLoaded = true;
+            }
+        }
+        if (!dictLoaded) {
+            LogWrite("[ERROR] Failed to load any dict\n");
         }
         InitGdiFonts();
         if (InstallHooks()) {
@@ -1040,7 +1205,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
         fflush(g_logFile);
     } else if (dwReason == DLL_PROCESS_DETACH) {
         if (g_logFile) {
-            fprintf(g_logFile, "\n[DllMain] DETACH (v12.2)\n");
+            fprintf(g_logFile, "\n[DllMain] DETACH (v12.3)\n");
             fprintf(g_logFile, "  Calls=%d Replaced=%d Hits=%d (unique=%d) Misses=%d (unique=%d)\n",
                 g_callCount, g_replacedCount, g_hitCount, (int)g_hitSeen.size(), g_missCount, (int)g_missSeen.size());
             fprintf(g_logFile, "  Blits=%d BlitFails=%d\n",
