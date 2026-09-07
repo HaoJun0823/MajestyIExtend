@@ -1349,16 +1349,29 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
         // 加载 INI 配置
         LoadConfig(iniPath);
 
-        // 加载词典: 优先 JSON, 回退 tab 分隔 txt
+        // 加载词典: 优先 dict.json, 再加载 dict_0.json ~ dict_9.json 分片
         bool dictLoaded = false;
         if (LoadDictJson(dictPath)) {
             LogWrite("[Dict] Loaded %d entries from JSON: %s\n", g_dictCount, dictPath);
             dictLoaded = true;
         } else {
-            LogWrite("[Dict] JSON not found or invalid, trying txt fallback: %s\n", dictTxtPath);
+            LogWrite("[Dict] dict.json not found or invalid, trying txt fallback: %s\n", dictTxtPath);
             if (LoadDictTxt(dictTxtPath)) {
                 LogWrite("[Dict] Loaded %d entries from txt: %s\n", g_dictCount, dictTxtPath);
                 dictLoaded = true;
+            }
+        }
+        // 加载分片词典 dict_0.json ~ dict_9.json (追加到同一个 g_dict)
+        for (int i = 0; i < 10; i++) {
+            char shardPath[MAX_PATH];
+            sprintf_s(shardPath, "%sdict_%d.json", dllDir, i);
+            int before = g_dictCount;
+            if (LoadDictJson(shardPath)) {
+                LogWrite("[Dict] Loaded %d entries from shard: %s (total: %d)\n",
+                    g_dictCount - before, shardPath, g_dictCount);
+                dictLoaded = true;
+            } else {
+                break; // 文件不存在，停止扫描
             }
         }
         if (!dictLoaded) {
