@@ -1,10 +1,14 @@
-﻿// dllmain.cpp : Majesty HD Runtime Localization v14.0 (Full-Screen Dirty Rect)
+﻿// dllmain.cpp : Majesty HD Runtime Localization v14.1 (Dirty Rect Diagnosis)
 //
-// v14.0: 全屏脏矩形方案修复残影
-//   在 DirectBlitText 每次文字渲染时，调用 sub_673FB0 把整个可见区域标记为脏矩形
-//   游戏同帧在 sub_454500 中读取脏矩形列表并调用 sub_5D7720 全屏重绘，覆盖残影
-//   sub_673FB0 内部自动做: 可见性检查 -> 屏幕->世界坐标转换 -> sub_673680 提交
-//   废弃 v13.0 局部脏矩形方案（坐标空间不匹配: 直接调 sub_673680 传屏幕坐标无效）
+// v14.1: v14.0 全屏脏矩形方案仍重影 -> 增加三处诊断，定案根因
+//   (a) DirectBlitText 提交 sub_673FB0 前后各读 [mgr+layer*4+0x34]，打印 delta
+//       期望 delta==1（提交被入队）。delta==0 = 提交被丢弃/图层错/坐标系错。
+//   (b) hook sub_5D7720 入口（cdecl 5 参），数每帧调用次数
+//       期望 DirectBlit 提交后 sub_5D7720 至少多调一次。=0 = 引擎消费链路没工作。
+//   (c) 打印 sub_5D7720 入口 arg1 vs [0x7CA9E8]（DirectBlit 设备）
+//       不一致 = 设备/surface 错位，引擎合成对象与 DirectBlit 设备不是同一个。
+//   每 1 秒汇总一行日志；DETACH 打印总账。
+//   修复不在这版做——这版只采集证据。
 
 #include "pch.h"
 #include <psapi.h>
@@ -851,19 +855,137 @@ static uint16_t RGB565(uint8_t r, uint8_t g, uint8_t b) {
 // rect = 指向 {left, top, right, bottom} 的指针 (屏幕坐标)
 // layerIdx = 图层索引 (dword_7C5228)
 // 内部自动做: 可见性检查(与视图边界相交) -> 屏幕->世界坐标转换 -> sub_673680 提交
+// per-layer 队列布局: [mgr+layerIdx*4+0x34] = count, [mgr+layerIdx*4+0x3c] = rect 数组
 typedef char (__thiscall *SubmitDirtyRect_t)(int thisPtr, int* rect, int layerIdx);
 static SubmitDirtyRect_t g_submitDirty = (SubmitDirtyRect_t)ADDR_SUBMIT_DIRTY;
 
-// 全屏脏矩形提交计数（用于日志统计）
+// sub_5D7720: 引擎合成/重绘上屏函数。cdecl 5 栈参（arg1=设备, arg2/3=rect*,
+//   arg4/5=0）。调用者 add esp,0x14 清理。
+typedef int (__cdecl *Orig5D7720_t)(int a1, void* a2, void* a3, int a4, int a5);
+static Orig5D7720_t g_orig5D7720 = nullptr;
+
+// 全屏脏矩形提交计数（用于日志统计，沿用 v14.0 字段名）
 static int g_dirtyRectCount = 0;
 
-// 独立 C 函数包装 __try（避免 C++ 对象展开冲突）
+// ===== v14.1 诊断数据 =====
+// (a) 提交 delta 统计
+static int g_dirtyDeltaOK    = 0;   // delta==1，提交入队
+static int g_dirtyDeltaZero  = 0;   // delta==0，提交被丢弃
+static int g_dirtyDeltaWeird = 0;   // delta 异常(<0 或 >1)
+static int g_dirtyMgrNonNull = 0;   // [0x7C12FC] 脏矩形管理器非空
+static int g_dirtyMgrNull    = 0;   // [0x7C12FC] 为 0
+static int g_dirtySampleLogged = 0; // 抽样日志计数器（每 200 个 blit 1 行）
+// (b) 引擎消费 (sub_5D7720) 统计
+static int g_composeCallsTotal = 0;  // 累计 sub_5D7720 调用次数
+static int g_composeSampleLogged = 0;
+// (c) 设备一致性
+static int g_composeDevMatch  = 0;  // arg1 == [0x7CA9E8]
+static int g_composeDevDiffer = 0;  // arg1 != [0x7CA9E8]
+// 每秒报告
+static LARGE_INTEGER s_qpcFreq = {0};
+static int64_t s_qpcLast = 0;
+static int s_blitsLast = 0;
+static int s_composeLast = 0;
+static int s_deltaOKLast = 0;
+static int s_deltaZeroLast = 0;
+static int s_devMatchLast = 0;
+static int s_devDifferLast = 0;
+static int s_mgrNullLast = 0;
+
+// 独立 C 函数包装 __try（避免 C++ 对象展开冲突）+ 提交前后读 [mgr+layer*4+0x34] delta
 static void SafeSubmitFullscreenDirty(uint32_t dirtyMgr, int width, int height, int layerIdx) {
     int rect[4] = { 0, 0, width, height };  // 整个可见区域 (屏幕坐标)
+    int cntBefore = -1, cntAfter = -1;
+    int ofs = layerIdx * 4 + 0x34;
+    SafeRead32(dirtyMgr + (uint32_t)ofs, (uint32_t*)&cntBefore);
     __try {
         g_submitDirty((int)dirtyMgr, rect, layerIdx);
         g_dirtyRectCount++;
     } __except (EXCEPTION_EXECUTE_HANDLER) {}
+    SafeRead32(dirtyMgr + (uint32_t)ofs, (uint32_t*)&cntAfter);
+    int delta = (cntBefore >= 0 && cntAfter >= 0) ? (cntAfter - cntBefore) : -999;
+    if (delta == 1) g_dirtyDeltaOK++;
+    else if (delta == 0) g_dirtyDeltaZero++;
+    else g_dirtyDeltaWeird++;
+
+    // 抽样日志：前 20 次 + 每 200 次 blit 1 行
+    g_dirtySampleLogged++;
+    if (g_dirtySampleLogged <= 20 || (g_blitCount > 0 && (g_blitCount % 200) == 0)) {
+        LogWrite("[SubmitDiag] blit=%d layer=%d mgr=0x%X cntBefore=%d cntAfter=%d delta=%d\n",
+            g_blitCount, layerIdx, dirtyMgr, cntBefore, cntAfter, delta);
+    }
+}
+
+// ===================== v14.1: 每秒汇总报告 =====================
+static void MaybeReportPerSecond() {
+    if (s_qpcFreq.QuadPart == 0) {
+        QueryPerformanceFrequency(&s_qpcFreq);
+    }
+    LARGE_INTEGER now;
+    QueryPerformanceCounter(&now);
+    if (s_qpcLast == 0) {
+        s_qpcLast = now.QuadPart;
+        s_blitsLast = g_blitCount;
+        s_composeLast = g_composeCallsTotal;
+        s_deltaOKLast = g_dirtyDeltaOK;
+        s_deltaZeroLast = g_dirtyDeltaZero;
+        s_devMatchLast = g_composeDevMatch;
+        s_devDifferLast = g_composeDevDiffer;
+        s_mgrNullLast = g_dirtyMgrNull;
+        return;
+    }
+    int64_t elapsed = now.QuadPart - s_qpcLast;
+    if (elapsed < s_qpcFreq.QuadPart) return;  // 1 秒内不报
+
+    double seconds = (double)elapsed / (double)s_qpcFreq.QuadPart;
+    int dBlit    = g_blitCount - s_blitsLast;
+    int dCompose = g_composeCallsTotal - s_composeLast;
+    int dDeltaOK = g_dirtyDeltaOK - s_deltaOKLast;
+    int dDeltaZ  = g_dirtyDeltaZero - s_deltaZeroLast;
+    int dDevM    = g_composeDevMatch - s_devMatchLast;
+    int dDevD    = g_composeDevDiffer - s_devDifferLast;
+    int dMgrNull = g_dirtyMgrNull - s_mgrNullLast;
+
+    LogWrite("[PerSec] t=%.2fs blits=%d (%.0f/s) compose=%d (%.0f/s) submitOK=%d submitZero=%d submitWeird=%d devMatch=%d devDiffer=%d mgrNull=%d\n",
+        seconds, dBlit, dBlit/seconds, dCompose, dCompose/seconds,
+        dDeltaOK, dDeltaZ, g_dirtyDeltaWeird,
+        dDevM, dDevD, dMgrNull);
+
+    s_qpcLast = now.QuadPart;
+    s_blitsLast = g_blitCount;
+    s_composeLast = g_composeCallsTotal;
+    s_deltaOKLast = g_dirtyDeltaOK;
+    s_deltaZeroLast = g_dirtyDeltaZero;
+    s_devMatchLast = g_composeDevMatch;
+    s_devDifferLast = g_composeDevDiffer;
+    s_mgrNullLast = g_dirtyMgrNull;
+}
+
+// ===================== v14.1: hook sub_5D7720 (cdecl 5 参) =====================
+int __cdecl Hooked_5D7720(int a1, void* a2, void* a3, int a4, int a5) {
+    g_composeCallsTotal++;
+
+    uint32_t devBlit = 0;
+    SafeRead32(ADDR_7CA9E4, &devBlit);
+    bool devMatch = (devBlit == (uint32_t)a1);
+    if (devMatch) g_composeDevMatch++; else g_composeDevDiffer++;
+
+    // 抽样日志：前 50 次 + 每次设备不匹配都记
+    g_composeSampleLogged++;
+    if (g_composeSampleLogged <= 50 || !devMatch) {
+        int L = 0, T = 0, R = 0, B = 0;
+        __try {
+            if (a2) {
+                int* r = (int*)a2;
+                L = r[0]; T = r[1]; R = r[2]; B = r[3];
+            }
+        } __except (EXCEPTION_EXECUTE_HANDLER) {
+            L = T = R = B = -1;
+        }
+        LogWrite("[Compose %d] dev=0x%X [0x7CA9E4]=0x%X match=%d rect=[%d,%d,%d,%d] a4=%d a5=%d\n",
+            g_composeCallsTotal, a1, devBlit, (int)devMatch, L, T, R, B, a4, a5);
+    }
+    return g_orig5D7720(a1, a2, a3, a4, a5);
 }
 
 // ===================== 直接像素缓冲区渲染 =====================
@@ -1060,17 +1182,20 @@ static bool DirectBlitText(int thisPtr, int a2, int a3, int a4,
             useAlpha ? "alpha" : "direct");
     }
 
-    // ★ 残影修复 (v14.0): 全屏脏矩形方案
-    // 每次文字渲染时，调用 sub_673FB0 把整个可见区域标记为脏矩形
-    // 游戏同帧在 sub_454500 中读取脏矩形列表并调用 sub_5D7720 全屏重绘，覆盖残影
-    // sub_673FB0 内部自动做可见性检查 + 屏幕->世界坐标转换（v13.0 直接调 sub_673680
-    // 传屏幕坐标导致坐标空间不匹配，残影无法覆盖 —— 本次已修复）
+    // ★ 残影修复 (v14.0 方案保留): 全屏脏矩形
+    //   每次文字渲染时，调用 sub_673FB0 把整个可见区域标记为脏矩形
+    //   游戏同帧在 sub_454500 中读取脏矩形列表并调用 sub_5D7720 全屏重绘，覆盖残影
+    //   v14.1: 统计 mgr null 率 + 由 SafeSubmitFullscreenDirty 内做 delta 抽样
     {
         uint32_t dirtyMgr = 0;
         int layerIdx = 0;
-        if (SafeRead32(ADDR_DIRTY_MGR, &dirtyMgr) && dirtyMgr &&
-            SafeRead32(ADDR_LAYER_IDX, (uint32_t*)&layerIdx)) {
-            SafeSubmitFullscreenDirty(dirtyMgr, (int)rdi.width, (int)rdi.height, layerIdx);
+        if (SafeRead32(ADDR_DIRTY_MGR, &dirtyMgr) && dirtyMgr) {
+            g_dirtyMgrNonNull++;
+            if (SafeRead32(ADDR_LAYER_IDX, (uint32_t*)&layerIdx)) {
+                SafeSubmitFullscreenDirty(dirtyMgr, (int)rdi.width, (int)rdi.height, layerIdx);
+            }
+        } else {
+            g_dirtyMgrNull++;
         }
     }
 
@@ -1255,6 +1380,8 @@ static bool DirectBlitText(int thisPtr, int a2, int a3, int a4,
         LogWrite("[Blit %d] done: text='%.*ls' pos=(%d,%d) chars=%d wraps=%d\n",
             g_blitCount, (wlen < 80 ? wlen : 80), wstr, drawX, drawY, wlen, (int)wrapPositions.size());
     }
+    // v14.1: 每秒汇总报告（DirectBlit 是稳定节拍源）
+    MaybeReportPerSecond();
 
     return true;
 }
@@ -1380,6 +1507,19 @@ static bool InstallHooks() {
         return false;
     }
     LogWrite("[Hook] sub_66E7B0 hooked, trampoline=%p\n", g_orig66E7B0);
+
+    // v14.1: hook sub_5D7720 数消费次数
+    status = MH_CreateHook((LPVOID)(uintptr_t)0x005D7720, (LPVOID)&Hooked_5D7720, (LPVOID*)&g_orig5D7720);
+    if (status != MH_OK) {
+        LogWrite("[Hook] MH_CreateHook(5D7720) failed: %s\n", MH_StatusToString(status));
+        return false;
+    }
+    status = MH_EnableHook((LPVOID)(uintptr_t)0x005D7720);
+    if (status != MH_OK) {
+        LogWrite("[Hook] MH_EnableHook(5D7720) failed: %s\n", MH_StatusToString(status));
+        return false;
+    }
+    LogWrite("[Hook] sub_5D7720 hooked, trampoline=%p\n", g_orig5D7720);
     return true;
 }
 
@@ -1425,7 +1565,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
         g_hitLogFile = fopen(hitLogPath, "w");
         g_rollbackLogFile = fopen(rollbackLogPath, "w");
         if (g_logFile) {
-            fprintf(g_logFile, "[MajestyHD Runtime Localization v14.0 Full-Screen Dirty] DllMain ATTACH\n");
+            fprintf(g_logFile, "[MajestyHD Runtime Localization v14.1 Dirty Rect Diagnosis] DllMain ATTACH\n");
             fprintf(g_logFile, "  Exe path: %s\n", path);
             fprintf(g_logFile, "  Log path: %s\n", logPath);
             fprintf(g_logFile, "  Miss log: %s\n", missLogPath);
@@ -1488,13 +1628,19 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
         fflush(g_logFile);
     } else if (dwReason == DLL_PROCESS_DETACH) {
         if (g_logFile) {
-            fprintf(g_logFile, "\n[DllMain] DETACH (v14.0)\n");
+            fprintf(g_logFile, "\n[DllMain] DETACH (v14.1)\n");
             fprintf(g_logFile, "  Calls=%d Replaced=%d Hits=%d (unique=%d) Rollback=%d (unique=%d) Misses=%d (unique=%d)\n",
                 g_callCount, g_replacedCount, g_hitCount, (int)g_hitSeen.size(),
                 g_rollbackHitCount, (int)g_rollbackSeen.size(),
                 g_missCount, (int)g_missSeen.size());
             fprintf(g_logFile, "  Blits=%d BlitFails=%d FullScreenDirty=%d\n",
                 g_blitCount, g_blitFailCount, g_dirtyRectCount);
+            // v14.1 总账
+            fprintf(g_logFile, "  Compose(sub_5D7720) total=%d devMatch=%d devDiffer=%d\n",
+                g_composeCallsTotal, g_composeDevMatch, g_composeDevDiffer);
+            fprintf(g_logFile, "  SubmitDelta: ok=%d zero=%d weird=%d  DirtyMgr: nonNull=%d null=%d\n",
+                g_dirtyDeltaOK, g_dirtyDeltaZero, g_dirtyDeltaWeird,
+                g_dirtyMgrNonNull, g_dirtyMgrNull);
             fclose(g_logFile);
             g_logFile = nullptr;
         }
