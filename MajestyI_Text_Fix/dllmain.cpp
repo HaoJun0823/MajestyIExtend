@@ -357,8 +357,17 @@ static COLORREF PalIndexToRgb(uint32_t palIndex) {
 }
 
 // ===================== 获取 DirectDraw surface =====================
-// 策略: 从多个全局变量获取 surface 指针, 用 SEH 保护
-static void* GetBackBufferSurface() {
+// 策略: 优先从 a4 (渲染设备对象) 提取 surface, 其次从全局变量获取, 用 SEH 保护
+//
+// CYDDOffport 有三个构造函数, surface 指针在不同路径下存储在不同偏移:
+//   sub_67FEF0 (DD2 路径): this[33] = byte offset 132
+//   sub_680080 (DD4 路径): this[32] = byte offset 128
+//   sub_6801F0 (DD7 路径): this[31] = byte offset 124
+// 同时 dword_7C89E8/7C89EC 存储原始 IDirectDrawSurface* (但运行时可能为0)
+//
+// a4 参数 (sub_66E7B0 的第4个参数) = 渲染设备对象 (CYDDOffport*)
+// 当 a4=0 时, 游戏用 dword_7CA9E4 作为默认渲染设备
+static void* GetBackBufferSurface(int a4) {
     // 优先使用缓存
     if (g_cachedBackSurface) {
         uint32_t vt_val = 0;
@@ -368,45 +377,97 @@ static void* GetBackBufferSurface() {
         g_cachedBackSurface = nullptr;
     }
 
-    // 按优先级尝试多个来源
-    uint32_t candidates[] = {
-        ADDR_7C89EC,   // 原始 back buffer surface
-        ADDR_7C89E8,   // 原始 primary surface
-    };
-
     uint32_t surface = 0;
-    for (int i = 0; i < 2 && !surface; i++) {
-        uint32_t addr = candidates[i];
-        if (SafeRead32(addr, &surface) && surface) {
-            // 验证 surface 的 vtable 指针
-            uint32_t vt_val = 0;
-            if (SafeRead32(surface, &vt_val) && vt_val) {
-                if (g_vtableLogCount < 3) {
-                    LogWrite("[Surface] Source 0x%X -> surface=0x%X vtable=0x%X\n", addr, surface, vt_val);
-                    g_vtableLogCount++;
+
+    // === 策略1: 从 a4 参数 (渲染设备对象) 提取 surface ===
+    // a4 是 CYDDOffport*, 尝试三个可能的偏移
+    if (a4) {
+        // 三个构造函数的 surface 偏移: 124(DD7), 128(DD4), 132(DD2)
+        uint32_t offsets[] = { 124, 128, 132 };
+        for (int i = 0; i < 3 && !surface; i++) {
+            uint32_t val = 0;
+            if (SafeRead32((uint32_t)a4 + offsets[i], &val) && val) {
+                uint32_t vt_val = 0;
+                if (SafeRead32(val, &vt_val) && vt_val) {
+                    surface = val;
+                    if (g_vtableLogCount < 5) {
+                        LogWrite("[Surface] a4=0x%X off[%d]=%d -> surface=0x%X vtable=0x%X\n",
+                            a4, i, offsets[i], surface, vt_val);
+                        g_vtableLogCount++;
+                    }
                 }
-            } else {
-                surface = 0; // vtable 无效, 继续尝试
+            }
+        }
+        // 如果 a4 的三个偏移都失败, dump 前 160 字节用于诊断
+        if (!surface && g_surfaceFailCount == 0) {
+            LogWrite("[Surface] a4=0x%X dump first 160 bytes:\n", a4);
+            for (int i = 0; i < 40; i++) {
+                uint32_t val = 0;
+                if (SafeRead32((uint32_t)a4 + i * 4, &val)) {
+                    LogWrite("  [%3d] (off %3d) = 0x%08X\n", i, i * 4, val);
+                } else {
+                    LogWrite("  [%3d] (off %3d) = UNREADABLE\n", i, i * 4);
+                    break;
+                }
             }
         }
     }
 
-    // 如果直接来源都失败, 尝试 CYDDOffport
+    // === 策略2: 从全局变量获取原始 surface 指针 ===
+    if (!surface) {
+        uint32_t candidates[] = {
+            ADDR_7C89EC,   // 原始 back buffer surface
+            ADDR_7C89E8,   // 原始 primary surface
+        };
+        for (int i = 0; i < 2 && !surface; i++) {
+            uint32_t addr = candidates[i];
+            if (SafeRead32(addr, &surface) && surface) {
+                uint32_t vt_val = 0;
+                if (SafeRead32(surface, &vt_val) && vt_val) {
+                    if (g_vtableLogCount < 5) {
+                        LogWrite("[Surface] Global 0x%X -> surface=0x%X vtable=0x%X\n", addr, surface, vt_val);
+                        g_vtableLogCount++;
+                    }
+                } else {
+                    surface = 0;
+                }
+            }
+        }
+    }
+
+    // === 策略3: 从全局 CYDDOffport 对象提取 surface ===
     if (!surface) {
         uint32_t cyOff[] = { ADDR_7CA9EC, ADDR_7CA9E8 };
         for (int i = 0; i < 2 && !surface; i++) {
             uint32_t cyAddr = 0;
             if (SafeRead32(cyOff[i], &cyAddr) && cyAddr) {
-                // CYDDOffport[33] (DWORD index 33 = byte offset 132)
-                if (SafeRead32(cyAddr + 132, &surface) && surface) {
-                    uint32_t vt_val = 0;
-                    if (SafeRead32(surface, &vt_val) && vt_val) {
-                        if (g_vtableLogCount < 3) {
-                            LogWrite("[Surface] CYDDOffport[0x%X]+132 -> surface=0x%X vtable=0x%X\n", cyAddr, surface, vt_val);
-                            g_vtableLogCount++;
+                // 尝试三个可能的偏移: 124(DD7), 128(DD4), 132(DD2)
+                uint32_t offsets[] = { 132, 128, 124 };
+                for (int j = 0; j < 3 && !surface; j++) {
+                    uint32_t val = 0;
+                    if (SafeRead32(cyAddr + offsets[j], &val) && val) {
+                        uint32_t vt_val = 0;
+                        if (SafeRead32(val, &vt_val) && vt_val) {
+                            surface = val;
+                            if (g_vtableLogCount < 5) {
+                                LogWrite("[Surface] CYDDOffport[0x%X]+%d -> surface=0x%X vtable=0x%X\n",
+                                    cyAddr, offsets[j], surface, vt_val);
+                                g_vtableLogCount++;
+                            }
                         }
-                    } else {
-                        surface = 0;
+                    }
+                }
+                // 如果三个偏移都失败, dump 前 160 字节
+                if (!surface && g_surfaceFailCount == 0) {
+                    LogWrite("[Surface] CYDDOffport[0x%X] dump first 160 bytes:\n", cyAddr);
+                    for (int k = 0; k < 40; k++) {
+                        uint32_t val = 0;
+                        if (SafeRead32(cyAddr + k * 4, &val)) {
+                            LogWrite("  [%3d] (off %3d) = 0x%08X\n", k, k * 4, val);
+                        } else {
+                            LogWrite("  [%3d] (off %3d) = UNREADABLE\n", k, k * 4);
+                            break;
+                        }
                     }
                 }
             }
@@ -420,7 +481,8 @@ static void* GetBackBufferSurface() {
             SafeRead32(ADDR_7CA9EC, &v2);
             SafeRead32(ADDR_7C89E8, &v3);
             SafeRead32(ADDR_7CA9E8, &v4);
-            LogWrite("[Surface] All sources failed (7C89EC=0x%X 7CA9EC=0x%X 7C89E8=0x%X 7CA9E8=0x%X)\n", v1, v2, v3, v4);
+            LogWrite("[Surface] All sources failed (a4=0x%X 7C89EC=0x%X 7CA9EC=0x%X 7C89E8=0x%X 7CA9E8=0x%X)\n",
+                a4, v1, v2, v3, v4);
         }
         g_surfaceFailCount++;
         return nullptr;
@@ -431,11 +493,11 @@ static void* GetBackBufferSurface() {
 }
 
 // ===================== GDI 文本绘制 (DirectDraw surface) =====================
-static bool GdiDrawText(int thisPtr, int a2, int a3, const wchar_t* wstr, int wlen) {
+static bool GdiDrawText(int thisPtr, int a2, int a3, int a4, const wchar_t* wstr, int wlen) {
     if (!wstr || wlen <= 0) return false;
 
-    // 获取 DirectDraw surface
-    void* surface = GetBackBufferSurface();
+    // 获取 DirectDraw surface (传入 a4 渲染设备对象)
+    void* surface = GetBackBufferSurface(a4);
     if (!surface) {
         g_gdiFailCount++;
         return false;
@@ -654,7 +716,7 @@ int __fastcall Hooked_66E7B0(int ecx_this, int edx_unused, int a2, int a3, int a
     const wchar_t* wstr = (const wchar_t*)entry.cnUtf16LE.data();
     int wlen = entry.cnWcharCount;
     
-    bool drawn = GdiDrawText(ecx_this, a2, a3, wstr, wlen);
+    bool drawn = GdiDrawText(ecx_this, a2, a3, a4, wstr, wlen);
     if (!drawn) {
         // GDI 绘制失败, 回退到原函数 (会显示空白, 但不会崩溃)
         if (g_gdiFailCount <= 5) {
