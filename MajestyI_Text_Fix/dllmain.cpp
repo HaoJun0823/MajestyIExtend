@@ -1,18 +1,12 @@
-﻿// dllmain.cpp : Majesty HD Runtime Localization v12.0 (INI-Configurable Pixel Buffer Rendering)
+﻿// dllmain.cpp : Majesty HD Runtime Localization v12.1 (FullLog + AutoWrap)
 //
-// v12.0: INI 配置 + 自定义TTF + Y位置修复 + 渲染模式可选
+// v12.1: 全量日志 + 自动换行
 //
-// v11.x 结果: 中文能显示但位置偏下、抗锯齿模糊、颜色不对
-//   根因: GDI originY 是从基线向上的偏移, 但代码把它当向下偏移用
-//   正确: dstY = curY + tmAscent - originY + py
-//
-// v12.0 改进:
-//   1. INI 配置文件 (MajestyI_TextFix.ini) 控制所有参数
-//   2. 自定义 TTF 字体加载 (同目录 .ttf 文件)
-//   3. 修复 Y 位置: 用 tmAscent - originY 计算字形顶部
-//   4. 渲染模式可选: GGO_BITMAP (1bpp) / GGO_GRAY8 (抗锯齿)
-//   5. 混合模式可选: 直接写入 / alpha 混合
-//   6. 前景色/描边色/字体大小/垂直偏移 全部可调
+// v12.0 结果: 字体问题解决，中文显示正确
+// v12.1 改进:
+//   1. 去掉 HIT/MISS 日志次数限制，输出全量 英文->中文 映射
+//   2. 长文本自动换行：按可用宽度断行，CJK 字符任意位置可断，空格处断行
+//   3. 日志中显示中文译文内容（UTF-8）
 
 #include "pch.h"
 #include <psapi.h>
@@ -569,11 +563,16 @@ static bool DirectBlitText(int thisPtr, int a2, int a3, int a4,
     bool useAlpha = (g_cfg.blendMode == 1) && (g_cfg.renderMode == 1);
     int alphaMax = 64;  // GGO_GRAY8 的最大灰度值
 
-    // 测量文本总宽度
+    // 测量文本总宽度 + 自动换行
     int totalWidth = 0;
     int textHeight = g_tmHeight;
     int maxLineWidth = 0;
     int curLineWidth = 0;
+    int availWidth = endX - startX;
+    if (availWidth <= 0) availWidth = rdi.width - startX;
+
+    // 字符宽度缓存
+    std::vector<int> charWidths(wlen, 0);
     for (int i = 0; i < wlen; i++) {
         if (wstr[i] == L'\n') {
             if (curLineWidth > maxLineWidth) maxLineWidth = curLineWidth;
@@ -586,11 +585,80 @@ static bool DirectBlitText(int thisPtr, int a2, int a3, int a4,
         MAT2 mat = {{0,1},{0,0},{0,0},{0,1}};
         DWORD ret = GetGlyphOutlineW(mdc, wstr[i], GGO_METRICS, &gm, 0, nullptr, &mat);
         if (ret != GDI_ERROR) {
+            charWidths[i] = gm.gmCellIncX;
             curLineWidth += gm.gmCellIncX;
         }
     }
     if (curLineWidth > maxLineWidth) maxLineWidth = curLineWidth;
     totalWidth = maxLineWidth;
+
+    // ★ 自动换行：如果文本超出可用宽度且没有显式换行符，按词断行
+    bool needWrap = false;
+    std::vector<int> wrapPositions; // 每行结束位置（不包含该字符）
+    {
+        int lineStart = 0;
+        int lineWidth = 0;
+        int lastBreakPos = -1; // 上一个可断行位置
+        for (int i = 0; i < wlen; i++) {
+            if (wstr[i] == L'\n') {
+                wrapPositions.push_back(i);
+                lineStart = i + 1;
+                lineWidth = 0;
+                lastBreakPos = -1;
+                continue;
+            }
+            if (wstr[i] == L'\r') continue;
+            lineWidth += charWidths[i];
+            // CJK 字符可以在任意位置断行
+            if (wstr[i] >= 0x4E00 && wstr[i] <= 0x9FFF) {
+                lastBreakPos = i + 1;
+            }
+            // 空格也可以断行
+            if (wstr[i] == L' ' || wstr[i] == L'\t') {
+                lastBreakPos = i + 1;
+            }
+            // 超出宽度则断行
+            if (lineWidth > availWidth && i > lineStart) {
+                if (lastBreakPos > lineStart) {
+                    wrapPositions.push_back(lastBreakPos);
+                    lineStart = lastBreakPos;
+                    // 重新计算当前行宽度
+                    lineWidth = 0;
+                    for (int j = lineStart; j <= i; j++) {
+                        if (wstr[j] != L'\n' && wstr[j] != L'\r')
+                            lineWidth += charWidths[j];
+                    }
+                } else {
+                    // 没有合适的断行点，强制在当前位置断行
+                    wrapPositions.push_back(i);
+                    lineStart = i;
+                    lineWidth = charWidths[i];
+                }
+                needWrap = true;
+            }
+        }
+        wrapPositions.push_back(wlen); // 最后一行
+    }
+
+    if (needWrap) {
+        textHeight = (int)wrapPositions.size() * (g_tmHeight + g_cfg.lineSpacing);
+        // 重新计算最大行宽
+        maxLineWidth = 0;
+        int lineStart = 0;
+        for (size_t wi = 0; wi < wrapPositions.size(); wi++) {
+            int lineEnd = wrapPositions[wi];
+            int lw = 0;
+            for (int j = lineStart; j < lineEnd; j++) {
+                if (wstr[j] != L'\n' && wstr[j] != L'\r')
+                    lw += charWidths[j];
+            }
+            if (lw > maxLineWidth) maxLineWidth = lw;
+            lineStart = lineEnd;
+            // 跳过换行符本身
+            if (lineStart < wlen && wstr[lineStart] == L'\n') lineStart++;
+        }
+        totalWidth = maxLineWidth;
+    }
 
     // 计算绘制位置
     int drawX = startX;
@@ -612,7 +680,7 @@ static bool DirectBlitText(int thisPtr, int a2, int a3, int a4,
     if (clipR > (int)rdi.width) clipR = (int)rdi.width;
     if (clipB > (int)rdi.height) clipB = (int)rdi.height;
 
-    if (g_blitCount < 5) {
+    if (g_blitCount < 20) {
         LogWrite("[Blit %d] pos=(%d,%d) clip=[%d,%d,%d,%d] flags=0x%02X fg=0x%X bg=0x%X bpp=%u fmt=%s blend=%s\n",
             g_blitCount, drawX, drawY, clipL, clipT, clipR, clipB,
             flags, fgColor, bgColor, rdi.bpp,
@@ -620,15 +688,35 @@ static bool DirectBlitText(int thisPtr, int a2, int a3, int a4,
             useAlpha ? "alpha" : "direct");
     }
 
+    // ★ 渲染：使用换行位置逐行绘制
     int curX = drawX;
     int curY = drawY;
     int lineH = g_tmHeight + g_cfg.lineSpacing;
+    int renderStart = 0;
 
-    for (int i = 0; i < wlen; i++) {
+    for (size_t wi = 0; wi < wrapPositions.size(); wi++) {
+        int lineEnd = wrapPositions[wi];
+        curX = drawX;
+        // 居中/右对齐按行重新计算
+        if (centered) {
+            int lw = 0;
+            for (int j = renderStart; j < lineEnd; j++) {
+                if (wstr[j] != L'\n' && wstr[j] != L'\r')
+                    lw += charWidths[j];
+            }
+            curX = startX + (endX - startX - lw) / 2;
+        } else if (rightAlign) {
+            int lw = 0;
+            for (int j = renderStart; j < lineEnd; j++) {
+                if (wstr[j] != L'\n' && wstr[j] != L'\r')
+                    lw += charWidths[j];
+            }
+            curX = endX - lw;
+        }
+
+    for (int i = renderStart; i < lineEnd; i++) {
         if (wstr[i] == L'\n') {
-            curX = drawX;
-            curY += lineH;
-            continue;
+            break;
         }
         if (wstr[i] == L'\r') continue;
         if (wstr[i] == L'\t') {
@@ -767,13 +855,19 @@ static bool DirectBlitText(int thisPtr, int a2, int a3, int a4,
         curX += gm.gmCellIncX;
     }
 
+    // 移动到下一行
+    curY += lineH;
+    renderStart = lineEnd;
+    if (renderStart < wlen && wstr[renderStart] == L'\n') renderStart++;
+    } // end wrap loop
+
     SelectObject(mdc, oldFont);
     DeleteDC(mdc);
 
     g_blitCount++;
-    if (g_blitCount <= 20) {
-        LogWrite("[Blit %d] done: text='%.*ls' pos=(%d,%d) chars=%d\n",
-            g_blitCount, (wlen < 40 ? wlen : 40), wstr, drawX, drawY, wlen);
+    if (g_blitCount <= 50) {
+        LogWrite("[Blit %d] done: text='%.*ls' pos=(%d,%d) chars=%d wraps=%d\n",
+            g_blitCount, (wlen < 80 ? wlen : 80), wstr, drawX, drawY, wlen, (int)wrapPositions.size());
     }
 
     return true;
@@ -795,19 +889,24 @@ int __fastcall Hooked_66E7B0(int ecx_this, int edx_unused, int a2, int a3, int a
     auto it = g_dict.find(enText);
     if (it == g_dict.end()) {
         g_missCount++;
-        if (g_missCount <= 60) {
-            LogWrite("[MISS] \"%s\" (wide=%d chLen=%d)\n",
-                enText.substr(0, 80).c_str(), (int)wide, chLen);
-        }
+        LogWrite("[MISS] \"%s\" (wide=%d chLen=%d)\n",
+            enText.substr(0, 200).c_str(), (int)wide, chLen);
         return g_orig66E7B0(ecx_this, edx_unused, a2, a3, a4);
     }
 
     g_hitCount++;
     const DictEntry& entry = it->second;
 
-    if (g_hitCount <= 80) {
-        LogWrite("[HIT %d] \"%s\" -> cn(wchars=%d)\n",
-            g_hitCount, enText.substr(0, 60).c_str(), entry.cnWcharCount);
+    // 全量输出英文->中文映射
+    {
+        // 中文转 UTF-8 用于日志
+        int u8len = WideCharToMultiByte(CP_UTF8, 0, (const wchar_t*)entry.cnUtf16LE.data(), entry.cnWcharCount, nullptr, 0, nullptr, nullptr);
+        char cnUtf8[1024] = {0};
+        if (u8len > 0 && u8len < 1024) {
+            WideCharToMultiByte(CP_UTF8, 0, (const wchar_t*)entry.cnUtf16LE.data(), entry.cnWcharCount, cnUtf8, u8len, nullptr, nullptr);
+        }
+        LogWrite("[HIT %d] \"%s\" -> \"%s\" (wchars=%d)\n",
+            g_hitCount, enText.substr(0, 200).c_str(), cnUtf8, entry.cnWcharCount);
     }
 
     const wchar_t* wstr = (const wchar_t*)entry.cnUtf16LE.data();
@@ -815,9 +914,7 @@ int __fastcall Hooked_66E7B0(int ecx_this, int edx_unused, int a2, int a3, int a
 
     bool drawn = DirectBlitText(ecx_this, a2, a3, a4, wstr, wlen);
     if (!drawn) {
-        if (g_blitFailCount <= 5) {
-            LogWrite("[Blit] Failed, falling back to original (will be blank)\n");
-        }
+        LogWrite("[Blit] FAILED hit=%d text=\"%s\"\n", g_hitCount, enText.substr(0, 100).c_str());
         return g_orig66E7B0(ecx_this, edx_unused, a2, a3, a4);
     }
 
@@ -883,7 +980,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
 
         g_logFile = fopen(logPath, "w");
         if (g_logFile) {
-            fprintf(g_logFile, "[MajestyHD Runtime Localization v12.0 INI-Configurable] DllMain ATTACH\n");
+            fprintf(g_logFile, "[MajestyHD Runtime Localization v12.1 FullLog+Wrap] DllMain ATTACH\n");
             fprintf(g_logFile, "  Exe path: %s\n", path);
             fprintf(g_logFile, "  Log path: %s\n", logPath);
             fprintf(g_logFile, "  Dict path: %s\n", dictPath);
@@ -909,7 +1006,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
         fflush(g_logFile);
     } else if (dwReason == DLL_PROCESS_DETACH) {
         if (g_logFile) {
-            fprintf(g_logFile, "\n[DllMain] DETACH (v12.0)\n");
+            fprintf(g_logFile, "\n[DllMain] DETACH (v12.1)\n");
             fprintf(g_logFile, "  Calls=%d Replaced=%d Hits=%d Misses=%d\n",
                 g_callCount, g_replacedCount, g_hitCount, g_missCount);
             fprintf(g_logFile, "  Blits=%d BlitFails=%d\n",
