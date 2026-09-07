@@ -1,50 +1,18 @@
-﻿// dllmain.cpp : Majesty HD Runtime Localization v11.1 (Gray8 Alpha Blend Rendering)
+﻿// dllmain.cpp : Majesty HD Runtime Localization v12.0 (INI-Configurable Pixel Buffer Rendering)
 //
-// === v11.0 直接像素缓冲区渲染 ===
-// v10.1 结果: DirectDraw surface GetDC 方案失败 — dword_7CA9E8 是 CYOffportIMP
-//   而非 CYDDOffport, 没有 IDirectDrawSurface 指针
+// v12.0: INI 配置 + 自定义TTF + Y位置修复 + 渲染模式可选
 //
-// v11.0 核心发现:
-//   dword_7CA9E4 = CYOffportIMP 渲染设备对象 (sub_648C70 设置)
-//   CYOffportIMP 布局 (sub_6477B0 初始化):
-//     this[4]  (off 16) = 像素缓冲区基地址 (malloc 分配, 系统内存)
-//     this[5]  (off 20) = width
-//     this[6]  (off 24) = height
-//     this[7]  (off 28) = BPP (bits per pixel)
-//     this[8]  (off 32) = stride (bytes per row, DWORD 对齐)
-//     this[14] (off 56) = 颜色格式索引
-//     this[18] (off 72) = clip left
-//     this[19] (off 76) = clip top
-//     this[20] (off 80) = clip right
-//     this[21] (off 84) = clip bottom
-//   sub_6479F0 (vtable[46], offset 184): 返回像素指针 = this[4] + y*stride + (x*bpp)>>3
-//   游戏 sub_634140 直接写像素缓冲区, 不用 Lock/Unlock
+// v11.x 结果: 中文能显示但位置偏下、抗锯齿模糊、颜色不对
+//   根因: GDI originY 是从基线向上的偏移, 但代码把它当向下偏移用
+//   正确: dstY = curY + tmAscent - originY + py
 //
-// v11.0 策略:
-//   hook sub_66E7B0 (文本绘制函数), 命中中文时:
-//   1. 跳过原函数
-//   2. 从 dword_7CA9E4 或 a4 获取 CYOffportIMP 渲染设备
-//   3. 读取像素缓冲区信息 (base/bpp/stride/clip)
-//   4. 用 GetGlyphOutlineW 获取中文字形位图 (1bpp monochrome)
-//   5. 手动 blit 字形到像素缓冲区 (支持 8/16/32bpp)
-//   6. 处理对齐/裁剪/描边
-//   7. 非中文文本走原函数
-//
-// this 对象布局 (sub_66E7B0 的 this = UI 组件):
-//   this[0]/[4]/[8]  - StrObj 字符串数据
-//   this[2] (0x08)  - 字符串模式 (1=UTF-16, 其他=ANSI)
-//   this[3] (0x0C)  - X 偏移
-//   this[4] (0x10)  - Y 偏移
-//   this[5] (0x14)  - 右边界 X
-//   this[6] (0x18)  - 底部 Y
-//   this[7] (0x1C)  - 渲染标志 (bit0=居中, bit1=右对齐, bit2=描边, bit3=垂直居中)
-//   this[25](0x64)  - 前景色
-//   this[26](0x68)  - 描边色
-//
-// sub_66E7B0(this, a2, a3, a4) 签名:
-//   this = UI 组件对象
-//   a2 = X 偏移, a3 = Y 偏移
-//   a4 = 渲染设备 (0=用默认 dword_7CA9E4)
+// v12.0 改进:
+//   1. INI 配置文件 (MajestyI_TextFix.ini) 控制所有参数
+//   2. 自定义 TTF 字体加载 (同目录 .ttf 文件)
+//   3. 修复 Y 位置: 用 tmAscent - originY 计算字形顶部
+//   4. 渲染模式可选: GGO_BITMAP (1bpp) / GGO_GRAY8 (抗锯齿)
+//   5. 混合模式可选: 直接写入 / alpha 混合
+//   6. 前景色/描边色/字体大小/垂直偏移 全部可调
 
 #include "pch.h"
 #include <psapi.h>
@@ -63,25 +31,54 @@
 
 // ===================== 地址常量 =====================
 static constexpr uintptr_t ADDR_66E7B0  = 0x0066E7B0;
-static constexpr uintptr_t ADDR_7CA9E4   = 0x007CA9E4;  // dword_7CA9E4 (默认渲染设备 CYOffportIMP)
-static constexpr uintptr_t EXPECTED_VT   = 0x00741CAC;  // CYOffportIMP vtable
+static constexpr uintptr_t ADDR_7CA9E4  = 0x007CA9E4;
+static constexpr uintptr_t EXPECTED_VT  = 0x00741CAC;
 
 // CYOffportIMP 字段偏移
-static constexpr uint32_t OFF_PIXELBUF  = 16;   // this[4]  像素缓冲区
-static constexpr uint32_t OFF_WIDTH     = 20;   // this[5]  宽度
-static constexpr uint32_t OFF_HEIGHT    = 24;   // this[6]  高度
-static constexpr uint32_t OFF_BPP        = 28;   // this[7]  BPP
-static constexpr uint32_t OFF_STRIDE     = 32;   // this[8]  stride
-static constexpr uint32_t OFF_CLIP_LEFT  = 72;   // this[18] 裁剪左
-static constexpr uint32_t OFF_CLIP_TOP   = 76;   // this[19] 裁剪上
-static constexpr uint32_t OFF_CLIP_RIGHT = 80;   // this[20] 裁剪右
-static constexpr uint32_t OFF_CLIP_BOT   = 84;   // this[21] 裁剪下
+static constexpr uint32_t OFF_PIXELBUF  = 16;
+static constexpr uint32_t OFF_WIDTH     = 20;
+static constexpr uint32_t OFF_HEIGHT    = 24;
+static constexpr uint32_t OFF_BPP       = 28;
+static constexpr uint32_t OFF_STRIDE    = 32;
+static constexpr uint32_t OFF_CLIP_LEFT  = 72;
+static constexpr uint32_t OFF_CLIP_TOP   = 76;
+static constexpr uint32_t OFF_CLIP_RIGHT = 80;
+static constexpr uint32_t OFF_CLIP_BOT   = 84;
+
+// ===================== INI 配置 =====================
+struct Config {
+    // 字体
+    char     fontFile[260];   // TTF 文件名 (同目录), 空=用系统字体
+    char     fontName[128];   // 字体名称 (如 SimSun, Source Han Sans)
+    int      fontSize;         // 字体大小 (像素)
+    int      fontWeight;      // FW_NORMAL=400, FW_BOLD=700
+
+    // 渲染模式
+    int      renderMode;       // 0=GGO_BITMAP (1bpp), 1=GGO_GRAY8 (抗锯齿)
+    int      blendMode;        // 0=直接写入, 1=alpha混合
+    int      quality;           // 0=NONANTIALIASED, 1=ANTIALIASED, 2=CLEARTYPE
+
+    // 颜色 (RGB565 格式, 16bpp)
+    uint32_t fgColor;          // 前景色 (0=自动: 16bpp=0xFFFF)
+    uint32_t bgColor;          // 描边色
+    bool     overrideColor;    // true=忽略游戏颜色用配置值
+
+    // 位置微调
+    int      yOffset;          // Y 偏移微调 (像素)
+    int      xOffset;          // X 偏移微调 (像素)
+    int      lineSpacing;      // 额外行间距 (像素, 加在 tmHeight 上)
+
+    // 描边
+    bool     enableOutline;    // 强制开启描边
+    int      outlineWidth;     // 描边宽度 (像素)
+};
+static Config g_cfg;
 
 // ===================== 字符串对象 =====================
 struct StrObj {
-    void*    data;   // [0]
-    uint32_t meta;   // [4]
-    uint32_t extra;  // [8]
+    void*    data;
+    uint32_t meta;
+    uint32_t extra;
 };
 
 // ===================== 字典 =====================
@@ -106,7 +103,7 @@ static int g_blitCount = 0;
 static int g_blitFailCount = 0;
 static int g_devDumpCount = 0;
 
-// ===================== IsBadReadPtr 替代 =====================
+// ===================== SafeRead =====================
 static bool SafeRead32(uint32_t addr, uint32_t* out) {
     if (!addr) return false;
     __try {
@@ -124,6 +121,80 @@ static void LogWrite(const char* fmt, ...) {
     vfprintf(g_logFile, fmt, args);
     va_end(args);
     fflush(g_logFile);
+}
+
+// ===================== INI 读取 =====================
+static std::string GetDllDir() {
+    char path[MAX_PATH];
+    HMODULE hMod;
+    GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+        (LPCSTR)&g_logFile, &hMod);
+    GetModuleFileNameA(hMod, path, MAX_PATH);
+    char* p = strrchr(path, '\\');
+    if (p) *(p + 1) = '\0';
+    return std::string(path);
+}
+
+static void LoadConfig(const char* iniPath) {
+    // 默认值
+    memset(&g_cfg, 0, sizeof(g_cfg));
+    strncpy_s(g_cfg.fontFile, "", 0);
+    strncpy_s(g_cfg.fontName, "SimSun", 6);
+    g_cfg.fontSize = 12;
+    g_cfg.fontWeight = FW_NORMAL;
+    g_cfg.renderMode = 0;       // GGO_BITMAP
+    g_cfg.blendMode = 0;        // 直接写入
+    g_cfg.quality = 0;          // NONANTIALIASED
+    g_cfg.fgColor = 0xFFFF;     // 白色 RGB565
+    g_cfg.bgColor = 0x0000;     // 黑色
+    g_cfg.overrideColor = true;
+    g_cfg.yOffset = 0;
+    g_cfg.xOffset = 0;
+    g_cfg.lineSpacing = 0;
+    g_cfg.enableOutline = false;
+    g_cfg.outlineWidth = 1;
+
+    char buf[260];
+
+    // [Font]
+    GetPrivateProfileStringA("Font", "FontFile", "", buf, 260, iniPath);
+    if (buf[0]) strncpy_s(g_cfg.fontFile, buf, 259);
+
+    GetPrivateProfileStringA("Font", "FontName", "SimSun", buf, 128, iniPath);
+    strncpy_s(g_cfg.fontName, buf, 127);
+
+    g_cfg.fontSize = GetPrivateProfileIntA("Font", "FontSize", 12, iniPath);
+    g_cfg.fontWeight = GetPrivateProfileIntA("Font", "FontWeight", FW_NORMAL, iniPath);
+
+    // [Render]
+    g_cfg.renderMode = GetPrivateProfileIntA("Render", "RenderMode", 0, iniPath);
+    g_cfg.blendMode = GetPrivateProfileIntA("Render", "BlendMode", 0, iniPath);
+    g_cfg.quality = GetPrivateProfileIntA("Render", "Quality", 0, iniPath);
+
+    // [Color]
+    g_cfg.fgColor = (uint32_t)GetPrivateProfileIntA("Color", "FgColor", 0xFFFF, iniPath);
+    g_cfg.bgColor = (uint32_t)GetPrivateProfileIntA("Color", "BgColor", 0x0000, iniPath);
+    g_cfg.overrideColor = GetPrivateProfileIntA("Color", "OverrideColor", 1, iniPath) != 0;
+
+    // [Position]
+    g_cfg.yOffset = GetPrivateProfileIntA("Position", "YOffset", 0, iniPath);
+    g_cfg.xOffset = GetPrivateProfileIntA("Position", "XOffset", 0, iniPath);
+    g_cfg.lineSpacing = GetPrivateProfileIntA("Position", "LineSpacing", 0, iniPath);
+
+    // [Outline]
+    g_cfg.enableOutline = GetPrivateProfileIntA("Outline", "Enable", 0, iniPath) != 0;
+    g_cfg.outlineWidth = GetPrivateProfileIntA("Outline", "Width", 1, iniPath);
+
+    LogWrite("[Config] FontFile=%s FontName=%s FontSize=%d FontWeight=%d\n",
+        g_cfg.fontFile[0] ? g_cfg.fontFile : "(none)", g_cfg.fontName, g_cfg.fontSize, g_cfg.fontWeight);
+    LogWrite("[Config] RenderMode=%d BlendMode=%d Quality=%d\n",
+        g_cfg.renderMode, g_cfg.blendMode, g_cfg.quality);
+    LogWrite("[Config] FgColor=0x%X BgColor=0x%X Override=%d\n",
+        g_cfg.fgColor, g_cfg.bgColor, (int)g_cfg.overrideColor);
+    LogWrite("[Config] YOffset=%d XOffset=%d LineSpacing=%d\n",
+        g_cfg.yOffset, g_cfg.xOffset, g_cfg.lineSpacing);
+    LogWrite("[Config] Outline=%d OutlineWidth=%d\n",
+        (int)g_cfg.enableOutline, g_cfg.outlineWidth);
 }
 
 // ===================== 字典加载 =====================
@@ -269,24 +340,44 @@ static bool ReadFullString(int thisPtr, std::string& out, int* outCharLen = null
     }
 }
 
-// ===================== GDI 字体 (用于 GetGlyphOutlineW) =====================
+// ===================== GDI 字体 =====================
 static HFONT g_cjkFont = nullptr;
-static int g_fontSize = 12;
-static int g_tmHeight = 16;   // TEXTMETRIC tmHeight
-static int g_tmAscent = 13;    // TEXTMETRIC tmAscent
+static int g_tmHeight = 16;
+static int g_tmAscent = 13;
+static int g_tmDescent = 3;
 
 static void InitGdiFonts() {
     if (g_cjkFont) return;
+
+    // 加载自定义 TTF
+    if (g_cfg.fontFile[0]) {
+        std::string dllDir = GetDllDir();
+        std::string fontPath = dllDir + g_cfg.fontFile;
+        if (AddFontResourceExA(fontPath.c_str(), FR_PRIVATE, nullptr)) {
+            LogWrite("[Font] Loaded TTF: %s\n", fontPath.c_str());
+        } else {
+            LogWrite("[Font] Failed to load TTF: %s (err=%d)\n", fontPath.c_str(), GetLastError());
+        }
+    }
+
+    int quality = NONANTIALIASED_QUALITY;
+    if (g_cfg.quality == 1) quality = ANTIALIASED_QUALITY;
+    else if (g_cfg.quality == 2) quality = CLEARTYPE_QUALITY;
+
+    wchar_t wfontName[128];
+    MultiByteToWideChar(CP_ACP, 0, g_cfg.fontName, -1, wfontName, 128);
+
     g_cjkFont = CreateFontW(
-        -g_fontSize, 0, 0, 0, FW_NORMAL,
+        -g_cfg.fontSize, 0, 0, 0, g_cfg.fontWeight,
         FALSE, FALSE, FALSE,
         DEFAULT_CHARSET,
         OUT_DEFAULT_PRECIS,
         CLIP_DEFAULT_PRECIS,
-        ANTIALIASED_QUALITY,  // 开启抗锯齿, 使用 GGO_GRAY8
+        quality,
         DEFAULT_PITCH | FF_DONTCARE,
-        L"SimSun"
+        wfontName
     );
+
     if (g_cjkFont) {
         HDC tdc = GetDC(nullptr);
         HFONT oldF = (HFONT)SelectObject(tdc, g_cjkFont);
@@ -294,35 +385,35 @@ static void InitGdiFonts() {
         if (GetTextMetricsW(tdc, &tm)) {
             g_tmHeight = tm.tmHeight;
             g_tmAscent = tm.tmAscent;
-            LogWrite("[Font] SimSun %dpt: tmHeight=%d tmAscent=%d tmDescent=%d tmInternalLeading=%d\n",
-                g_fontSize, tm.tmHeight, tm.tmAscent, tm.tmDescent, tm.tmInternalLeading);
+            g_tmDescent = tm.tmDescent;
+            LogWrite("[Font] %s %dpt: tmHeight=%d tmAscent=%d tmDescent=%d tmInternalLeading=%d\n",
+                g_cfg.fontName, g_cfg.fontSize, tm.tmHeight, tm.tmAscent, tm.tmDescent, tm.tmInternalLeading);
         }
         SelectObject(tdc, oldF);
         ReleaseDC(nullptr, tdc);
-        LogWrite("[Font] SimSun %dpt created (handle=0x%p) tmHeight=%d\n", g_fontSize, g_cjkFont, g_tmHeight);
+        LogWrite("[Font] %s %dpt created (handle=0x%p) tmHeight=%d tmAscent=%d\n",
+            g_cfg.fontName, g_cfg.fontSize, g_cjkFont, g_tmHeight, g_tmAscent);
     } else {
         LogWrite("[Font] ERROR: CreateFontW failed (err=%d)\n", GetLastError());
     }
 }
 
-// ===================== 渲染设备信息缓存 =====================
+// ===================== 渲染设备信息 =====================
 struct RenderDevInfo {
-    uint32_t obj;       // CYOffportIMP 对象地址
-    uint32_t pixelBuf;  // this[4] 像素缓冲区
-    uint32_t width;     // this[5]
-    uint32_t height;    // this[6]
-    uint32_t bpp;       // this[7]
-    uint32_t stride;    // this[8]
-    uint32_t clipL;     // this[18]
-    uint32_t clipT;     // this[19]
-    uint32_t clipR;     // this[20]
-    uint32_t clipB;     // this[21]
+    uint32_t obj;
+    uint32_t pixelBuf;
+    uint32_t width;
+    uint32_t height;
+    uint32_t bpp;
+    uint32_t stride;
+    uint32_t clipL;
+    uint32_t clipT;
+    uint32_t clipR;
+    uint32_t clipB;
 };
 
 static bool GetRenderDevInfo(int a4, RenderDevInfo& info) {
     memset(&info, 0, sizeof(info));
-
-    // 1. 获取渲染设备对象地址
     info.obj = 0;
     if (a4) {
         info.obj = (uint32_t)a4;
@@ -333,8 +424,6 @@ static bool GetRenderDevInfo(int a4, RenderDevInfo& info) {
             return false;
         }
     }
-
-    // 2. 验证 vtable (可选, 用于诊断)
     uint32_t vt = 0;
     if (SafeRead32(info.obj, &vt)) {
         if (g_devDumpCount < 3) {
@@ -347,8 +436,6 @@ static bool GetRenderDevInfo(int a4, RenderDevInfo& info) {
             LogWrite("[Render] obj=0x%X vtable unreadable\n", info.obj);
         return false;
     }
-
-    // 3. 读取像素缓冲区信息
     if (!SafeRead32(info.obj + OFF_PIXELBUF, &info.pixelBuf) || !info.pixelBuf) {
         if (g_blitFailCount < 5)
             LogWrite("[Render] pixelBuf = 0 (obj=0x%X)\n", info.obj);
@@ -358,25 +445,24 @@ static bool GetRenderDevInfo(int a4, RenderDevInfo& info) {
     if (!SafeRead32(info.obj + OFF_HEIGHT, &info.height) || !info.height) return false;
     if (!SafeRead32(info.obj + OFF_BPP, &info.bpp) || !info.bpp) return false;
     if (!SafeRead32(info.obj + OFF_STRIDE, &info.stride) || !info.stride) return false;
-
-    // 4. 读取裁剪矩形
     SafeRead32(info.obj + OFF_CLIP_LEFT, &info.clipL);
     SafeRead32(info.obj + OFF_CLIP_TOP, &info.clipT);
     SafeRead32(info.obj + OFF_CLIP_RIGHT, &info.clipR);
     SafeRead32(info.obj + OFF_CLIP_BOT, &info.clipB);
-
-    // 使用 surface 尺寸作为默认裁剪
     if (info.clipR == 0) info.clipR = info.width;
     if (info.clipB == 0) info.clipB = info.height;
-
     if (g_devDumpCount < 5) {
         LogWrite("[Render] pixelBuf=0x%X %ux%u bpp=%u stride=%u clip=[%u,%u,%u,%u]\n",
             info.pixelBuf, info.width, info.height, info.bpp, info.stride,
             info.clipL, info.clipT, info.clipR, info.clipB);
         g_devDumpCount++;
     }
-
     return true;
+}
+
+// ===================== RGB565 颜色编码 =====================
+static uint16_t RGB565(uint8_t r, uint8_t g, uint8_t b) {
+    return (uint16_t)(((r >> 3) << 11) | ((g >> 2) << 5) | (b >> 3));
 }
 
 // ===================== 直接像素缓冲区渲染 =====================
@@ -384,42 +470,48 @@ static bool DirectBlitText(int thisPtr, int a2, int a3, int a4,
                            const wchar_t* wstr, int wlen) {
     if (!wstr || wlen <= 0) return false;
 
-    // 1. 获取渲染设备信息
     RenderDevInfo rdi;
     if (!GetRenderDevInfo(a4, rdi)) {
         g_blitFailCount++;
         return false;
     }
 
-    // 2. 读取文本布局
+    // 读取文本布局
     uint32_t* dwordBase = (uint32_t*)thisPtr;
     int startX = (int)dwordBase[3] + a2;
     int endX   = (int)dwordBase[5] + a2;
     int startY = (int)dwordBase[4] + a3;
     int endY   = (int)dwordBase[6] + a3;
     uint8_t flags = (uint8_t)dwordBase[7];
-    uint32_t fgColor = dwordBase[25];  // 前景色
-    uint32_t bgColor = dwordBase[26];  // 描边色
 
     bool centered   = (flags & 0x01) != 0;
     bool rightAlign = (flags & 0x02) != 0;
-    bool outlined   = (flags & 0x04) != 0;
+    bool outlined   = (flags & 0x04) != 0 || g_cfg.enableOutline;
     bool vCentered  = (flags & 0x08) != 0;
 
-    // 颜色默认值: fg=0 时用白色, bg=0 且描边时用黑色
-    if (fgColor == 0) {
-        switch (rdi.bpp) {
-            case 8:  fgColor = 0xFF; break;
-            case 16: fgColor = 0xFFFF; break;
-            case 24: fgColor = 0xFFFFFF; break;
-            case 32: fgColor = 0xFFFFFF; break;
+    // 颜色
+    uint32_t fgColor, bgColor;
+    if (g_cfg.overrideColor) {
+        fgColor = g_cfg.fgColor;
+        bgColor = g_cfg.bgColor;
+    } else {
+        fgColor = dwordBase[25];
+        bgColor = dwordBase[26];
+        if (fgColor == 0) {
+            switch (rdi.bpp) {
+                case 16: fgColor = 0xFFFF; break;
+                case 24: case 32: fgColor = 0xFFFFFF; break;
+                default: fgColor = 0xFF; break;
+            }
         }
     }
-    if (outlined && bgColor == 0) {
-        bgColor = 0x00000000;
-    }
 
-    // 3. 计算每像素字节数
+    // 偏移微调
+    startX += g_cfg.xOffset;
+    endX   += g_cfg.xOffset;
+    startY += g_cfg.yOffset;
+    endY   += g_cfg.yOffset;
+
     int bytesPerPixel = rdi.bpp / 8;
     if (bytesPerPixel < 1 || bytesPerPixel > 4) {
         if (g_blitFailCount < 5)
@@ -428,15 +520,15 @@ static bool DirectBlitText(int thisPtr, int a2, int a3, int a4,
         return false;
     }
 
-    // 4. 创建内存 DC (用于 GetGlyphOutlineW)
     HDC mdc = CreateCompatibleDC(nullptr);
-    if (!mdc) {
-        g_blitFailCount++;
-        return false;
-    }
+    if (!mdc) { g_blitFailCount++; return false; }
     HFONT oldFont = (HFONT)SelectObject(mdc, g_cjkFont);
 
-    // 5. 测量文本总宽度
+    DWORD glyphFormat = (g_cfg.renderMode == 1) ? GGO_GRAY8 : GGO_BITMAP;
+    bool useAlpha = (g_cfg.blendMode == 1) && (g_cfg.renderMode == 1);
+    int alphaMax = 64;  // GGO_GRAY8 的最大灰度值
+
+    // 测量文本总宽度
     int totalWidth = 0;
     int textHeight = g_tmHeight;
     int maxLineWidth = 0;
@@ -445,7 +537,7 @@ static bool DirectBlitText(int thisPtr, int a2, int a3, int a4,
         if (wstr[i] == L'\n') {
             if (curLineWidth > maxLineWidth) maxLineWidth = curLineWidth;
             curLineWidth = 0;
-            textHeight += g_tmHeight;
+            textHeight += g_tmHeight + g_cfg.lineSpacing;
             continue;
         }
         if (wstr[i] == L'\r') continue;
@@ -459,7 +551,7 @@ static bool DirectBlitText(int thisPtr, int a2, int a3, int a4,
     if (curLineWidth > maxLineWidth) maxLineWidth = curLineWidth;
     totalWidth = maxLineWidth;
 
-    // 6. 计算绘制位置
+    // 计算绘制位置
     int drawX = startX;
     int drawY = startY;
     if (centered) {
@@ -471,7 +563,7 @@ static bool DirectBlitText(int thisPtr, int a2, int a3, int a4,
         drawY = startY + (endY - startY - textHeight) / 2;
     }
 
-    // 7. 裁剪: 文本裁剪 + surface 裁剪
+    // 裁剪
     int clipL = startX > (int)rdi.clipL ? startX : (int)rdi.clipL;
     int clipT = startY > (int)rdi.clipT ? startY : (int)rdi.clipT;
     int clipR = endX < (int)rdi.clipR ? endX : (int)rdi.clipR;
@@ -480,20 +572,21 @@ static bool DirectBlitText(int thisPtr, int a2, int a3, int a4,
     if (clipB > (int)rdi.height) clipB = (int)rdi.height;
 
     if (g_blitCount < 5) {
-        LogWrite("[Blit %d] pos=(%d,%d) clip=[%d,%d,%d,%d] surf=[%u,%u,%u,%u] flags=0x%02X fg=0x%X bg=0x%X bpp=%u\n",
+        LogWrite("[Blit %d] pos=(%d,%d) clip=[%d,%d,%d,%d] flags=0x%02X fg=0x%X bg=0x%X bpp=%u fmt=%s blend=%s\n",
             g_blitCount, drawX, drawY, clipL, clipT, clipR, clipB,
-            rdi.clipL, rdi.clipT, rdi.clipR, rdi.clipB,
-            flags, fgColor, bgColor, rdi.bpp);
+            flags, fgColor, bgColor, rdi.bpp,
+            g_cfg.renderMode ? "GRAY8" : "BITMAP",
+            useAlpha ? "alpha" : "direct");
     }
 
-    // 8. 逐字符 blit
     int curX = drawX;
     int curY = drawY;
+    int lineH = g_tmHeight + g_cfg.lineSpacing;
 
     for (int i = 0; i < wlen; i++) {
         if (wstr[i] == L'\n') {
             curX = drawX;
-            curY += g_tmHeight;
+            curY += lineH;
             continue;
         }
         if (wstr[i] == L'\r') continue;
@@ -502,40 +595,48 @@ static bool DirectBlitText(int thisPtr, int a2, int a3, int a4,
             continue;
         }
 
-        // 获取字形位图 (GGO_GRAY8: 8-bit grayscale, values 0-64)
         GLYPHMETRICS gm;
         MAT2 mat = {{0,1},{0,0},{0,0},{0,1}};
-        DWORD glyphSize = GetGlyphOutlineW(mdc, wstr[i], GGO_GRAY8, &gm, 0, nullptr, &mat);
+        DWORD glyphSize = GetGlyphOutlineW(mdc, wstr[i], glyphFormat, &gm, 0, nullptr, &mat);
         if (glyphSize == GDI_ERROR || glyphSize == 0) {
             GLYPHMETRICS gm2;
             DWORD ret = GetGlyphOutlineW(mdc, wstr[i], GGO_METRICS, &gm2, 0, nullptr, &mat);
-            if (ret != GDI_ERROR) {
-                curX += gm2.gmCellIncX;
-            } else {
-                curX += g_tmHeight;
-            }
+            if (ret != GDI_ERROR) curX += gm2.gmCellIncX;
+            else curX += g_tmHeight;
             continue;
         }
 
         std::vector<uint8_t> glyphBuf(glyphSize, 0);
-        if (GetGlyphOutlineW(mdc, wstr[i], GGO_GRAY8, &gm, glyphSize, glyphBuf.data(), &mat) == GDI_ERROR) {
+        if (GetGlyphOutlineW(mdc, wstr[i], glyphFormat, &gm, glyphSize, glyphBuf.data(), &mat) == GDI_ERROR) {
             curX += gm.gmCellIncX;
             continue;
         }
 
         int glyphW = gm.gmBlackBoxX;
         int glyphH = gm.gmBlackBoxY;
-        int glyphStride = (glyphW + 3) & ~3;  // DWORD 对齐 (8bpp)
-        if ((DWORD)(glyphStride * glyphH) > glyphSize) {
-            glyphStride = glyphSize / glyphH;
+        int glyphStride;
+        bool isBitmap = (g_cfg.renderMode == 0);
+
+        if (isBitmap) {
+            glyphStride = ((glyphW + 7) / 8 + 3) & ~3;  // 1bpp DWORD 对齐
+        } else {
+            glyphStride = (glyphW + 3) & ~3;  // 8bpp DWORD 对齐
+            if ((DWORD)(glyphStride * glyphH) > glyphSize) {
+                glyphStride = glyphSize / glyphH;
+            }
         }
+
         int originX = gm.gmptGlyphOrigin.x;
         int originY = gm.gmptGlyphOrigin.y;
 
-        // alpha blend blit: 灰度值作为 alpha 混合到目标像素
+        // ★ Y 位置修复: originY 是从基线向上的偏移
+        //   基线 = curY + tmAscent
+        //   字形顶部 = 基线 - originY = curY + tmAscent - originY
+        int glyphTopY = curY + g_tmAscent - originY;
+
         auto blitGlyph = [&](int offX, int offY, uint32_t color) {
             for (int py = 0; py < glyphH; py++) {
-                int dstY = curY + originY + py + offY;
+                int dstY = glyphTopY + py + offY;
                 if (dstY < clipT || dstY >= clipB) continue;
                 if (dstY < 0 || dstY >= (int)rdi.height) continue;
 
@@ -543,53 +644,76 @@ static bool DirectBlitText(int thisPtr, int a2, int a3, int a4,
                 uint8_t* srcRow = glyphBuf.data() + py * glyphStride;
 
                 for (int px = 0; px < glyphW; px++) {
-                    uint8_t gray = srcRow[px];
-                    if (gray == 0) continue;
+                    bool isOn;
+                    int alpha = alphaMax;
+
+                    if (isBitmap) {
+                        isOn = (srcRow[px >> 3] & (0x80 >> (px & 7))) != 0;
+                        if (!isOn) continue;
+                    } else {
+                        uint8_t gray = srcRow[px];
+                        if (gray == 0) continue;
+                        if (gray > alphaMax) gray = (uint8_t)alphaMax;
+                        alpha = gray;
+                    }
 
                     int dstX = curX + originX + px + offX;
                     if (dstX < clipL || dstX >= clipR) continue;
                     if (dstX < 0 || dstX >= (int)rdi.width) continue;
 
-                    int alpha = gray;
-                    if (alpha > 64) alpha = 64;
-                    int invA = 64 - alpha;
-
                     __try {
-                        switch (rdi.bpp) {
-                            case 16: {
-                                uint16_t* p = (uint16_t*)(dstRow + dstX * 2);
-                                uint16_t d = *p;
-                                int dR=(d>>11)&0x1F, dG=(d>>5)&0x3F, dB=d&0x1F;
-                                int sR=(color>>11)&0x1F, sG=(color>>5)&0x3F, sB=color&0x1F;
-                                *p=(uint16_t)(((sR*alpha+dR*invA)/64)<<11|((sG*alpha+dG*invA)/64)<<5|((sB*alpha+dB*invA)/64));
-                                break;
+                        if (useAlpha && !isBitmap) {
+                            int invA = alphaMax - alpha;
+                            switch (rdi.bpp) {
+                                case 16: {
+                                    uint16_t* p = (uint16_t*)(dstRow + dstX * 2);
+                                    uint16_t d = *p;
+                                    int dR=(d>>11)&0x1F, dG=(d>>5)&0x3F, dB=d&0x1F;
+                                    int sR=(color>>11)&0x1F, sG=(color>>5)&0x3F, sB=color&0x1F;
+                                    *p=(uint16_t)(((sR*alpha+dR*invA)/alphaMax)<<11|((sG*alpha+dG*invA)/alphaMax)<<5|((sB*alpha+dB*invA)/alphaMax));
+                                    break;
+                                }
+                                case 32: {
+                                    uint32_t* p = (uint32_t*)(dstRow + dstX * 4);
+                                    uint32_t d = *p;
+                                    *p = (uint32_t)((((color&0xFF)*alpha+(d&0xFF)*invA)/alphaMax)|((((color>>8)&0xFF)*alpha+((d>>8)&0xFF)*invA)/alphaMax)<<8|((((color>>16)&0xFF)*alpha+((d>>16)&0xFF)*invA)/alphaMax)<<16);
+                                    break;
+                                }
+                                case 24: {
+                                    uint8_t* p = dstRow + dstX * 3;
+                                    p[0]=(uint8_t)(((color&0xFF)*alpha+p[0]*invA)/alphaMax);
+                                    p[1]=(uint8_t)(((color>>8&0xFF)*alpha+p[1]*invA)/alphaMax);
+                                    p[2]=(uint8_t)(((color>>16&0xFF)*alpha+p[2]*invA)/alphaMax);
+                                    break;
+                                }
+                                case 8:
+                                    if (alpha > alphaMax/2) dstRow[dstX] = (uint8_t)color;
+                                    break;
                             }
-                            case 32: {
-                                uint32_t* p = (uint32_t*)(dstRow + dstX * 4);
-                                uint32_t d = *p;
-                                *p = (uint32_t)((((color&0xFF)*alpha+(d&0xFF)*invA)/64)|((((color>>8)&0xFF)*alpha+((d>>8)&0xFF)*invA)/64)<<8|((((color>>16)&0xFF)*alpha+((d>>16)&0xFF)*invA)/64)<<16);
-                                break;
+                        } else {
+                            // 直接写入
+                            switch (rdi.bpp) {
+                                case 8:  dstRow[dstX] = (uint8_t)color; break;
+                                case 16: *(uint16_t*)(dstRow + dstX * 2) = (uint16_t)color; break;
+                                case 24:
+                                    dstRow[dstX * 3]     = (uint8_t)(color);
+                                    dstRow[dstX * 3 + 1] = (uint8_t)(color >> 8);
+                                    dstRow[dstX * 3 + 2] = (uint8_t)(color >> 16);
+                                    break;
+                                case 32: *(uint32_t*)(dstRow + dstX * 4) = color; break;
                             }
-                            case 24: {
-                                uint8_t* p = dstRow + dstX * 3;
-                                p[0]=(uint8_t)(((color&0xFF)*alpha+p[0]*invA)/64);
-                                p[1]=(uint8_t)(((color>>8&0xFF)*alpha+p[1]*invA)/64);
-                                p[2]=(uint8_t)(((color>>16&0xFF)*alpha+p[2]*invA)/64);
-                                break;
-                            }
-                            case 8:
-                                if (alpha > 32) dstRow[dstX] = (uint8_t)color;
-                                break;
                         }
                     } __except (EXCEPTION_EXECUTE_HANDLER) {}
                 }
             }
         };
 
-        // 描边 (先画, 被前景色覆盖)
+        // 描边
         if (outlined) {
-            for (int dy = -1; dy <= 1; dy++) {
-                for (int dx = -1; dx <= 1; dx++) {
+            int ow = g_cfg.outlineWidth;
+            if (ow < 1) ow = 1;
+            for (int dy = -ow; dy <= ow; dy++) {
+                for (int dx = -ow; dx <= ow; dx++) {
                     if (dx == 0 && dy == 0) continue;
                     blitGlyph(dx, dy, bgColor);
                 }
@@ -599,11 +723,9 @@ static bool DirectBlitText(int thisPtr, int a2, int a3, int a4,
         // 前景色
         blitGlyph(0, 0, fgColor);
 
-        // 前进
         curX += gm.gmCellIncX;
     }
 
-    // 清理
     SelectObject(mdc, oldFont);
     DeleteDC(mdc);
 
@@ -620,7 +742,6 @@ static bool DirectBlitText(int thisPtr, int a2, int a3, int a4,
 int __fastcall Hooked_66E7B0(int ecx_this, int edx_unused, int a2, int a3, int a4) {
     g_callCount++;
 
-    // 读取完整字符串
     std::string enText;
     bool wide = false;
     int chLen = 0;
@@ -630,7 +751,6 @@ int __fastcall Hooked_66E7B0(int ecx_this, int edx_unused, int a2, int a3, int a
         return g_orig66E7B0(ecx_this, edx_unused, a2, a3, a4);
     }
 
-    // 查词典
     auto it = g_dict.find(enText);
     if (it == g_dict.end()) {
         g_missCount++;
@@ -641,7 +761,6 @@ int __fastcall Hooked_66E7B0(int ecx_this, int edx_unused, int a2, int a3, int a
         return g_orig66E7B0(ecx_this, edx_unused, a2, a3, a4);
     }
 
-    // 命中!
     g_hitCount++;
     const DictEntry& entry = it->second;
 
@@ -650,7 +769,6 @@ int __fastcall Hooked_66E7B0(int ecx_this, int edx_unused, int a2, int a3, int a
             g_hitCount, enText.substr(0, 60).c_str(), entry.cnWcharCount);
     }
 
-    // 直接像素缓冲区渲染, 跳过原函数
     const wchar_t* wstr = (const wchar_t*)entry.cnUtf16LE.data();
     int wlen = entry.cnWcharCount;
 
@@ -706,24 +824,36 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
         if (!strstr(path, "MajestyHD.exe") && !strstr(path, "majestyhd.exe")) {
             return TRUE;
         }
+
+        // 路径设置
+        char dllPath[MAX_PATH];
+        GetModuleFileNameA(hModule, dllPath, MAX_PATH);
+        char* p = strrchr(dllPath, '\\');
+        char dllDir[MAX_PATH];
+        strncpy_s(dllDir, dllPath, (size_t)(p - dllPath + 1));
+        dllDir[p - dllPath + 1] = '\0';
+
         char logPath[MAX_PATH];
-        GetModuleFileNameA(hModule, logPath, MAX_PATH);
-        char* p = strrchr(logPath, '\\');
-        if (p) strcpy(p + 1, "MajestyI_TextFix.log");
-        else strcpy(logPath, "MajestyI_TextFix.log");
+        sprintf_s(logPath, "%sMajestyI_TextFix.log", dllDir);
+        char dictPath[MAX_PATH];
+        sprintf_s(dictPath, "%sdict.txt", dllDir);
+        char iniPath[MAX_PATH];
+        sprintf_s(iniPath, "%sMajestyI_TextFix.ini", dllDir);
+
         g_logFile = fopen(logPath, "w");
         if (g_logFile) {
-            fprintf(g_logFile, "[MajestyHD Runtime Localization v11.1 Gray8 Alpha Blend] DllMain ATTACH\n");
+            fprintf(g_logFile, "[MajestyHD Runtime Localization v12.0 INI-Configurable] DllMain ATTACH\n");
             fprintf(g_logFile, "  Exe path: %s\n", path);
             fprintf(g_logFile, "  Log path: %s\n", logPath);
-            fprintf(g_logFile, "  Strategy: hook sub_66E7B0 + CYOffportIMP pixel buffer + GGO_GRAY8 alpha blend\n\n");
+            fprintf(g_logFile, "  Dict path: %s\n", dictPath);
+            fprintf(g_logFile, "  INI path: %s\n", iniPath);
+            fprintf(g_logFile, "  Strategy: hook sub_66E7B0 + CYOffportIMP pixel buffer + INI config\n\n");
             fflush(g_logFile);
         }
-        char dictPath[MAX_PATH];
-        GetModuleFileNameA(hModule, dictPath, MAX_PATH);
-        char* p2 = strrchr(dictPath, '\\');
-        if (p2) strcpy(p2 + 1, "dict.txt");
-        else strcpy(dictPath, "dict.txt");
+
+        // 加载 INI 配置
+        LoadConfig(iniPath);
+
         if (LoadDict(dictPath)) {
             LogWrite("[Dict] Loaded %d entries from %s\n", g_dictCount, dictPath);
         } else {
@@ -738,7 +868,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
         fflush(g_logFile);
     } else if (dwReason == DLL_PROCESS_DETACH) {
         if (g_logFile) {
-            fprintf(g_logFile, "\n[DllMain] DETACH (v11.1)\n");
+            fprintf(g_logFile, "\n[DllMain] DETACH (v12.0)\n");
             fprintf(g_logFile, "  Calls=%d Replaced=%d Hits=%d Misses=%d\n",
                 g_callCount, g_replacedCount, g_hitCount, g_missCount);
             fprintf(g_logFile, "  Blits=%d BlitFails=%d\n",
@@ -747,6 +877,11 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
             g_logFile = nullptr;
         }
         if (g_cjkFont) { DeleteObject(g_cjkFont); g_cjkFont = nullptr; }
+        if (g_cfg.fontFile[0]) {
+            std::string dllDir = GetDllDir();
+            std::string fontPath = dllDir + g_cfg.fontFile;
+            RemoveFontResourceExA(fontPath.c_str(), FR_PRIVATE, nullptr);
+        }
     }
     return TRUE;
 }
