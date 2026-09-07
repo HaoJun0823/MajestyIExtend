@@ -1,17 +1,19 @@
-﻿// dllmain.cpp : Majesty HD Runtime Localization v12.1 (FullLog + AutoWrap)
+﻿// dllmain.cpp : Majesty HD Runtime Localization v12.2 (SplitLog + WrapWidth)
 //
-// v12.1: 全量日志 + 自动换行
+// v12.2: 日志拆分 + 换行宽度可配
 //
-// v12.0 结果: 字体问题解决，中文显示正确
-// v12.1 改进:
-//   1. 去掉 HIT/MISS 日志次数限制，输出全量 英文->中文 映射
-//   2. 长文本自动换行：按可用宽度断行，CJK 字符任意位置可断，空格处断行
-//   3. 日志中显示中文译文内容（UTF-8）
+// v12.1 结果: 中文显示正确，自动换行有效
+// v12.2 改进:
+//   1. 换行宽度可通过 INI [Position] WrapWidth 配置 (0=自动, >0=固定像素宽度)
+//   2. 日志拆分为三个文件：主日志(初始化/配置/错误) / miss.log(MISS去重) / hit.log(HIT去重)
+//   3. MISS/HIT 去重：每个英文 key 只输出一次
+//   4. MISS 日志不截断，输出完整 key（便于补充词典）
 
 #include "pch.h"
 #include <psapi.h>
 #include <intrin.h>
 #include <unordered_map>
+#include <unordered_set>
 #include <string>
 #include <vector>
 #include "MinHook.h"
@@ -61,6 +63,7 @@ struct Config {
     int      yOffset;          // Y 偏移微调 (像素)
     int      xOffset;          // X 偏移微调 (像素)
     int      lineSpacing;      // 额外行间距 (像素, 加在 tmHeight 上)
+    int      wrapWidth;        // 自动换行宽度 (0=自动用 endX-startX, >0=固定像素宽度)
 
     // 描边
     bool     enableOutline;    // 强制开启描边
@@ -89,6 +92,8 @@ static OrigDraw_t g_orig66E7B0 = nullptr;
 
 // ===================== Debug 日志 =====================
 static FILE* g_logFile = nullptr;
+static FILE* g_missLogFile = nullptr;
+static FILE* g_hitLogFile = nullptr;
 static int g_callCount = 0;
 static int g_replacedCount = 0;
 static int g_hitCount = 0;
@@ -96,6 +101,10 @@ static int g_missCount = 0;
 static int g_blitCount = 0;
 static int g_blitFailCount = 0;
 static int g_devDumpCount = 0;
+
+// MISS/HIT 去重
+static std::unordered_set<std::string> g_missSeen;
+static std::unordered_set<std::string> g_hitSeen;
 
 // ===================== SafeRead =====================
 static bool SafeRead32(uint32_t addr, uint32_t* out) {
@@ -115,6 +124,26 @@ static void LogWrite(const char* fmt, ...) {
     vfprintf(g_logFile, fmt, args);
     va_end(args);
     fflush(g_logFile);
+}
+
+// MISS 日志（去重，输出到 miss.log）
+static void LogMiss(const char* enText, bool wide, int chLen) {
+    g_missCount++;
+    if (!g_missLogFile) return;
+    if (g_missSeen.count(enText)) return;
+    g_missSeen.insert(enText);
+    fprintf(g_missLogFile, "[MISS] \"%s\" (wide=%d chLen=%d)\n", enText, (int)wide, chLen);
+    fflush(g_missLogFile);
+}
+
+// HIT 日志（去重，输出到 hit.log，含英文→中文映射）
+static void LogHit(const char* enText, const char* cnUtf8, int wchars) {
+    g_hitCount++;
+    if (!g_hitLogFile) return;
+    if (g_hitSeen.count(enText)) return;
+    g_hitSeen.insert(enText);
+    fprintf(g_hitLogFile, "[HIT] \"%s\" -> \"%s\" (wchars=%d)\n", enText, cnUtf8, wchars);
+    fflush(g_hitLogFile);
 }
 
 // ===================== INI 读取 =====================
@@ -145,6 +174,7 @@ static void LoadConfig(const char* iniPath) {
     g_cfg.yOffset = 0;
     g_cfg.xOffset = 0;
     g_cfg.lineSpacing = 0;
+    g_cfg.wrapWidth = 0;
     g_cfg.enableOutline = false;
     g_cfg.outlineWidth = 1;
 
@@ -174,6 +204,7 @@ static void LoadConfig(const char* iniPath) {
     g_cfg.yOffset = GetPrivateProfileIntA("Position", "YOffset", 0, iniPath);
     g_cfg.xOffset = GetPrivateProfileIntA("Position", "XOffset", 0, iniPath);
     g_cfg.lineSpacing = GetPrivateProfileIntA("Position", "LineSpacing", 0, iniPath);
+    g_cfg.wrapWidth = GetPrivateProfileIntA("Position", "WrapWidth", 0, iniPath);
 
     // [Outline]
     g_cfg.enableOutline = GetPrivateProfileIntA("Outline", "Enable", 0, iniPath) != 0;
@@ -185,8 +216,8 @@ static void LoadConfig(const char* iniPath) {
         g_cfg.renderMode, g_cfg.blendMode, g_cfg.quality);
     LogWrite("[Config] FgColor=0x%X BgColor=0x%X Override=%d\n",
         g_cfg.fgColor, g_cfg.bgColor, (int)g_cfg.overrideColor);
-    LogWrite("[Config] YOffset=%d XOffset=%d LineSpacing=%d\n",
-        g_cfg.yOffset, g_cfg.xOffset, g_cfg.lineSpacing);
+    LogWrite("[Config] YOffset=%d XOffset=%d LineSpacing=%d WrapWidth=%d\n",
+        g_cfg.yOffset, g_cfg.xOffset, g_cfg.lineSpacing, g_cfg.wrapWidth);
     LogWrite("[Config] Outline=%d OutlineWidth=%d\n",
         (int)g_cfg.enableOutline, g_cfg.outlineWidth);
 }
@@ -568,7 +599,7 @@ static bool DirectBlitText(int thisPtr, int a2, int a3, int a4,
     int textHeight = g_tmHeight;
     int maxLineWidth = 0;
     int curLineWidth = 0;
-    int availWidth = endX - startX;
+    int availWidth = (g_cfg.wrapWidth > 0) ? g_cfg.wrapWidth : (endX - startX);
     if (availWidth <= 0) availWidth = rdi.width - startX;
 
     // 字符宽度缓存
@@ -888,25 +919,20 @@ int __fastcall Hooked_66E7B0(int ecx_this, int edx_unused, int a2, int a3, int a
 
     auto it = g_dict.find(enText);
     if (it == g_dict.end()) {
-        g_missCount++;
-        LogWrite("[MISS] \"%s\" (wide=%d chLen=%d)\n",
-            enText.substr(0, 200).c_str(), (int)wide, chLen);
+        LogMiss(enText.c_str(), wide, chLen);
         return g_orig66E7B0(ecx_this, edx_unused, a2, a3, a4);
     }
 
-    g_hitCount++;
     const DictEntry& entry = it->second;
 
-    // 全量输出英文->中文映射
+    // HIT 日志（去重输出到 hit.log）
     {
-        // 中文转 UTF-8 用于日志
         int u8len = WideCharToMultiByte(CP_UTF8, 0, (const wchar_t*)entry.cnUtf16LE.data(), entry.cnWcharCount, nullptr, 0, nullptr, nullptr);
         char cnUtf8[1024] = {0};
         if (u8len > 0 && u8len < 1024) {
             WideCharToMultiByte(CP_UTF8, 0, (const wchar_t*)entry.cnUtf16LE.data(), entry.cnWcharCount, cnUtf8, u8len, nullptr, nullptr);
         }
-        LogWrite("[HIT %d] \"%s\" -> \"%s\" (wchars=%d)\n",
-            g_hitCount, enText.substr(0, 200).c_str(), cnUtf8, entry.cnWcharCount);
+        LogHit(enText.c_str(), cnUtf8, entry.cnWcharCount);
     }
 
     const wchar_t* wstr = (const wchar_t*)entry.cnUtf16LE.data();
@@ -979,10 +1005,18 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
         sprintf_s(iniPath, "%sMajestyI_TextFix.ini", dllDir);
 
         g_logFile = fopen(logPath, "w");
+        char missLogPath[MAX_PATH];
+        sprintf_s(missLogPath, "%smiss.log", dllDir);
+        char hitLogPath[MAX_PATH];
+        sprintf_s(hitLogPath, "%shit.log", dllDir);
+        g_missLogFile = fopen(missLogPath, "w");
+        g_hitLogFile = fopen(hitLogPath, "w");
         if (g_logFile) {
-            fprintf(g_logFile, "[MajestyHD Runtime Localization v12.1 FullLog+Wrap] DllMain ATTACH\n");
+            fprintf(g_logFile, "[MajestyHD Runtime Localization v12.2 SplitLog+WrapWidth] DllMain ATTACH\n");
             fprintf(g_logFile, "  Exe path: %s\n", path);
             fprintf(g_logFile, "  Log path: %s\n", logPath);
+            fprintf(g_logFile, "  Miss log: %s\n", missLogPath);
+            fprintf(g_logFile, "  Hit log: %s\n", hitLogPath);
             fprintf(g_logFile, "  Dict path: %s\n", dictPath);
             fprintf(g_logFile, "  INI path: %s\n", iniPath);
             fprintf(g_logFile, "  Strategy: hook sub_66E7B0 + CYOffportIMP pixel buffer + INI config\n\n");
@@ -1006,14 +1040,16 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
         fflush(g_logFile);
     } else if (dwReason == DLL_PROCESS_DETACH) {
         if (g_logFile) {
-            fprintf(g_logFile, "\n[DllMain] DETACH (v12.1)\n");
-            fprintf(g_logFile, "  Calls=%d Replaced=%d Hits=%d Misses=%d\n",
-                g_callCount, g_replacedCount, g_hitCount, g_missCount);
+            fprintf(g_logFile, "\n[DllMain] DETACH (v12.2)\n");
+            fprintf(g_logFile, "  Calls=%d Replaced=%d Hits=%d (unique=%d) Misses=%d (unique=%d)\n",
+                g_callCount, g_replacedCount, g_hitCount, (int)g_hitSeen.size(), g_missCount, (int)g_missSeen.size());
             fprintf(g_logFile, "  Blits=%d BlitFails=%d\n",
                 g_blitCount, g_blitFailCount);
             fclose(g_logFile);
             g_logFile = nullptr;
         }
+        if (g_missLogFile) { fclose(g_missLogFile); g_missLogFile = nullptr; }
+        if (g_hitLogFile) { fclose(g_hitLogFile); g_hitLogFile = nullptr; }
         if (g_cjkFont) { DeleteObject(g_cjkFont); g_cjkFont = nullptr; }
         if (g_cfg.fontFile[0]) {
             std::string dllDir = GetDllDir();
