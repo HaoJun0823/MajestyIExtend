@@ -61,10 +61,25 @@ static constexpr uintptr_t ADDR_7CA9E4   = 0x007CA9E4;  // dword_7CA9E4 (默认�
 static constexpr uintptr_t ADDR_7CA9BC  = 0x007CA9BC;  // dword_7CA9BC (调色板数组)
 static constexpr uintptr_t ADDR_7CA9E8  = 0x007CA9E8;  // dword_7CA9E8 (primary surface CYDDOffport)
 static constexpr uintptr_t ADDR_7CA9EC  = 0x007CA9EC;  // dword_7CA9EC (back buffer CYDDOffport)
+static constexpr uintptr_t ADDR_7C89E8  = 0x007C89E8;  // dword_7C89E8 (primary IDirectDrawSurface*)
+static constexpr uintptr_t ADDR_7C89EC  = 0x007C89EC;  // dword_7C89EC (back buffer IDirectDrawSurface*)
+static constexpr uintptr_t ADDR_7C89D8  = 0x007C89D8;  // dword_7C89D8 (DirectDraw2 interface)
+static constexpr uintptr_t ADDR_7C89E0  = 0x007C89E0;  // dword_7C89E0 (DirectDraw4 interface)
+static constexpr uintptr_t ADDR_7C89DC  = 0x007C89DC;  // dword_7C89DC (DirectDraw7 interface)
 
 // ===================== DirectDraw 函数指针类型 =====================
-typedef HRESULT (__stdcall *DDSURFACE_GETDC)(IDirectDrawSurface*, HDC*);
-typedef HRESULT (__stdcall *DDSURFACE_RELEASEDC)(IDirectDrawSurface*, HDC);
+// IDirectDrawSurface vtable: GetDC=slot19, ReleaseDC=slot28
+// (QueryInterface=0, AddRef=1, Release=2, AddAttachedSurface=3,
+//  AddOverlayDirtyRect=4, Blt=5, BltBatch=6, BltFast=7,
+//  DeleteAttachedSurface=8, EnumAttachedZBuffers=9, Flip=10,
+//  GetAttachedSurface=11, GetBltStatus=12, GetCaps=13, GetClipper=14,
+//  GetColorKey=15, GetDC=16, GetFlipStatus=17, GetOverlayPosition=18,
+//  GetPalette=19, GetPixelFormat=20, GetSurfaceDesc=21, Initialize=22,
+//  IsLost=23, Lock=24, ReleaseDC=25, Restore=26, SetClipper=27,
+//  SetColorKey=28, SetOverlayPosition=29, SetPalette=30, Unlock=31,
+//  UpdateOverlay=32, UpdateOverlayDisplay=33, UpdateOverlayZBuffer=34)
+typedef HRESULT (__stdcall *DDSURFACE_GETDC)(void*, HDC*);
+typedef HRESULT (__stdcall *DDSURFACE_RELEASEDC)(void*, HDC);
 
 // ===================== 字符串对象 =====================
 struct StrObj {
@@ -96,9 +111,10 @@ static int g_gdiFailCount = 0;
 static int g_surfaceFailCount = 0;
 
 // ===================== surface 缓存 =====================
-static IDirectDrawSurface* g_cachedBackSurface = nullptr;
-static IDirectDrawSurface* g_cachedPrimarySurface = nullptr;
+static void* g_cachedBackSurface = nullptr;
+static void* g_cachedPrimarySurface = nullptr;
 static int g_surfaceCacheMissCount = 0;
+static int g_vtableLogCount = 0;
 
 static void LogWrite(const char* fmt, ...) {
     if (!g_logFile) return;
@@ -331,45 +347,81 @@ static COLORREF PalIndexToRgb(uint32_t palIndex) {
 }
 
 // ===================== 获取 DirectDraw surface =====================
-// 从全局变量 dword_7CA9EC (back buffer) 或 dword_7CA9E8 (primary) 获取
-// CYDDOffport 对象, 然后从 this[33] (字节偏移 132) 获取 IDirectDrawSurface*
-static IDirectDrawSurface* GetBackBufferSurface() {
+// 策略:
+//   1. 先尝试 dword_7C89EC (原始 IDirectDrawSurface* back buffer)
+//   2. 回退到 CYDDOffport[33] (字节偏移 132)
+//   3. 回退到 dword_7C89E8 (原始 primary surface)
+static void* GetBackBufferSurface() {
     // 优先使用缓存
     if (g_cachedBackSurface) {
-        // 验证缓存是否有效 (检查 vtable 指针非空)
         void* vt = *(void**)g_cachedBackSurface;
         if (vt) return g_cachedBackSurface;
         g_cachedBackSurface = nullptr;
     }
 
-    // 从 dword_7CA9EC 获取 back buffer CYDDOffport
-    uint32_t cyDDOffport = *(uint32_t*)ADDR_7CA9EC;
-    if (!cyDDOffport) {
-        // 尝试 primary
-        cyDDOffport = *(uint32_t*)ADDR_7CA9E8;
-        if (!cyDDOffport) {
-            if (g_surfaceFailCount < 10) {
-                LogWrite("[Surface] Both back and primary CYDDOffport are null\n");
+    // 方案1: 直接从 dword_7C89EC 获取原始 back buffer surface 指针
+    uint32_t surface = *(uint32_t*)ADDR_7C89EC;
+    if (surface && g_vtableLogCount < 3) {
+        void* vt = *(void**)surface;
+        LogWrite("[Surface] dword_7C89EC = 0x%X, vtable=%p, vt[0]=%p, vt[16]=%p\n",
+            surface, vt, ((void**)vt)[0], ((void**)vt)[16]);
+        g_vtableLogCount++;
+    }
+    if (!surface) {
+        // 方案2: 从 CYDDOffport 获取
+        uint32_t cyDDOffport = *(uint32_t*)ADDR_7CA9EC;
+        if (cyDDOffport) {
+            surface = *(uint32_t*)(cyDDOffport + 132);
+            if (surface && g_vtableLogCount < 3) {
+                void* vt = *(void**)surface;
+                LogWrite("[Surface] CYDDOffport[33] = 0x%X, vtable=%p, vt[0]=%p, vt[16]=%p\n",
+                    surface, vt, ((void**)vt)[0], ((void**)vt)[16]);
+                g_vtableLogCount++;
             }
-            g_surfaceFailCount++;
-            return nullptr;
+        }
+    }
+    if (!surface) {
+        // 方案3: 从 dword_7C89E8 获取 primary surface
+        surface = *(uint32_t*)ADDR_7C89E8;
+        if (surface && g_vtableLogCount < 3) {
+            void* vt = *(void**)surface;
+            LogWrite("[Surface] dword_7C89E8 = 0x%X, vtable=%p, vt[0]=%p, vt[16]=%p\n",
+                surface, vt, ((void**)vt)[0], ((void**)vt)[16]);
+            g_vtableLogCount++;
+        }
+    }
+    if (!surface) {
+        // 方案4: 从 CYDDOffport primary 获取
+        uint32_t cyDDOffport = *(uint32_t*)ADDR_7CA9E8;
+        if (cyDDOffport) {
+            surface = *(uint32_t*)(cyDDOffport + 132);
         }
     }
 
-    // CYDDOffport[33] (字节偏移 132) = IDirectDrawSurface*
-    IDirectDrawSurface* surface = *(IDirectDrawSurface**)(cyDDOffport + 132);
     if (!surface) {
         if (g_surfaceFailCount < 10) {
-            LogWrite("[Surface] IDirectDrawSurface* at CYDDOffport+132 is null (CYDDOffport=0x%X)\n", cyDDOffport);
+            LogWrite("[Surface] All surface sources null (7C89EC=%d, 7CA9EC=%d, 7C89E8=%d, 7CA9E8=%d)\n",
+                *(uint32_t*)ADDR_7C89EC, *(uint32_t*)ADDR_7CA9EC,
+                *(uint32_t*)ADDR_7C89E8, *(uint32_t*)ADDR_7CA9E8);
+        }
+        g_surfaceFailCount++;
+        return nullptr;
+    }
+
+    // 验证 surface: 检查 vtable 指针
+    void* vt = *(void**)surface;
+    if (!vt) {
+        if (g_surfaceFailCount < 10) {
+            LogWrite("[Surface] Surface vtable is null (surface=0x%X)\n", surface);
         }
         g_surfaceFailCount++;
         return nullptr;
     }
 
     // 缓存
-    g_cachedBackSurface = surface;
-    LogWrite("[Surface] Cached back buffer surface: %p (CYDDOffport=0x%X)\n", surface, cyDDOffport);
-    return surface;
+    g_cachedBackSurface = (void*)surface;
+    LogWrite("[Surface] Cached surface: 0x%X (vtable=%p)\n", surface, vt);
+    return g_cachedBackSurface;
 }
 
 // ===================== GDI 文本绘制 (DirectDraw surface) =====================
@@ -377,34 +429,39 @@ static bool GdiDrawText(int thisPtr, int a2, int a3, const wchar_t* wstr, int wl
     if (!wstr || wlen <= 0) return false;
 
     // 获取 DirectDraw surface
-    IDirectDrawSurface* surface = GetBackBufferSurface();
+    void* surface = GetBackBufferSurface();
     if (!surface) {
         g_gdiFailCount++;
         return false;
     }
 
-    // 调用 IDirectDrawSurface::GetDC
-    // vtable slot 8 = GetDC (3rd method after QueryInterface/AddRef/Release)
-    // IDirectDrawSurface vtable: 0=QueryInterface, 1=AddRef, 2=Release,
-    //   3=AddAttachedSurface, 4=AddOverlayDirtyRect, 5=Blt, 6=BltBatch,
-    //   7=BltFast, 8=DeleteAttachedSurface, 9=EnumAttachedZBuffers,
-    //   10=Flip, 11=GetAttachedSurface, 12=GetBltStatus, 13=GetCaps,
-    //   14=GetClipper, 15=GetColorKey, 16=GetDC, 17=GetFlipStatus,
-    //   18=GetOverlayPosition, 19=GetPalette, 20=GetPixelFormat,
-    //   21=GetSurfaceDesc, 22=Initialize, 23=IsLost, 24=Lock,
-    //   25=ReleaseDC, 26=Restore, 27=SetClipper, 28=SetColorKey,
-    //   29=SetOverlayPosition, 30=SetPalette, 31=Unlock, 32=UpdateOverlay,
-    //   33=UpdateOverlayDisplay, 34=UpdateOverlayZBuffer
-    //
-    // vtable offset: GetDC = slot 16, byte offset = 16*4 = 64
-    //                ReleaseDC = slot 25, byte offset = 25*4 = 100
-    
+    // IDirectDrawSurface vtable: GetDC=slot16, ReleaseDC=slot25
     void** vtable = *(void***)surface;
     DDSURFACE_GETDC pGetDC = (DDSURFACE_GETDC)vtable[16];
     DDSURFACE_RELEASEDC pReleaseDC = (DDSURFACE_RELEASEDC)vtable[25];
 
+    if (!pGetDC || !pReleaseDC) {
+        if (g_gdiFailCount < 10) {
+            LogWrite("[GDI] vtable slot null: GetDC=%p ReleaseDC=%p\n", pGetDC, pReleaseDC);
+        }
+        g_gdiFailCount++;
+        return false;
+    }
+
+    // SEH 保护: DirectDraw surface 可能在调用时失效
     HDC hdc = nullptr;
-    HRESULT hr = pGetDC(surface, &hdc);
+    HRESULT hr = 0; // DD_OK
+    __try {
+        hr = pGetDC(surface, &hdc);
+    } __except (EXCEPTION_EXECUTE_HANDLER) {
+        if (g_gdiFailCount < 10) {
+            LogWrite("[GDI] GetDC SEH exception: 0x%08X\n", GetExceptionCode());
+        }
+        // 失效缓存, 下次重新获取
+        g_cachedBackSurface = nullptr;
+        g_gdiFailCount++;
+        return false;
+    }
     if (FAILED(hr) || !hdc) {
         if (g_gdiFailCount < 10) {
             LogWrite("[GDI] Surface GetDC failed: hr=0x%08X\n", (unsigned)hr);
@@ -506,8 +563,15 @@ static bool GdiDrawText(int thisPtr, int a2, int a3, const wchar_t* wstr, int wl
     SelectObject(hdc, oldFont);
     RestoreDC(hdc, savedState);
 
-    // 释放 DC
-    pReleaseDC(surface, hdc);
+    // 释放 DC (加 SEH 保护)
+    __try {
+        pReleaseDC(surface, hdc);
+    } __except (EXCEPTION_EXECUTE_HANDLER) {
+        if (g_gdiFailCount < 10) {
+            LogWrite("[GDI] ReleaseDC SEH exception: 0x%08X\n", GetExceptionCode());
+        }
+        g_cachedBackSurface = nullptr;
+    }
 
     g_gdiDrawCount++;
     if (g_gdiDrawCount <= 20) {
