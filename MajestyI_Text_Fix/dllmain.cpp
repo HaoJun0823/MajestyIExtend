@@ -406,10 +406,16 @@ static bool ExtractTextFromStrObj(StrObj* obj, std::string& out) {
         return true;
     } else {
         // narrow: data 直接指向字符串
-        // 用 strlen 限制长度, 防止 meta 中的 len 不准
-        int actualLen = len;
-        // 也可以用 strnlen 确认
-        out.assign((const char*)obj->data, actualLen);
+        // 使用 strnlen 取实际 C 字符串长度, 防止 meta 中的 len 包含 padding/null
+        // 同时用 extra 字段作为备用 (extra 通常是真实字符串长度)
+        const char* str = (const char*)obj->data;
+        int actualLen = strnlen(str, len);
+        if (actualLen <= 0) {
+            // fallback: 用 extra 字段
+            actualLen = obj->extra & 0xFFFFFF;
+            if (actualLen <= 0 || actualLen > len) actualLen = len;
+        }
+        out.assign(str, actualLen);
         return true;
     }
 }
