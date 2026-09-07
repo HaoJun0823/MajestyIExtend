@@ -40,6 +40,8 @@
 static constexpr uintptr_t ADDR_64D6B0 = 0x0064D6B0;
 static constexpr uintptr_t ADDR_664660 = 0x00664660;
 static constexpr uintptr_t ADDR_6646F0 = 0x006646F0;
+static constexpr uintptr_t ADDR_64D5F0 = 0x0064D5F0; // XML dict lookup (thiscall)
+static constexpr uintptr_t ADDR_508480 = 0x00508480; // XML+CAM text search (cdecl)
 
 // ===================== 字符串对象 =====================
 struct StrObj {
@@ -64,10 +66,34 @@ static OrigGetStrText_t g_orig664660 = nullptr;
 // sub_6646F0: __cdecl(int filename, int section_id, int key) -> int (StrObj*)
 static OrigGetStrText_t g_orig6646F0 = nullptr;
 
+// sub_64D5F0: __thiscall(this, int hash_key) -> int (StrObj*)
+// 使用 __fastcall 模拟 __thiscall (ecx=this, first arg on stack)
+typedef int (__fastcall *OrigXmlLookup_t)(int ecx_this, int edx_unused, int hash_key);
+static OrigXmlLookup_t g_orig64D5F0 = nullptr;
+
+// sub_508480: __cdecl(int hash_key, int out_str_obj) -> bool
+// XML+CAM text search: 先查 CAM STRT, 再查 XML 字典
+typedef int (__cdecl *OrigXmlSearch_t)(int hash_key, int out_str_obj);
+static OrigXmlSearch_t g_orig508480 = nullptr;
+
 // ===================== Debug 日志 =====================
 static FILE* g_logFile = nullptr;
 static int g_lookupCount = 0;
 static int g_hitCount = 0;
+static int g_missCount = 0;
+
+// Per-hook call counters
+static int g_call64D6B0 = 0;
+static int g_call664660 = 0;
+static int g_call6646F0 = 0;
+static int g_call64D5F0 = 0;
+static int g_call508480 = 0;
+
+// Loop detection: track last call per hook
+static int g_lastArg64D6B0 = -1;
+static int g_lastArg64D6B0_repeatCount = 0;
+static int g_lastArg664660_a3 = -1;
+static int g_lastArg664660_repeatCount = 0;
 
 static void LogWrite(const char* fmt, ...) {
     if (!g_logFile) return;
@@ -76,6 +102,40 @@ static void LogWrite(const char* fmt, ...) {
     vfprintf(g_logFile, fmt, args);
     va_end(args);
     fflush(g_logFile);
+}
+
+// Dump StrObj contents for debugging
+static void DumpStrObj(const char* label, StrObj* obj) {
+    if (!obj) {
+        LogWrite("  %s: NULL\n", label);
+        return;
+    }
+    bool isWide = (*(uint8_t*)((char*)obj + 7) & 1) != 0;
+    int len = obj->meta & 0xFFFFFF;
+    LogWrite("  %s: data=%p meta=%08X extra=%08X isWide=%d len=%d\n",
+        label, obj->data, obj->meta, obj->extra, isWide ? 1 : 0, len);
+    if (obj->data && len > 0) {
+        // Dump first 32 bytes of data
+        uint8_t* d = (uint8_t*)obj->data;
+        char hex[128] = {0};
+        int dumpLen = len < 16 ? len : 16;
+        for (int i = 0; i < dumpLen && i < 16; i++) {
+            sprintf(hex + i * 3, "%02X ", d[i]);
+        }
+        LogWrite("    data[0..%d]: %s\n", dumpLen - 1, hex);
+        // If narrow, try to print as string
+        if (!isWide && len < 256) {
+            char text[256] = {0};
+            memcpy(text, d, len < 255 ? len : 255);
+            LogWrite("    text: \"%s\"\n", text);
+        } else if (isWide && len < 128) {
+            // Wide: data 直接指向 UTF-16LE (无 BOM)
+            const wchar_t* wstr = (const wchar_t*)d;
+            char text[512] = {0};
+            WideCharToMultiByte(CP_ACP, 0, wstr, len, text, 511, nullptr, nullptr);
+            LogWrite("    wtext: \"%s\"\n", text);
+        }
+    }
 }
 
 // ===================== 字典加载 =====================
@@ -262,58 +322,67 @@ static void InitPool() {
 }
 
 // 从池中分配, 返回 data 指针
-static void* PoolAlloc(int wideBytes) {
+// wide: 分配 2*len + 2 (null term), 不写 BOM (BOM 在 data-2 处, 由游戏逻辑管理)
+// 我们只分配纯 UTF-16LE 数据 + null terminator
+static void* PoolAllocWide(int wlen) {
     if (!g_poolBase) return nullptr;
-
-    // 需要 2 字节 BOM + wideBytes + 2 字节 null
-    int need = 2 + wideBytes + 2;
+    // 需要 wideBytes + 2 字节 null
+    int wideBytes = wlen * 2;
+    int need = wideBytes + 2;
     // 4 字节对齐
     need = (need + 3) & ~3;
-
     if (g_poolOffset + need > POOL_SIZE) {
         LogWrite("[ERROR] Pool exhausted! offset=%zu need=%d\n", g_poolOffset, need);
         return nullptr;
     }
-
     uint8_t* p = g_poolBase + g_poolOffset;
     g_poolOffset += need;
+    return p;
+}
 
-    // 写 BOM
-    p[0] = 0xFF;
-    p[1] = 0xFE;
-
-    return p; // 返回指向 BOM 的指针
+// 从池中分配 StrObj 结构
+static StrObj* PoolAllocStrObj() {
+    if (!g_poolBase) return nullptr;
+    int need = sizeof(StrObj);
+    need = (need + 3) & ~3;
+    if (g_poolOffset + need > POOL_SIZE) {
+        LogWrite("[ERROR] Pool exhausted (StrObj)! offset=%zu need=%d\n", g_poolOffset, need);
+        return nullptr;
+    }
+    StrObj* p = (StrObj*)(g_poolBase + g_poolOffset);
+    g_poolOffset += need;
+    return p;
 }
 
 // ===================== 构造 wide StrObj =====================
 // 从 wstring 构造 wide StrObj, data 指向池分配的永久内存
+// data 不含 BOM, 直接是 UTF-16LE + null terminator
+// StrObj 本身也从池分配, 避免 static 被覆盖
 static StrObj* MakeWideStrObj(const wchar_t* wstr, int wlen) {
     if (!wstr || wlen <= 0) return nullptr;
 
     int wideBytes = wlen * 2;
 
-    // 从池分配
-    void* dataPtr = PoolAlloc(wideBytes);
+    // 分配数据区
+    void* dataPtr = PoolAllocWide(wlen);
     if (!dataPtr) return nullptr;
 
-    // 复制 wide 字符串数据 (跳过 BOM)
-    memcpy((uint8_t*)dataPtr + 2, wstr, wideBytes);
+    // 复制 wide 字符串数据
+    memcpy(dataPtr, wstr, wideBytes);
 
     // 写 null terminator
-    *((wchar_t*)((uint8_t*)dataPtr + 2 + wideBytes)) = 0;
+    *((wchar_t*)((uint8_t*)dataPtr + wideBytes)) = 0;
 
-    // 构造 StrObj (用池分配的空间)
-    // 在 data 后面分配 StrObj
-    // 实际上 StrObj 可以是栈上的, 因为调用者会拷贝
-    // 但为了安全, 我们用静态线程局部存储
+    // 分配 StrObj 结构本身
+    StrObj* obj = PoolAllocStrObj();
+    if (!obj) return nullptr;
 
-    static thread_local StrObj s_obj;
-    s_obj.data = dataPtr;
-    s_obj.meta = (uint32_t)wlen | 0x1000000;  // 长度 + wide 标志 (bit24)
+    obj->data = dataPtr;
+    obj->meta = (uint32_t)wlen | 0x1000000;  // 长度 + wide 标志 (bit24)
     // byte7 = (meta >> 24) & 0xFF = 0x01 (wide flag)
-    s_obj.extra = (uint32_t)wlen;
+    obj->extra = (uint32_t)wlen;
 
-    return &s_obj;
+    return obj;
 }
 
 // ===================== 从 StrObj 提取英文文本 =====================
@@ -327,9 +396,8 @@ static bool ExtractTextFromStrObj(StrObj* obj, std::string& out) {
     if (len <= 0 || !obj->data) return false;
 
     if (isWide) {
-        // wide: data 指向 [0xFF 0xFE] + UTF-16LE 数据
-        // 跳过 BOM (2 字节)
-        const wchar_t* wstr = (const wchar_t*)((uint8_t*)obj->data + 2);
+        // wide: data 直接指向 UTF-16LE 字符串数据 (无 BOM)
+        const wchar_t* wstr = (const wchar_t*)obj->data;
         // 转换为 UTF-8
         int utf8Len = WideCharToMultiByte(CP_UTF8, 0, wstr, len, nullptr, 0, nullptr, nullptr);
         if (utf8Len <= 0) return false;
@@ -337,23 +405,46 @@ static bool ExtractTextFromStrObj(StrObj* obj, std::string& out) {
         WideCharToMultiByte(CP_UTF8, 0, wstr, len, &out[0], utf8Len, nullptr, nullptr);
         return true;
     } else {
-        // narrow: data 直接指向 ASCII 字符串
-        out.assign((const char*)obj->data, len);
+        // narrow: data 直接指向字符串
+        // 用 strlen 限制长度, 防止 meta 中的 len 不准
+        int actualLen = len;
+        // 也可以用 strnlen 确认
+        out.assign((const char*)obj->data, actualLen);
         return true;
     }
 }
 
 // ===================== 查字典 =====================
-static StrObj* LookupDict(StrObj* origObj) {
+static StrObj* LookupDict(StrObj* origObj, const char* hookName) {
     if (!origObj) return nullptr;
 
+    // 如果原 StrObj 已经是 wide (中文), 直接 pass-through 不翻译
+    // SMNU section 的文本本身就是中文 UTF-16LE, 不需要查字典
+    bool isWide = (*(uint8_t*)((char*)origObj + 7) & 1) != 0;
+    if (isWide) {
+        return nullptr;  // pass-through, 让游戏使用原始 wide StrObj
+    }
+
     std::string enText;
-    if (!ExtractTextFromStrObj(origObj, enText)) return nullptr;
+    if (!ExtractTextFromStrObj(origObj, enText)) {
+        // Log extraction failures for first 20
+        if (g_missCount < 20) {
+            LogWrite("[%s] ExtractText FAILED: ", hookName);
+            DumpStrObj("origObj", origObj);
+            g_missCount++;
+        }
+        return nullptr;
+    }
 
     g_lookupCount++;
 
     auto it = g_dict.find(enText);
     if (it == g_dict.end()) {
+        // Log first 30 misses
+        if (g_missCount < 30) {
+            LogWrite("[%s] MISS(%d): \"%s\"\n", hookName, g_missCount, enText.substr(0, 80).c_str());
+            g_missCount++;
+        }
         return nullptr;
     }
 
@@ -364,11 +455,14 @@ static StrObj* LookupDict(StrObj* origObj) {
     if (result) {
         // 日志前 50 条
         if (g_hitCount <= 50) {
-            LogWrite("[HIT %d] en=\"%s\" -> cn(len=%d)\n",
-                g_hitCount,
+            LogWrite("[%s] HIT %d: \"%s\" -> cn(wlen=%d)\n",
+                hookName, g_hitCount,
                 enText.substr(0, 80).c_str(),
                 (int)it->second.size());
+            DumpStrObj("translated", result);
         }
+    } else {
+        LogWrite("[%s] MakeWideStrObj FAILED for \"%s\"\n", hookName, enText.substr(0, 80).c_str());
     }
     return result;
 }
@@ -378,32 +472,179 @@ static StrObj* LookupDict(StrObj* origObj) {
 // Hook sub_64D6B0: __stdcall(int a1) -> int (StrObj*)
 // 接受 IDTXT_ key C 字符串, 返回文本对象指针
 int __stdcall Hooked_64D6B0(int a1) {
+    g_call64D6B0++;
+
+    // Loop detection: same arg repeated >100 times
+    if (a1 == g_lastArg64D6B0) {
+        g_lastArg64D6B0_repeatCount++;
+        if (g_lastArg64D6B0_repeatCount == 100) {
+            LogWrite("[LOOP DETECTED] sub_64D6B0 called %d times with a1=0x%X!\n",
+                g_lastArg64D6B0_repeatCount, a1);
+        } else if (g_lastArg64D6B0_repeatCount > 100 &&
+                   g_lastArg64D6B0_repeatCount % 1000 == 0) {
+            LogWrite("[LOOP] sub_64D6B0 still looping: %d calls with a1=0x%X\n",
+                g_lastArg64D6B0_repeatCount, a1);
+        }
+    } else {
+        g_lastArg64D6B0 = a1;
+        g_lastArg64D6B0_repeatCount = 0;
+    }
+
     // 调原函数获取英文 StrObj
     int origResult = g_orig64D6B0(a1);
 
-    if (!origResult) return origResult;
+    if (!origResult) {
+        // Log first 5 null returns
+        if (g_call64D6B0 <= 5) {
+            LogWrite("[64D6B0] call #%d a1=0x%X -> NULL\n", g_call64D6B0, a1);
+        }
+        return origResult;
+    }
 
     StrObj* origObj = (StrObj*)origResult;
 
+    // Log first 10 calls with full detail
+    if (g_call64D6B0 <= 10) {
+        LogWrite("[64D6B0] call #%d a1=0x%X\n", g_call64D6B0, a1);
+        DumpStrObj("orig", origObj);
+    }
+
     // 查字典
-    StrObj* translated = LookupDict(origObj);
+    StrObj* translated = LookupDict(origObj, "64D6B0");
     if (translated) {
+        if (g_hitCount <= 10) {
+            LogWrite("[64D6B0] returning translated\n");
+        }
         return (int)translated;
     }
 
     return origResult;
 }
 
-// Hook sub_664660: __cdecl(filename, section_id, index) -> int (StrObj*)
-int __cdecl Hooked_664660(int a1, int a2, int a3) {
-    int origResult = g_orig664660(a1, a2, a3);
+// Hook sub_64D5F0: __thiscall(this, hash_key) -> int (StrObj*)
+// XML 字典查找: 接收 hash 值, 返回 StrObj 指针
+// 用 __fastcall 模拟 __thiscall (ecx=this, 第一个参数在栈上)
+int __fastcall Hooked_64D5F0(int ecx_this, int edx_unused, int hash_key) {
+    g_call64D5F0++;
 
-    if (!origResult) return origResult;
+    // 调原函数获取英文 StrObj
+    int origResult = g_orig64D5F0(ecx_this, edx_unused, hash_key);
+
+    if (!origResult) {
+        if (g_call64D5F0 <= 5) {
+            LogWrite("[64D5F0] call #%d hash=0x%X -> NULL\n", g_call64D5F0, hash_key);
+        }
+        return origResult;
+    }
 
     StrObj* origObj = (StrObj*)origResult;
 
-    StrObj* translated = LookupDict(origObj);
+    if (g_call64D5F0 <= 10) {
+        LogWrite("[64D5F0] call #%d hash=0x%X\n", g_call64D5F0, hash_key);
+        DumpStrObj("orig", origObj);
+    }
+
+    // 查字典
+    StrObj* translated = LookupDict(origObj, "64D5F0");
     if (translated) {
+        if (g_hitCount <= 10) {
+            LogWrite("[64D5F0] returning translated\n");
+        }
+        return (int)translated;
+    }
+
+    return origResult;
+}
+
+// Hook sub_508480: __cdecl(hash_key, out_str_obj) -> bool
+// XML+CAM 文本检索: 先查 CAM STRT, 再查 XML 字典
+// 调原函数后, 从 out 参数读取 StrObj, 查字典替换
+int __cdecl Hooked_508480(int hash_key, int out_str_obj) {
+    g_call508480++;
+
+    // 调原函数
+    int result = g_orig508480(hash_key, out_str_obj);
+
+    if (!result || !out_str_obj) {
+        if (g_call508480 <= 5) {
+            LogWrite("[508480] call #%d hash=0x%X out=0x%X -> result=%d\n",
+                g_call508480, hash_key, out_str_obj, result);
+        }
+        return result;
+    }
+
+    // out_str_obj 指向一个 StrObj (12 字节)
+    StrObj* outObj = (StrObj*)out_str_obj;
+
+    if (g_call508480 <= 10) {
+        LogWrite("[508480] call #%d hash=0x%X\n", g_call508480, hash_key);
+        DumpStrObj("out", outObj);
+    }
+
+    // 查字典 (如果 out 中是 narrow 英文)
+    StrObj* translated = LookupDict(outObj, "508480");
+    if (translated) {
+        // 将翻译后的 wide StrObj 数据覆盖到 out 中
+        // sub_628350 是 StrObj 的赋值函数, 但我们不能直接调它
+        // 直接修改 out 的 data/meta/extra
+        // 注意: out 中的 data 可能指向游戏堆内存, 需要先释放
+        // 安全做法: 直接覆盖 out 的三个字段
+        // 但需要确保 translated 的 data 在永久内存中 (VirtualAlloc 池)
+        outObj->data = translated->data;
+        outObj->meta = translated->meta;
+        outObj->extra = translated->extra;
+
+        if (g_hitCount <= 10) {
+            LogWrite("[508480] replaced out with translated\n");
+        }
+    }
+
+    return result;
+}
+
+// Hook sub_664660: __cdecl(filename, section_id, index) -> int (StrObj*)
+int __cdecl Hooked_664660(int a1, int a2, int a3) {
+    g_call664660++;
+
+    // Loop detection on a3 (index)
+    if (a3 == g_lastArg664660_a3) {
+        g_lastArg664660_repeatCount++;
+        if (g_lastArg664660_repeatCount == 100) {
+            LogWrite("[LOOP DETECTED] sub_664660 called %d times with a3=0x%X!\n",
+                g_lastArg664660_repeatCount, a3);
+        } else if (g_lastArg664660_repeatCount > 100 &&
+                   g_lastArg664660_repeatCount % 1000 == 0) {
+            LogWrite("[LOOP] sub_664660 still looping: %d calls with a3=0x%X\n",
+                g_lastArg664660_repeatCount, a3);
+        }
+    } else {
+        g_lastArg664660_a3 = a3;
+        g_lastArg664660_repeatCount = 0;
+    }
+
+    int origResult = g_orig664660(a1, a2, a3);
+
+    if (!origResult) {
+        if (g_call664660 <= 5) {
+            LogWrite("[664660] call #%d a1=0x%X a2=0x%X a3=0x%X -> NULL\n",
+                g_call664660, a1, a2, a3);
+        }
+        return origResult;
+    }
+
+    StrObj* origObj = (StrObj*)origResult;
+
+    if (g_call664660 <= 10) {
+        LogWrite("[664660] call #%d a1=0x%X a2=0x%X a3=0x%X\n",
+            g_call664660, a1, a2, a3);
+        DumpStrObj("orig", origObj);
+    }
+
+    StrObj* translated = LookupDict(origObj, "664660");
+    if (translated) {
+        if (g_hitCount <= 10) {
+            LogWrite("[664660] returning translated\n");
+        }
         return (int)translated;
     }
 
@@ -412,14 +653,34 @@ int __cdecl Hooked_664660(int a1, int a2, int a3) {
 
 // Hook sub_6646F0: __cdecl(filename, section_id, key) -> int (StrObj*)
 int __cdecl Hooked_6646F0(int a1, int a2, int a3) {
+    g_call6646F0++;
+
+    // Log first 10 calls
+    if (g_call6646F0 <= 10) {
+        LogWrite("[6646F0] call #%d a1=0x%X a2=0x%X a3=0x%X\n",
+            g_call6646F0, a1, a2, a3);
+    }
+
     int origResult = g_orig6646F0(a1, a2, a3);
 
-    if (!origResult) return origResult;
+    if (!origResult) {
+        if (g_call6646F0 <= 5) {
+            LogWrite("[6646F0] call #%d -> NULL\n", g_call6646F0);
+        }
+        return origResult;
+    }
 
     StrObj* origObj = (StrObj*)origResult;
 
-    StrObj* translated = LookupDict(origObj);
+    if (g_call6646F0 <= 10) {
+        DumpStrObj("orig", origObj);
+    }
+
+    StrObj* translated = LookupDict(origObj, "6646F0");
     if (translated) {
+        if (g_hitCount <= 10) {
+            LogWrite("[6646F0] returning translated\n");
+        }
         return (int)translated;
     }
 
@@ -449,6 +710,8 @@ static bool InstallHooks() {
     uint8_t* p64D6B0 = (uint8_t*)ADDR_64D6B0;
     uint8_t* p664660 = (uint8_t*)ADDR_664660;
     uint8_t* p6646F0 = (uint8_t*)ADDR_6646F0;
+    uint8_t* p64D5F0 = (uint8_t*)ADDR_64D5F0;
+    uint8_t* p508480 = (uint8_t*)ADDR_508480;
 
     LogWrite("[Verify] sub_64D6B0 bytes: %02X %02X %02X %02X\n",
         p64D6B0[0], p64D6B0[1], p64D6B0[2], p64D6B0[3]);
@@ -456,6 +719,10 @@ static bool InstallHooks() {
         p664660[0], p664660[1], p664660[2], p664660[3]);
     LogWrite("[Verify] sub_6646F0 bytes: %02X %02X %02X %02X\n",
         p6646F0[0], p6646F0[1], p6646F0[2], p6646F0[3]);
+    LogWrite("[Verify] sub_64D5F0 bytes: %02X %02X %02X %02X\n",
+        p64D5F0[0], p64D5F0[1], p64D5F0[2], p64D5F0[3]);
+    LogWrite("[Verify] sub_508480 bytes: %02X %02X %02X %02X\n",
+        p508480[0], p508480[1], p508480[2], p508480[3]);
 
     // 初始化 MinHook
     MH_STATUS status = MH_Initialize();
@@ -503,6 +770,33 @@ static bool InstallHooks() {
     }
     LogWrite("[Hook] sub_6646F0 hooked, trampoline=%p\n", g_orig6646F0);
 
+    // Hook sub_64D5F0 (XML dict lookup, __thiscall)
+    // 用 __fastcall 模拟 __thiscall
+    status = MH_CreateHook((LPVOID)ADDR_64D5F0, (LPVOID)&Hooked_64D5F0, (LPVOID*)&g_orig64D5F0);
+    if (status != MH_OK) {
+        LogWrite("[Hook] MH_CreateHook(64D5F0) failed: %s\n", MH_StatusToString(status));
+        return false;
+    }
+    status = MH_EnableHook((LPVOID)ADDR_64D5F0);
+    if (status != MH_OK) {
+        LogWrite("[Hook] MH_EnableHook(64D5F0) failed: %s\n", MH_StatusToString(status));
+        return false;
+    }
+    LogWrite("[Hook] sub_64D5F0 hooked, trampoline=%p\n", g_orig64D5F0);
+
+    // Hook sub_508480 (XML+CAM text search, __cdecl)
+    status = MH_CreateHook((LPVOID)ADDR_508480, (LPVOID)&Hooked_508480, (LPVOID*)&g_orig508480);
+    if (status != MH_OK) {
+        LogWrite("[Hook] MH_CreateHook(508480) failed: %s\n", MH_StatusToString(status));
+        return false;
+    }
+    status = MH_EnableHook((LPVOID)ADDR_508480);
+    if (status != MH_OK) {
+        LogWrite("[Hook] MH_EnableHook(508480) failed: %s\n", MH_StatusToString(status));
+        return false;
+    }
+    LogWrite("[Hook] sub_508480 hooked, trampoline=%p\n", g_orig508480);
+
     return true;
 }
 
@@ -538,7 +832,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
             fprintf(g_logFile, "  Exe path: %s\n", path);
             fprintf(g_logFile, "  Log path: %s\n", logPath);
             fprintf(g_logFile, "  Strategy: runtime dict lookup, no file modification\n");
-            fprintf(g_logFile, "  Hooks: sub_64D6B0 (IDTXT), sub_664660 (STRT idx), sub_6646F0 (STRT key)\n\n");
+            fprintf(g_logFile, "  Hooks: sub_64D6B0 (IDTXT), sub_664660 (STRT idx), sub_6646F0 (STRT key), sub_64D5F0 (XML dict), sub_508480 (XML+CAM search)\n\n");
             fflush(g_logFile);
         }
 
@@ -579,7 +873,10 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
     } else if (dwReason == DLL_PROCESS_DETACH) {
         if (g_logFile) {
             fprintf(g_logFile, "\n[DllMain] DETACH\n");
-            fprintf(g_logFile, "  Lookups: %d, Hits: %d\n", g_lookupCount, g_hitCount);
+            fprintf(g_logFile, "  Call counts: 64D6B0=%d, 664660=%d, 6646F0=%d, 64D5F0=%d, 508480=%d\n",
+                g_call64D6B0, g_call664660, g_call6646F0, g_call64D5F0, g_call508480);
+            fprintf(g_logFile, "  Lookups: %d, Hits: %d, Misses: %d\n",
+                g_lookupCount, g_hitCount, g_missCount);
             fclose(g_logFile);
             g_logFile = nullptr;
         }
