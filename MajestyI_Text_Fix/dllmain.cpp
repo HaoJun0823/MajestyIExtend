@@ -1,12 +1,13 @@
-﻿// dllmain.cpp : Majesty HD Runtime Localization v12.3 (JSON Dict + WrapAdjust)
+﻿// dllmain.cpp : Majesty HD Runtime Localization v12.4 (Rollback Fallback)
 //
-// v12.3: JSON 词典 + WrapWidth 微调
+// v12.4: rollback.json 词汇级兜底替换
 //
-// v12.2 结果: 日志拆分有效，换行宽度可配
-// v12.3 改进:
-//   1. 词典格式从 tab 分隔文本改为 JSON（可靠、无歧义、支持特殊字符）
-//   2. 新增 WrapWidthAdjust: auto 模式下对自动宽度做 +/- 微调
-//   3. 兼容旧 dict.txt（如果 dict.json 不存在则回退加载 dict.txt）
+// v12.3 结果: JSON 词典 + WrapWidthAdjust 可配
+// v12.4 改进:
+//   1. 新增 rollback.json: 词汇级子串替换表（Gold→金币, Embassy→使馆 等）
+//   2. 执行顺序: dict.json 精确匹配 → rollback.json 词汇替换 → miss
+//   3. 日志四文件: hit.log / rollback.log / miss.log / 主日志
+//   4. rollback 替换后的文本用 CJK 字体渲染（同 HIT 路径）
 
 #include "pch.h"
 #include <psapi.h>
@@ -86,6 +87,11 @@ struct DictEntry {
 static std::unordered_map<std::string, DictEntry> g_dict;
 static int g_dictCount = 0;
 
+// ===================== Rollback 词汇表 =====================
+// 存储 英文片段→中文片段 的替换对，用于 MISS 后的子串替换
+static std::vector<std::pair<std::string, std::string>> g_rollback;
+static int g_rollbackCount = 0;
+
 // ===================== 原始函数指针 =====================
 typedef int (__fastcall *OrigDraw_t)(int ecx_this, int edx_unused, int a2, int a3, int a4);
 static OrigDraw_t g_orig66E7B0 = nullptr;
@@ -94,17 +100,20 @@ static OrigDraw_t g_orig66E7B0 = nullptr;
 static FILE* g_logFile = nullptr;
 static FILE* g_missLogFile = nullptr;
 static FILE* g_hitLogFile = nullptr;
+static FILE* g_rollbackLogFile = nullptr;
 static int g_callCount = 0;
 static int g_replacedCount = 0;
 static int g_hitCount = 0;
 static int g_missCount = 0;
+static int g_rollbackHitCount = 0;
 static int g_blitCount = 0;
 static int g_blitFailCount = 0;
 static int g_devDumpCount = 0;
 
-// MISS/HIT 去重
+// MISS/HIT/Rollback 去重
 static std::unordered_set<std::string> g_missSeen;
 static std::unordered_set<std::string> g_hitSeen;
+static std::unordered_set<std::string> g_rollbackSeen;
 
 // ===================== SafeRead =====================
 static bool SafeRead32(uint32_t addr, uint32_t* out) {
@@ -126,16 +135,6 @@ static void LogWrite(const char* fmt, ...) {
     fflush(g_logFile);
 }
 
-// MISS 日志（去重，输出到 miss.log）
-static void LogMiss(const char* enText, bool wide, int chLen) {
-    g_missCount++;
-    if (!g_missLogFile) return;
-    if (g_missSeen.count(enText)) return;
-    g_missSeen.insert(enText);
-    fprintf(g_missLogFile, "[MISS] \"%s\" (wide=%d chLen=%d)\n", enText, (int)wide, chLen);
-    fflush(g_missLogFile);
-}
-
 // HIT 日志（去重，输出到 hit.log，含英文→中文映射）
 static void LogHit(const char* enText, const char* cnUtf8, int wchars) {
     g_hitCount++;
@@ -144,6 +143,26 @@ static void LogHit(const char* enText, const char* cnUtf8, int wchars) {
     g_hitSeen.insert(enText);
     fprintf(g_hitLogFile, "[HIT] \"%s\" -> \"%s\" (wchars=%d)\n", enText, cnUtf8, wchars);
     fflush(g_hitLogFile);
+}
+
+// Rollback 日志（去重，输出到 rollback.log，含原文→替换后文本）
+static void LogRollback(const char* enText, const char* replacedUtf8, int wchars) {
+    g_rollbackHitCount++;
+    if (!g_rollbackLogFile) return;
+    if (g_rollbackSeen.count(enText)) return;
+    g_rollbackSeen.insert(enText);
+    fprintf(g_rollbackLogFile, "[ROLLBACK] \"%s\" -> \"%s\" (wchars=%d)\n", enText, replacedUtf8, wchars);
+    fflush(g_rollbackLogFile);
+}
+
+// MISS 日志（去重，输出到 miss.log）— 仅在 rollback 也未命中时调用
+static void LogMiss(const char* enText, bool wide, int chLen) {
+    g_missCount++;
+    if (!g_missLogFile) return;
+    if (g_missSeen.count(enText)) return;
+    g_missSeen.insert(enText);
+    fprintf(g_missLogFile, "[MISS] \"%s\" (wide=%d chLen=%d)\n", enText, (int)wide, chLen);
+    fflush(g_missLogFile);
 }
 
 // ===================== INI 读取 =====================
@@ -396,6 +415,92 @@ static bool LoadDictJson(const char* path) {
         }
     }
     return g_dictCount > 0;
+}
+
+// ===================== Rollback 词汇表加载 =====================
+static bool LoadRollbackJson(const char* path) {
+    FILE* f = fopen(path, "rb");
+    if (!f) return false;
+    fseek(f, 0, SEEK_END);
+    long fileSize = ftell(f);
+    fseek(f, 0, SEEK_SET);
+    if (fileSize <= 0) { fclose(f); return false; }
+    if (fileSize > 4 * 1024 * 1024) {
+        LogWrite("[Rollback] JSON file too large: %ld bytes\n", fileSize);
+        fclose(f); return false;
+    }
+    std::vector<char> buf(fileSize + 1, 0);
+    fread(buf.data(), 1, fileSize, f);
+    fclose(f);
+    int len = (int)fileSize;
+    LogWrite("[Rollback] JSON file size: %ld bytes\n", fileSize);
+
+    int pos = SkipWhitespace(buf.data(), 0, len);
+    if (pos >= len || buf[pos] != '{') {
+        LogWrite("[Rollback] JSON: expected '{' at pos %d\n", pos);
+        return false;
+    }
+    pos++;
+    pos = SkipWhitespace(buf.data(), pos, len);
+
+    char enKey[8192];
+    char cnValue[8192];
+
+    while (pos < len) {
+        pos = SkipWhitespace(buf.data(), pos, len);
+        if (pos >= len) break;
+        if (buf[pos] == '}') { pos++; break; }
+        if (buf[pos] == ',') { pos++; continue; }
+
+        int newPos = ParseJsonString(buf.data(), pos, len, enKey, sizeof(enKey));
+        if (newPos < 0) {
+            LogWrite("[Rollback] JSON: parse key failed at pos %d\n", pos);
+            break;
+        }
+        pos = newPos;
+
+        pos = SkipWhitespace(buf.data(), pos, len);
+        if (pos >= len || buf[pos] != ':') {
+            LogWrite("[Rollback] JSON: expected ':' at pos %d\n", pos);
+            break;
+        }
+        pos++;
+        pos = SkipWhitespace(buf.data(), pos, len);
+
+        newPos = ParseJsonString(buf.data(), pos, len, cnValue, sizeof(cnValue));
+        if (newPos < 0) {
+            LogWrite("[Rollback] JSON: parse value failed for key '%.80s'\n", enKey);
+            break;
+        }
+        pos = newPos;
+
+        std::string en(enKey);
+        std::string cn(cnValue);
+        if (!en.empty() && !cn.empty()) {
+            g_rollback.push_back({en, cn});
+            g_rollbackCount++;
+        }
+    }
+    return g_rollbackCount > 0;
+}
+
+// ===================== Rollback 词汇替换 =====================
+// 对 UTF-8 英文文本做子串替换，返回替换后的 UTF-8 文本
+static bool RollbackReplace(const std::string& enText, std::string& outUtf8) {
+    outUtf8 = enText;
+    bool anyReplaced = false;
+    for (const auto& kv : g_rollback) {
+        const std::string& from = kv.first;
+        const std::string& to = kv.second;
+        if (from.empty()) continue;
+        size_t pos = 0;
+        while ((pos = outUtf8.find(from, pos)) != std::string::npos) {
+            outUtf8.replace(pos, from.size(), to);
+            pos += to.size();
+            anyReplaced = true;
+        }
+    }
+    return anyReplaced;
 }
 
 // 旧格式兼容: tab 分隔文本
@@ -1072,6 +1177,30 @@ int __fastcall Hooked_66E7B0(int ecx_this, int edx_unused, int a2, int a3, int a
 
     auto it = g_dict.find(enText);
     if (it == g_dict.end()) {
+        // ★ MISS: 尝试 rollback.json 词汇替换
+        if (g_rollbackCount > 0) {
+            std::string replacedUtf8;
+            if (RollbackReplace(enText, replacedUtf8)) {
+                // rollback 成功，渲染替换后的文本
+                int wlen = MultiByteToWideChar(CP_UTF8, 0, replacedUtf8.c_str(), (int)replacedUtf8.size(), nullptr, 0);
+                if (wlen > 0) {
+                    std::vector<uint8_t> utf16buf((wlen + 1) * 2, 0);
+                    MultiByteToWideChar(CP_UTF8, 0, replacedUtf8.c_str(), (int)replacedUtf8.size(),
+                        (wchar_t*)utf16buf.data(), wlen);
+                    LogRollback(enText.c_str(), replacedUtf8.c_str(), wlen);
+                    const wchar_t* wstr = (const wchar_t*)utf16buf.data();
+                    bool drawn = DirectBlitText(ecx_this, a2, a3, a4, wstr, wlen);
+                    if (drawn) {
+                        g_replacedCount++;
+                        return wlen;
+                    }
+                    // 渲染失败，回退原版
+                    LogWrite("[Rollback] Blit FAILED for \"%s\"\n", enText.substr(0, 100).c_str());
+                    return g_orig66E7B0(ecx_this, edx_unused, a2, a3, a4);
+                }
+            }
+        }
+        // rollback 未命中或未加载，输出 miss.log
         LogMiss(enText.c_str(), wide, chLen);
         return g_orig66E7B0(ecx_this, edx_unused, a2, a3, a4);
     }
@@ -1156,6 +1285,8 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
         sprintf_s(dictPath, "%sdict.json", dllDir);
         char dictTxtPath[MAX_PATH];
         sprintf_s(dictTxtPath, "%sdict.txt", dllDir);
+        char rollbackPath[MAX_PATH];
+        sprintf_s(rollbackPath, "%srollback.json", dllDir);
         char iniPath[MAX_PATH];
         sprintf_s(iniPath, "%sMajestyI_TextFix.ini", dllDir);
 
@@ -1164,15 +1295,20 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
         sprintf_s(missLogPath, "%smiss.log", dllDir);
         char hitLogPath[MAX_PATH];
         sprintf_s(hitLogPath, "%shit.log", dllDir);
+        char rollbackLogPath[MAX_PATH];
+        sprintf_s(rollbackLogPath, "%srollback.log", dllDir);
         g_missLogFile = fopen(missLogPath, "w");
         g_hitLogFile = fopen(hitLogPath, "w");
+        g_rollbackLogFile = fopen(rollbackLogPath, "w");
         if (g_logFile) {
-            fprintf(g_logFile, "[MajestyHD Runtime Localization v12.3 JSON Dict+WrapAdjust] DllMain ATTACH\n");
+            fprintf(g_logFile, "[MajestyHD Runtime Localization v12.4 Rollback Fallback] DllMain ATTACH\n");
             fprintf(g_logFile, "  Exe path: %s\n", path);
             fprintf(g_logFile, "  Log path: %s\n", logPath);
             fprintf(g_logFile, "  Miss log: %s\n", missLogPath);
             fprintf(g_logFile, "  Hit log: %s\n", hitLogPath);
+            fprintf(g_logFile, "  Rollback log: %s\n", rollbackLogPath);
             fprintf(g_logFile, "  Dict path: %s (json) / %s (txt fallback)\n", dictPath, dictTxtPath);
+            fprintf(g_logFile, "  Rollback path: %s\n", rollbackPath);
             fprintf(g_logFile, "  INI path: %s\n", iniPath);
             fprintf(g_logFile, "  Strategy: hook sub_66E7B0 + CYOffportIMP pixel buffer + INI config\n\n");
             fflush(g_logFile);
@@ -1196,6 +1332,13 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
         if (!dictLoaded) {
             LogWrite("[ERROR] Failed to load any dict\n");
         }
+
+        // 加载 rollback 词汇表
+        if (LoadRollbackJson(rollbackPath)) {
+            LogWrite("[Rollback] Loaded %d entries from %s\n", g_rollbackCount, rollbackPath);
+        } else {
+            LogWrite("[Rollback] No rollback.json found or empty: %s\n", rollbackPath);
+        }
         InitGdiFonts();
         if (InstallHooks()) {
             LogWrite("\n[Init] Hook installed successfully\n");
@@ -1205,9 +1348,11 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
         fflush(g_logFile);
     } else if (dwReason == DLL_PROCESS_DETACH) {
         if (g_logFile) {
-            fprintf(g_logFile, "\n[DllMain] DETACH (v12.3)\n");
-            fprintf(g_logFile, "  Calls=%d Replaced=%d Hits=%d (unique=%d) Misses=%d (unique=%d)\n",
-                g_callCount, g_replacedCount, g_hitCount, (int)g_hitSeen.size(), g_missCount, (int)g_missSeen.size());
+            fprintf(g_logFile, "\n[DllMain] DETACH (v12.4)\n");
+            fprintf(g_logFile, "  Calls=%d Replaced=%d Hits=%d (unique=%d) Rollback=%d (unique=%d) Misses=%d (unique=%d)\n",
+                g_callCount, g_replacedCount, g_hitCount, (int)g_hitSeen.size(),
+                g_rollbackHitCount, (int)g_rollbackSeen.size(),
+                g_missCount, (int)g_missSeen.size());
             fprintf(g_logFile, "  Blits=%d BlitFails=%d\n",
                 g_blitCount, g_blitFailCount);
             fclose(g_logFile);
@@ -1215,6 +1360,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
         }
         if (g_missLogFile) { fclose(g_missLogFile); g_missLogFile = nullptr; }
         if (g_hitLogFile) { fclose(g_hitLogFile); g_hitLogFile = nullptr; }
+        if (g_rollbackLogFile) { fclose(g_rollbackLogFile); g_rollbackLogFile = nullptr; }
         if (g_cjkFont) { DeleteObject(g_cjkFont); g_cjkFont = nullptr; }
         if (g_cfg.fontFile[0]) {
             std::string dllDir = GetDllDir();
