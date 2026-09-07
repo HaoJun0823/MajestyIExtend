@@ -1,29 +1,34 @@
-﻿// dllmain.cpp : Majesty HD Runtime Localization v6.5
+﻿// dllmain.cpp : Majesty HD Runtime Localization v6.5.1
 //
-// === 方案 (v6.5) ===
+// === 方案 (v6.5.1) ===
 // 外挂汉化: 不修改任何原文件, 运行时 hook 字符串赋值函数 sub_628350
 //
-// v6.5 核心改变: 在 v6.4 基础上加返回地址过滤, 只翻译 XML 文本加载
+// v6.5.1 修复: 用 _ReturnAddress() 替换内联汇编提取返回地址
+//   原因: MSVC 在内联汇编之前插入函数序言(push ebp/sub esp)
+//         导致 [esp] 不再指向返回地址
+//
+// v6.5 过滤: 用 _ReturnAddress() 获取真实调用者返回地址,
+//           只在来自 sub_659820 (XML 文本提取) 的调用时翻译
 //
 // v6.4 基础: hook sub_628350, 用栈上临时 wide StrObj 让游戏自己 malloc/free
-// v6.5 过滤: 检查 [esp] 返回地址, 只在来自 sub_659820 (XML 文本提取)
-//           的调用时翻译, 跳过 GPL 脚本字符串赋值
 //
 // sub_659820 内部有两处 call sub_628350:
-//   0x659896 — XML 节点有文本时
-//   0x6598C4 — XML 节点为空时
-// 只有返回地址在这两个位置附近的才翻译
+//   0x659896 — XML 节点有文本时 (返回地址 = 0x65989B)
+//   0x6598C4 — XML 节点为空时 (返回地址 = 0x6598C9)
+// 只有返回地址匹配这两个值的才翻译
 //
 // 字典文件: scripts/dict.txt (UTF-8, 格式: 英文\t中文\n)
 
 #include "pch.h"
 #include <psapi.h>
+#include <intrin.h>
 #include <unordered_map>
 #include <string>
 #include <vector>
 #include "MinHook.h"
 
 #pragma comment(lib, "psapi.lib")
+#pragma intrinsic(_ReturnAddress)
 
 // ===================== 地址常量 =====================
 static constexpr uintptr_t ADDR_628350 = 0x00628350; // StrObj assign (thiscall)
@@ -226,20 +231,24 @@ static constexpr uintptr_t XML_CALLSITE_2_RET = 0x6598C9;
 // ecx = this (目标 StrObj), [esp+4] = src (源 StrObj*)
 // 用 __fastcall 模拟: ecx=this, edx=unused, stack arg=src
 //
-// v6.5: 只在来自 sub_659820 的调用时翻译, 跳过 GPL 脚本字符串
+// v6.5.1: 用 _ReturnAddress() 正确获取返回地址
+//         只在来自 sub_659820 的调用时翻译, 跳过 GPL 脚本字符串
 int __fastcall Hooked_628350(int ecx_this, int edx_unused, int src) {
     g_callCount++;
 
-    // v6.5: 检查返回地址, 只在来自 sub_659820 的调用时翻译
-    // __fastcall: ecx=arg0, edx=unused, stack arg=src
-    // 栈布局: [esp] = return addr, [esp+4] = src
-    uintptr_t retAddr;
-    __asm {
-        mov eax, [esp]
-        mov retAddr, eax
-    }
+    // v6.5.1: 用 _ReturnAddress() 获取真实返回地址
+    // _ReturnAddress() 在函数序言之前返回调用者的返回地址
+    uintptr_t retAddr = (uintptr_t)_ReturnAddress();
 
     bool fromXml = (retAddr == XML_CALLSITE_1_RET || retAddr == XML_CALLSITE_2_RET);
+
+    // 调试: 记录前 20 条调用的返回地址
+    static int s_debugCount = 0;
+    if (s_debugCount < 20) {
+        s_debugCount++;
+        LogWrite("[CALL %d] retAddr=%08X fromXml=%d src=%08X\n",
+            s_debugCount, (unsigned int)retAddr, (int)fromXml, src);
+    }
 
     if (!fromXml) {
         // 不是来自 XML 文本提取, 直接调原函数
@@ -365,10 +374,10 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
 
         g_logFile = fopen(logPath, "w");
         if (g_logFile) {
-            fprintf(g_logFile, "[MajestyHD Runtime Localization v6.5] DllMain ATTACH\n");
+            fprintf(g_logFile, "[MajestyHD Runtime Localization v6.5.1] DllMain ATTACH\n");
             fprintf(g_logFile, "  Exe path: %s\n", path);
             fprintf(g_logFile, "  Log path: %s\n", logPath);
-            fprintf(g_logFile, "  Strategy: hook sub_628350 with return-addr filter (XML-only)\n");
+            fprintf(g_logFile, "  Strategy: hook sub_628350 with _ReturnAddress() filter (XML-only)\n");
             fprintf(g_logFile, "  All malloc/free by game CRT, no cross-CRT issues\n\n");
             fflush(g_logFile);
         }
