@@ -1,42 +1,24 @@
-﻿// dllmain.cpp : Majesty HD Runtime Localization v9.0 (绘制函数 hook)
+﻿// dllmain.cpp : Majesty HD Runtime Localization v9.1 (绘制函数 hook + 字体诊断)
 //
-// === 方案 (v9.0) ===
-// 外挂汉化: hook sub_66E7B0 (真正的文本绘制函数), 在入口替换 this 字符串为中文
+// === v9.1 诊断版 ===
+// v9.0 结果: hook sub_66E7B0 成功(59 hits, 不卡死), 但中文显示空白
+// 原因: 字符绘制时用的字体(英文字体)没有 CJK 字形
 //
-// v8 分析结果:
-//   sub_66CA70 是测量函数, 不是绘制函数 → v8 替换无效 (只改变测量, 不改变绘制)
-//   sub_66E7B0 是真正的文本绘制函数 (0x717 bytes, 15 callers)
-//     - 内部逐字符调用 sub_647420 (实际字符 blit, 调 renderContext->vtable[10])
-//     - 调用 sub_66CA70 (测量) + sub_66C7D0 (推进) + sub_647020 (设位置)
-//     - this 对象的 StrObj 布局与 sub_66CA70 完全相同
-//   sub_647420: 实际字符绘制, 调 renderContext vtable[10](char, x, y, ...)
+// 字体机制 (IDA 分析):
+//   sub_647140(this, fontObj, fontID) 初始化 renderContext
+//     - this[0] = fontObj (来自 sub_66E7B0 的 this[40], 偏移 0xA0)
+//     - this[22] = fontID (来自 sub_66E7B0 的 this[97], 字节偏移 0x61)
+//   sub_647420(绘制单字符):
+//     - 优先用 renderContext[21] (如果非空)
+//     - 否则用 dword_7CA9C0[renderContext[22]] (全局字体数组)
+//   dword_7CA9C0: 全局字体数组, dword_7BC518=1 (只有1个字体, 索引0)
+//   字体类: CYFont(基类) / CYFontPixelmap / CYFontImage
+//   CAM 加载: sub_6C5AB0 在 FONT section 时创建 CYFontPixelmap
 //
-// v9.0 策略:
-//   - hook sub_66E7B0 入口 (0x0066E7B0)
-//   - 读取 this 字符串(英文原文)
-//   - 查词典, 命中时:
-//     构造临时 inline wide StrObj, 替换 this 的字符串指针
-//     调原函数绘制中文 (测量+绘制均使用中文), 绘制后还原 this
-//   - 未命中或读取失败: 直接调原函数
-//   - 无 a1==0 过滤 (sub_66E7B0 不分片, 总是绘制完整字符串)
-//
-// sub_66E7B0 入口字节 (SEH prologue):
-//   6A FF              push -1
-//   68 E8 46 72 00     push offset SEH_66E7B0
-//   64 A1 00 00 00 00  mov eax, fs:0
-//   MinHook 需要 5+ 字节, 取前 7 字节 (2 条指令) 做 trampoline
-//   push -1 和 push offset 均为立即数, 可安全重定位
-//
-// StrObj 布局 (sub_66E7B0 与 sub_66CA70 相同):
-//   this[0] 非空 => StrObj*, [0]=data, [4]=meta(低24位长,bit24 wide), [7]&1=wide
-//   this[0]==0   => this[4]=data, this[8]==1?wide:narrow (inline 形式)
-//
-// 替换策略:
-//   构造 inline wide StrObj: 设 this[0]=0, this[4]=cnData(wchar*), this[8]=1
-//   原函数走 inline wide 路径: cmp [edi+8],1 -> je wide -> mov cx,[ecx+esi*2]
-//   临时数据在 DLL 全局 buffer, 生命周期覆盖绘制调用
-//
-// 字典文件: scripts/dict.txt (UTF-8, 格式: 英文\t中文\n)
+// v9.1 策略:
+//   - 保持 v9 的字符串替换逻辑
+//   - 增加诊断: 打印 this+40(字体对象) / this+97(字体ID) / dword_7CA9C0 数组内容
+//   - 尝试: 命中时同时修改 this+97 为 0 (确保用全局数组索引0的字体)
 
 #include "pch.h"
 #include <psapi.h>
@@ -52,6 +34,8 @@
 
 // ===================== 地址常量 =====================
 static constexpr uintptr_t ADDR_66E7B0 = 0x0066E7B0;
+static constexpr uintptr_t ADDR_7CA9C0  = 0x007CA9C0;  // dword_7CA9C0 (字体数组指针)
+static constexpr uintptr_t ADDR_7BC518  = 0x007BC518;  // dword_7BC518 (字体数组大小)
 
 // ===================== 字符串对象 =====================
 struct StrObj {
@@ -61,17 +45,14 @@ struct StrObj {
 };
 
 // ===================== 字典 =====================
-// key: 英文(UTF-8), value: 中文 UTF-16LE 字节(可直接用于 wide 渲染)
 struct DictEntry {
-    std::vector<uint8_t> cnUtf16LE;  // UTF-16LE 字节 (含 null terminator)
-    int cnWcharCount;                // wchar 数 (不含 null)
+    std::vector<uint8_t> cnUtf16LE;
+    int cnWcharCount;
 };
 static std::unordered_map<std::string, DictEntry> g_dict;
 static int g_dictCount = 0;
 
 // ===================== 原始函数指针 =====================
-// sub_66E7B0 是 __thiscall(this, a2, a3, a4)
-// 用 __fastcall 捕获 ecx=this, edx 忽略
 typedef int (__fastcall *OrigDraw_t)(int ecx_this, int edx_unused, int a2, int a3, int a4);
 static OrigDraw_t g_orig66E7B0 = nullptr;
 
@@ -81,6 +62,7 @@ static int g_callCount = 0;
 static int g_replacedCount = 0;
 static int g_hitCount = 0;
 static int g_missCount = 0;
+static bool g_fontDiagDone = false;
 
 static void LogWrite(const char* fmt, ...) {
     if (!g_logFile) return;
@@ -186,7 +168,6 @@ static bool LoadDict(const char* path) {
         std::string enStr(enKey, enLen);
         std::string cnStr(cnStart, cnLen);
 
-        // 处理 \n 转义 -> 真换行
         for (size_t i = 0; i + 1 < cnStr.size(); i++) {
             if (cnStr[i] == '\\' && cnStr[i+1] == 'n') {
                 cnStr[i] = '\n';
@@ -194,16 +175,14 @@ static bool LoadDict(const char* path) {
             }
         }
 
-        // 转 UTF-16LE
         int wlen = MultiByteToWideChar(CP_UTF8, 0, cnStr.c_str(), (int)cnStr.size(), nullptr, 0);
         if (wlen <= 0) continue;
 
         DictEntry entry;
         entry.cnWcharCount = wlen;
-        entry.cnUtf16LE.resize((wlen + 1) * 2);  // +1 for null terminator
+        entry.cnUtf16LE.resize((wlen + 1) * 2);
         MultiByteToWideChar(CP_UTF8, 0, cnStr.c_str(), (int)cnStr.size(),
             (wchar_t*)entry.cnUtf16LE.data(), wlen);
-        // null terminator
         *(wchar_t*)(entry.cnUtf16LE.data() + wlen * 2) = 0;
 
         g_dict[enStr] = std::move(entry);
@@ -213,7 +192,7 @@ static bool LoadDict(const char* path) {
     return true;
 }
 
-// ===================== 从 this 读取完整字符串 (UTF-8) =====================
+// ===================== 从 this 读取完整字符串 =====================
 static bool ReadFullString(int thisPtr, std::string& out, int* outCharLen = nullptr, bool* outWide = nullptr) {
     if (!thisPtr) return false;
     uint8_t* edi = (uint8_t*)thisPtr;
@@ -222,7 +201,7 @@ static bool ReadFullString(int thisPtr, std::string& out, int* outCharLen = null
     bool wide = false;
     int chLen = 0;
 
-    void* obj = *(void**)edi;  // this[0]
+    void* obj = *(void**)edi;
     if (obj) {
         uint8_t* s = (uint8_t*)obj;
         wide = (s[7] & 1) != 0;
@@ -231,17 +210,15 @@ static bool ReadFullString(int thisPtr, std::string& out, int* outCharLen = null
     } else {
         wide = (*(uint32_t*)(edi + 8)) == 1;
         data = *(uint8_t**)(edi + 4);
-        chLen = 0; // inline 形式没有显式长度
+        chLen = 0;
     }
 
     if (!data) return false;
     if (outWide) *outWide = wide;
 
     if (wide) {
-        // UTF-16 -> UTF-8
         int n = chLen;
         if (n <= 0) {
-            // 扫描 null terminator
             const wchar_t* ws = (const wchar_t*)data;
             n = 0;
             while (n < 256 && ws[n] != 0) n++;
@@ -256,7 +233,6 @@ static bool ReadFullString(int thisPtr, std::string& out, int* outCharLen = null
     } else {
         int n = chLen;
         if (n <= 0) {
-            // 扫描 null terminator
             const char* cs = (const char*)data;
             n = (int)strnlen(cs, 256);
             if (n >= 256) return false;
@@ -267,9 +243,103 @@ static bool ReadFullString(int thisPtr, std::string& out, int* outCharLen = null
     }
 }
 
-// ===================== Hook sub_66E7B0 (绘制函数, 翻译替换) =====================
+// ===================== RTTI 安全读取 =====================
+// MSVC RTTI 链: vtable-4 -> COL -> COL+12 -> TypeDescriptor -> TD+8 -> name
+static bool ReadRttiName(uint32_t objPtr, char* buf, int bufSize) {
+    if (!objPtr || bufSize < 8) return false;
+    buf[0] = 0;
+    if (IsBadReadPtr((void*)objPtr, 4)) return false;
+    uint32_t vtable = *(uint32_t*)objPtr;
+    if (!vtable) return false;
+    if (IsBadReadPtr((void*)(vtable - 4), 4)) return false;
+    uint32_t colPtr = *(uint32_t*)(vtable - 4);  // Complete Object Locator
+    if (!colPtr) return false;
+    if (IsBadReadPtr((void*)(colPtr + 12), 4)) return false;
+    uint32_t typeDescPtr = *(uint32_t*)(colPtr + 12);  // TypeDescriptor ptr
+    if (!typeDescPtr) return false;
+    // 尝试直接 VA (老 MSVC)
+    const char* typeName = (const char*)(typeDescPtr + 8);
+    if (!IsBadReadPtr((void*)typeName, bufSize)) {
+        strncpy(buf, typeName, bufSize - 1);
+        buf[bufSize - 1] = 0;
+        return true;
+    }
+    // 尝试 RVA (新 MSVC, image base=0x400000)
+    uint32_t rvaAddr = 0x400000 + typeDescPtr;
+    const char* typeNameRva = (const char*)(rvaAddr + 8);
+    if (!IsBadReadPtr((void*)typeNameRva, bufSize)) {
+        strncpy(buf, typeNameRva, bufSize - 1);
+        buf[bufSize - 1] = 0;
+        return true;
+    }
+    return false;
+}
+
+// ===================== 字体诊断 =====================
+static void FontDiag(int thisPtr) {
+    if (g_fontDiagDone) return;
+    g_fontDiagDone = true;
+
+    uint8_t* base = (uint8_t*)thisPtr;
+
+    uint32_t fontObj = *(uint32_t*)(base + 160);  // this+0xA0
+    uint8_t  fontId  = *(uint8_t*)(base + 97);    // this+0x61
+
+    LogWrite("\n[FontDiag] === FONT DIAGNOSTICS ===\n");
+    LogWrite("[FontDiag] this=0x%08X\n", thisPtr);
+    LogWrite("[FontDiag] this+0xA0 (fontObj) = 0x%08X\n", fontObj);
+    LogWrite("[FontDiag] this+0x61 (fontId)  = %d\n", fontId);
+
+    // 全局字体数组
+    uint32_t* fontArray = *(uint32_t**)ADDR_7CA9C0;
+    uint32_t arraySize = *(uint32_t*)ADDR_7BC518;
+    LogWrite("[FontDiag] dword_7CA9C0 (fontArrayPtr) = 0x%08X\n", (uint32_t)(uintptr_t)fontArray);
+    LogWrite("[FontDiag] dword_7BC518 (arraySize)    = %d\n", arraySize);
+
+    if (fontArray && arraySize > 0 && arraySize < 100) {
+        for (uint32_t i = 0; i < arraySize; i++) {
+            uint32_t entry = fontArray[i];
+            LogWrite("[FontDiag] fontArray[%d] = 0x%08X\n", i, entry);
+            if (entry) {
+                uint32_t vtable = *(uint32_t*)entry;
+                LogWrite("[FontDiag]   vtable = 0x%08X\n", vtable);
+                char nameBuf[65] = {0};
+                if (ReadRttiName(entry, nameBuf, sizeof(nameBuf))) {
+                    LogWrite("[FontDiag]   RTTI name = %s\n", nameBuf);
+                } else {
+                    LogWrite("[FontDiag]   (RTTI read failed)\n");
+                }
+            }
+        }
+    }
+
+    // fontObj 详细信息
+    if (fontObj) {
+        uint32_t vtable = *(uint32_t*)fontObj;
+        LogWrite("[FontDiag] fontObj vtable = 0x%08X\n", vtable);
+        char nameBuf[65] = {0};
+        if (ReadRttiName(fontObj, nameBuf, sizeof(nameBuf))) {
+            LogWrite("[FontDiag] fontObj RTTI name = %s\n", nameBuf);
+        } else {
+            LogWrite("[FontDiag] (fontObj RTTI read failed)\n");
+        }
+        // 前 64 字节 hex dump
+        LogWrite("[FontDiag] fontObj bytes: ");
+        for (int i = 0; i < 64; i++) {
+            fprintf(g_logFile, "%02X ", ((uint8_t*)fontObj)[i]);
+        }
+        fprintf(g_logFile, "\n");
+    }
+    LogWrite("[FontDiag] === END FONT DIAGNOSTICS ===\n\n");
+    fflush(g_logFile);
+}
+
+// ===================== Hook sub_66E7B0 =====================
 int __fastcall Hooked_66E7B0(int ecx_this, int edx_unused, int a2, int a3, int a4) {
     g_callCount++;
+
+    // 字体诊断 (仅首次)
+    FontDiag(ecx_this);
 
     // 读取完整字符串
     std::string enText;
@@ -284,7 +354,6 @@ int __fastcall Hooked_66E7B0(int ecx_this, int edx_unused, int a2, int a3, int a
     // 查词典
     auto it = g_dict.find(enText);
     if (it == g_dict.end()) {
-        // 未命中
         g_missCount++;
         if (g_missCount <= 60) {
             LogWrite("[MISS] \"%s\" (wide=%d chLen=%d)\n",
@@ -293,7 +362,7 @@ int __fastcall Hooked_66E7B0(int ecx_this, int edx_unused, int a2, int a3, int a
         return g_orig66E7B0(ecx_this, edx_unused, a2, a3, a4);
     }
 
-    // 命中! 替换为中文
+    // 命中!
     g_hitCount++;
     const DictEntry& entry = it->second;
 
@@ -303,22 +372,18 @@ int __fastcall Hooked_66E7B0(int ecx_this, int edx_unused, int a2, int a3, int a
     }
 
     // 构造临时 inline wide StrObj
-    // this[0]=0, this[4]=cnData(wchar*), this[8]=1(wide)
     uint8_t* edi = (uint8_t*)ecx_this;
 
-    // 保存原始值
     uint32_t origThis0 = *(uint32_t*)edi;
     uint32_t origThis4 = *(uint32_t*)(edi + 4);
     uint32_t origThis8 = *(uint32_t*)(edi + 8);
 
-    // 替换为 inline wide
-    *(uint32_t*)edi = 0;                                    // this[0] = 0 (inline)
-    *(uint32_t*)(edi + 4) = (uint32_t)(uintptr_t)entry.cnUtf16LE.data(); // this[4] = data ptr
-    *(uint32_t*)(edi + 8) = 1;                             // this[8] = 1 (wide)
+    *(uint32_t*)edi = 0;
+    *(uint32_t*)(edi + 4) = (uint32_t)(uintptr_t)entry.cnUtf16LE.data();
+    *(uint32_t*)(edi + 8) = 1;
 
     g_replacedCount++;
 
-    // 调原函数绘制中文
     int result = g_orig66E7B0(ecx_this, edx_unused, a2, a3, a4);
 
     // 还原 this
@@ -333,7 +398,6 @@ int __fastcall Hooked_66E7B0(int ecx_this, int edx_unused, int a2, int a3, int a
 static bool InstallHooks() {
     uint8_t* p66E7B0 = (uint8_t*)ADDR_66E7B0;
 
-    // 验证入口字节: 应为 6A FF (push -1, SEH prologue)
     LogWrite("[Verify] sub_66E7B0 bytes: %02X %02X %02X %02X %02X %02X %02X\n",
         p66E7B0[0], p66E7B0[1], p66E7B0[2], p66E7B0[3], p66E7B0[4], p66E7B0[5], p66E7B0[6]);
 
@@ -378,7 +442,6 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
             return TRUE;
         }
 
-        // 日志路径
         char logPath[MAX_PATH];
         GetModuleFileNameA(hModule, logPath, MAX_PATH);
         char* p = strrchr(logPath, '\\');
@@ -390,14 +453,13 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
 
         g_logFile = fopen(logPath, "w");
         if (g_logFile) {
-            fprintf(g_logFile, "[MajestyHD Runtime Localization v9.0 绘制函数Hook] DllMain ATTACH\n");
+            fprintf(g_logFile, "[MajestyHD Runtime Localization v9.1 字体诊断] DllMain ATTACH\n");
             fprintf(g_logFile, "  Exe path: %s\n", path);
             fprintf(g_logFile, "  Log path: %s\n", logPath);
-            fprintf(g_logFile, "  Strategy: hook sub_66E7B0 (real draw func), replace this string with CN\n\n");
+            fprintf(g_logFile, "  Strategy: hook sub_66E7B0 + font diagnostics\n\n");
             fflush(g_logFile);
         }
 
-        // 加载字典
         char dictPath[MAX_PATH];
         GetModuleFileNameA(hModule, dictPath, MAX_PATH);
         char* p2 = strrchr(dictPath, '\\');
@@ -413,7 +475,6 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
             LogWrite("[ERROR] Failed to load dict from %s\n", dictPath);
         }
 
-        // 安装 hooks
         if (InstallHooks()) {
             LogWrite("\n[Init] Hook installed successfully\n");
         } else {
