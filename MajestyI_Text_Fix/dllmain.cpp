@@ -346,6 +346,18 @@ static int ParseJsonString(const char* s, int pos, int len, char* out, int outMa
     return pos;
 }
 
+// ===================== [newline] -> \n 替换 =====================
+// dict/rollback 的 value 中 [newline] 是字面量（9字符），需替换为实际换行符 \n
+static void ReplaceNewlineLiteral(std::string& s) {
+    const char* tag = "[newline]";
+    size_t tagLen = 9;
+    size_t pos = 0;
+    while ((pos = s.find(tag, pos)) != std::string::npos) {
+        s.replace(pos, tagLen, "\n");
+        pos += 1; // \n 只有1字节，避免重复匹配
+    }
+}
+
 static bool LoadDictJson(const char* path) {
     FILE* f = fopen(path, "rb");
     if (!f) return false;
@@ -409,6 +421,7 @@ static bool LoadDictJson(const char* path) {
         // store entry
         std::string enStr(enKey);
         std::string cnStr(cnValue);
+        ReplaceNewlineLiteral(cnStr);
         int wlen = MultiByteToWideChar(CP_UTF8, 0, cnStr.c_str(), (int)cnStr.size(), nullptr, 0);
         if (wlen > 0) {
             DictEntry entry;
@@ -483,6 +496,7 @@ static bool LoadRollbackJson(const char* path) {
 
         std::string en(enKey);
         std::string cn(cnValue);
+        ReplaceNewlineLiteral(cn);
         if (!en.empty() && !cn.empty()) {
             g_rollback.push_back({en, cn});
             g_rollbackCount++;
@@ -572,6 +586,7 @@ static bool LoadDictTxt(const char* path) {
                 cnStr.erase(i+1, 1);
             }
         }
+        ReplaceNewlineLiteral(cnStr);
         int wlen = MultiByteToWideChar(CP_UTF8, 0, cnStr.c_str(), (int)cnStr.size(), nullptr, 0);
         if (wlen <= 0) continue;
         DictEntry entry;
