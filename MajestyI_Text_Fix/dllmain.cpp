@@ -49,6 +49,7 @@ static constexpr uintptr_t ADDR_664660 = 0x00664660;
 static constexpr uintptr_t ADDR_6646F0 = 0x006646F0;
 static constexpr uintptr_t ADDR_64D5F0 = 0x0064D5F0; // XML dict lookup (thiscall)
 static constexpr uintptr_t ADDR_508480 = 0x00508480; // XML+CAM text search (cdecl)
+static constexpr uintptr_t ADDR_521A60 = 0x00521A60; // Quest XML text retrieval (stdcall)
 
 // ===================== 字符串对象 =====================
 struct StrObj {
@@ -83,6 +84,12 @@ static OrigXmlLookup_t g_orig64D5F0 = nullptr;
 typedef int (__cdecl *OrigXmlSearch_t)(int hash_key, int out_str_obj);
 static OrigXmlSearch_t g_orig508480 = nullptr;
 
+// sub_521A60: __stdcall(int out_ptr, int name, int lang) -> int
+// Quest XML 文本检索: 从 XML DOM 按 name+lang 查找节点, 提取文本写入 out_ptr
+// 返回值 = out_ptr (a1)
+typedef int (__stdcall *OrigQuestText_t)(int a1, int a2, int a3);
+static OrigQuestText_t g_orig521A60 = nullptr;
+
 // ===================== Debug 日志 =====================
 static FILE* g_logFile = nullptr;
 static int g_lookupCount = 0;
@@ -95,6 +102,7 @@ static int g_call664660 = 0;
 static int g_call6646F0 = 0;
 static int g_call64D5F0 = 0;
 static int g_call508480 = 0;
+static int g_call521A60 = 0;
 
 // Loop detection: track last call per hook
 static int g_lastArg64D6B0 = -1;
@@ -670,6 +678,68 @@ int __cdecl Hooked_6646F0(int a1, int a2, int a3) {
     return origResult;
 }
 
+// Hook sub_521A60: __stdcall(int out_ptr, int name, int lang) -> int
+// Quest XML 文本检索入口
+// 调原函数后, 检查 out_ptr 处的 StrObj, 如果是 narrow 英文就查字典替换
+int __stdcall Hooked_521A60(int a1, int a2, int a3) {
+    g_call521A60++;
+
+    // 尝试记录 a2 (name) 和 a3 (lang) 的字符串内容
+    if (g_call521A60 <= 20) {
+        const char* nameStr = nullptr;
+        const char* langStr = nullptr;
+        if (a2 && !IsBadReadPtr((void*)a2, 1)) {
+            nameStr = (const char*)a2;
+        }
+        if (a3 && !IsBadReadPtr((void*)a3, 1)) {
+            langStr = (const char*)a3;
+        }
+        LogWrite("[521A60] call #%d a1=0x%X a2=0x%X(\"%s\") a3=0x%X(\"%s\")\n",
+            g_call521A60, a1, a2, nameStr ? nameStr : "?", a3, langStr ? langStr : "?");
+    }
+
+    // 调原函数 (会将文本 StrObj 写入 a1)
+    int result = g_orig521A60(a1, a2, a3);
+
+    if (!a1) return result;
+
+    StrObj* obj = (StrObj*)a1;
+
+    if (g_call521A60 <= 20) {
+        DumpStrObj("result", obj);
+    }
+
+    // 查字典翻译
+    StrObj* translated = LookupDict(obj, "521A60");
+    if (translated) {
+        // 保存旧 data 指针, 用于释放
+        void* oldData = obj->data;
+        uint32_t oldMeta = obj->meta;
+        bool oldIsWide = (*(uint8_t*)((char*)obj + 7) & 1) != 0;
+        int oldLen = oldMeta & 0xFFFFFF;
+
+        // 覆盖 StrObj 字段
+        obj->data = translated->data;
+        obj->meta = translated->meta;
+        obj->extra = translated->extra;
+
+        // 释放旧 data (由游戏 sub_628350 分配, 用同一 CRT 堆, free 安全)
+        if (oldData && oldLen > 0) {
+            if (oldIsWide) {
+                free((uint8_t*)oldData - 2);
+            } else {
+                free(oldData);
+            }
+        }
+
+        if (g_hitCount <= 10) {
+            LogWrite("[521A60] replaced with translated\n");
+        }
+    }
+
+    return result;
+}
+
 // ===================== 字节验证 =====================
 static bool VerifyBytes(uintptr_t addr, const uint8_t* expected, int count, const char* name) {
     uint8_t* target = (uint8_t*)addr;
@@ -695,6 +765,7 @@ static bool InstallHooks() {
     uint8_t* p6646F0 = (uint8_t*)ADDR_6646F0;
     uint8_t* p64D5F0 = (uint8_t*)ADDR_64D5F0;
     uint8_t* p508480 = (uint8_t*)ADDR_508480;
+    uint8_t* p521A60 = (uint8_t*)ADDR_521A60;
 
     LogWrite("[Verify] sub_64D6B0 bytes: %02X %02X %02X %02X\n",
         p64D6B0[0], p64D6B0[1], p64D6B0[2], p64D6B0[3]);
@@ -706,6 +777,8 @@ static bool InstallHooks() {
         p64D5F0[0], p64D5F0[1], p64D5F0[2], p64D5F0[3]);
     LogWrite("[Verify] sub_508480 bytes: %02X %02X %02X %02X\n",
         p508480[0], p508480[1], p508480[2], p508480[3]);
+    LogWrite("[Verify] sub_521A60 bytes: %02X %02X %02X %02X\n",
+        p521A60[0], p521A60[1], p521A60[2], p521A60[3]);
 
     // 初始化 MinHook
     MH_STATUS status = MH_Initialize();
@@ -780,6 +853,19 @@ static bool InstallHooks() {
     }
     LogWrite("[Hook] sub_508480 hooked, trampoline=%p\n", g_orig508480);
 
+    // Hook sub_521A60 (Quest XML text retrieval, __stdcall)
+    status = MH_CreateHook((LPVOID)ADDR_521A60, (LPVOID)&Hooked_521A60, (LPVOID*)&g_orig521A60);
+    if (status != MH_OK) {
+        LogWrite("[Hook] MH_CreateHook(521A60) failed: %s\n", MH_StatusToString(status));
+        return false;
+    }
+    status = MH_EnableHook((LPVOID)ADDR_521A60);
+    if (status != MH_OK) {
+        LogWrite("[Hook] MH_EnableHook(521A60) failed: %s\n", MH_StatusToString(status));
+        return false;
+    }
+    LogWrite("[Hook] sub_521A60 hooked, trampoline=%p\n", g_orig521A60);
+
     return true;
 }
 
@@ -815,7 +901,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
             fprintf(g_logFile, "  Exe path: %s\n", path);
             fprintf(g_logFile, "  Log path: %s\n", logPath);
             fprintf(g_logFile, "  Strategy: runtime dict lookup, malloc-based StrObj (sub_628350-safe)\n");
-            fprintf(g_logFile, "  Hooks: sub_64D6B0 (IDTXT), sub_664660 (STRT idx), sub_6646F0 (STRT key), sub_64D5F0 (XML dict), sub_508480 (XML+CAM search)\n\n");
+            fprintf(g_logFile, "  Hooks: sub_64D6B0 (IDTXT), sub_664660 (STRT idx), sub_6646F0 (STRT key), sub_64D5F0 (XML dict), sub_508480 (XML+CAM search), sub_521A60 (Quest XML)\n\n");
             fflush(g_logFile);
         }
 
@@ -852,8 +938,8 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
     } else if (dwReason == DLL_PROCESS_DETACH) {
         if (g_logFile) {
             fprintf(g_logFile, "\n[DllMain] DETACH\n");
-            fprintf(g_logFile, "  Call counts: 64D6B0=%d, 664660=%d, 6646F0=%d, 64D5F0=%d, 508480=%d\n",
-                g_call64D6B0, g_call664660, g_call6646F0, g_call64D5F0, g_call508480);
+            fprintf(g_logFile, "  Call counts: 64D6B0=%d, 664660=%d, 6646F0=%d, 64D5F0=%d, 508480=%d, 521A60=%d\n",
+                g_call64D6B0, g_call664660, g_call6646F0, g_call64D5F0, g_call508480, g_call521A60);
             fprintf(g_logFile, "  Lookups: %d, Hits: %d, Misses: %d\n",
                 g_lookupCount, g_hitCount, g_missCount);
             fclose(g_logFile);
