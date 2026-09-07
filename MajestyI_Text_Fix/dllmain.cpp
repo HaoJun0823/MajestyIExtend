@@ -1237,6 +1237,8 @@ int __fastcall Hooked_66E7B0(int ecx_this, int edx_unused, int a2, int a3, int a
         if (g_rollbackCount > 0) {
             std::string replacedUtf8;
             if (RollbackReplace(normText, replacedUtf8)) {
+                // rollback 替换后，将残留的 [newline] 字面量转回 \n
+                ReplaceNewlineLiteral(replacedUtf8);
                 // rollback 成功，渲染替换后的文本
                 int wlen = MultiByteToWideChar(CP_UTF8, 0, replacedUtf8.c_str(), (int)replacedUtf8.size(), nullptr, 0);
                 if (wlen > 0) {
