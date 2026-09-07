@@ -1,21 +1,25 @@
-﻿// dllmain.cpp : Majesty HD Runtime Localization v6.5.1
+﻿// dllmain.cpp : Majesty HD Runtime Localization v7.0 (只读诊断版)
 //
-// === 方案 (v6.5.1) ===
-// 外挂汉化: 不修改任何原文件, 运行时 hook 字符串赋值函数 sub_628350
+// === 方案 (v7.0) ===
+// 外挂汉化: 不修改任何原文件, 运行时 hook 渲染核心 sub_66CA70
 //
-// v6.5.1 修复: 用 _ReturnAddress() 替换内联汇编提取返回地址
-//   原因: MSVC 在内联汇编之前插入函数序言(push ebp/sub esp)
-//         导致 [esp] 不再指向返回地址
+// v7.0 只读诊断:
+//   本版不替换渲染, 只 hook sub_66CA70 入口,
+//   读取 this 字符串 + 起始索引 a1 + 查词典 + 打日志,
+//   验证:
+//     1) this 字符串能否正确读出完整文本
+//     2) 起始索引 a1 是否通常为 0 (决定能否整体替换)
+//     3) 词典命中情况
+//     4) 调用频率 (是否为渲染热路径)
+//   全部直接调用原函数, 不修改任何数据, 游戏行为完全不变。
 //
-// v6.5 过滤: 用 _ReturnAddress() 获取真实调用者返回地址,
-//           只在来自 sub_659820 (XML 文本提取) 的调用时翻译
-//
-// v6.4 基础: hook sub_628350, 用栈上临时 wide StrObj 让游戏自己 malloc/free
-//
-// sub_659820 内部有两处 call sub_628350:
-//   0x659896 — XML 节点有文本时 (返回地址 = 0x65989B)
-//   0x6598C4 — XML 节点为空时 (返回地址 = 0x6598C9)
-// 只有返回地址匹配这两个值的才翻译
+// sub_66CA70 反汇编关键事实:
+//   __thiscall(this, a1=startCharIdx, a2, a3, a4, a5, a6)  ret 0x18(6栈参)
+//   this(edi): 字符串字段在 this 的 [0]/[4]/[8]:
+//     - this[0] 非空 => this[0]=StrObj*, 其 [0]=data, [7]&1=wide
+//     - this[0]==0   => this[4]=data, this[8]==1?wide:narrow
+//   esi(a1) = 起始字符索引, 渲染从 a1 开始的子串
+//   逐字符读取 [eax+7]&1 判 wide/narrow
 //
 // 字典文件: scripts/dict.txt (UTF-8, 格式: 英文\t中文\n)
 
@@ -25,13 +29,14 @@
 #include <unordered_map>
 #include <string>
 #include <vector>
+#include <set>
 #include "MinHook.h"
 
 #pragma comment(lib, "psapi.lib")
 #pragma intrinsic(_ReturnAddress)
 
 // ===================== 地址常量 =====================
-static constexpr uintptr_t ADDR_628350 = 0x00628350; // StrObj assign (thiscall)
+static constexpr uintptr_t ADDR_66CA70 = 0x0066CA70; // 渲染核心 (thiscall, 6栈参 ret 0x18)
 
 // ===================== 字符串对象 =====================
 struct StrObj {
@@ -45,10 +50,11 @@ static std::unordered_map<std::string, std::wstring> g_dict;
 static int g_dictCount = 0;
 
 // ===================== 原始函数指针 =====================
-// sub_628350: __thiscall(this, src) -> this
-// 用 __fastcall 模拟 __thiscall (ecx=this, edx=unused, first stack arg=src)
-typedef int (__fastcall *OrigStrAssign_t)(int ecx_this, int edx_unused, int src);
-static OrigStrAssign_t g_orig628350 = nullptr;
+// sub_66CA70: __thiscall(this, a1..a6) -> int
+// 用 __fastcall 模拟 __thiscall: ecx=this, edx=unused, a1..a6 全走栈
+//   栈布局与 __thiscall 完全一致 (this 在 ecx, a1..a6 在栈 [esp+4]起)
+typedef int (__fastcall *OrigRender_t)(int ecx_this, int edx_unused, int a1, int a2, int a3, int a4, int a5, int a6);
+static OrigRender_t g_orig66CA70 = nullptr;
 
 // ===================== Debug 日志 =====================
 static FILE* g_logFile = nullptr;
@@ -56,6 +62,8 @@ static int g_callCount = 0;
 static int g_lookupCount = 0;
 static int g_hitCount = 0;
 static int g_missCount = 0;
+static int g_zeroIndexCount = 0;
+static int g_nonZeroIndexCount = 0;
 
 static void LogWrite(const char* fmt, ...) {
     if (!g_logFile) return;
@@ -188,144 +196,142 @@ static bool LoadDict(const char* path) {
     return true;
 }
 
-// ===================== 从 StrObj 提取英文文本 =====================
-static bool ExtractTextFromStrObj(StrObj* obj, std::string& out) {
-    if (!obj) return false;
+// ===================== 从 this 控件读取完整字符串 =====================
+// this(edi) 字符串布局:
+//   this[0] 非空 => this = StrObj*, 其 data=[+0], meta=[+4](低24位长, bit24 wide), extra=[+8]
+//   this[0]==0   => this[4]=data, this[8]==1? wide : narrow
+// 返回: 完整字符串 (UTF-8)。len 为字符数。
+static bool ReadFullString(int thisPtr, std::string& out, int* outCharLen = nullptr, bool* outWide = nullptr) {
+    if (!thisPtr) return false;
+    uint8_t* edi = (uint8_t*)thisPtr;
 
-    bool isWide = (*(uint8_t*)((char*)obj + 7) & 1) != 0;
-    int len = obj->meta & 0xFFFFFF;
+    uint8_t* data = nullptr;
+    bool wide = false;
+    int chLen = 0;      // 字符数 (wide: wchar数; narrow: 字节数)
 
-    if (len <= 0 || !obj->data) return false;
+    void* obj = *(void**)edi;  // this[0]
+    if (obj) {
+        // StrObj 指针形式
+        uint8_t* s = (uint8_t*)obj;
+        wide = (s[7] & 1) != 0;
+        chLen = (*(uint32_t*)(s + 4)) & 0xFFFFFF;  // meta 低24位
+        data = *(uint8_t**)s;                       // data
+    } else {
+        // 内联形式
+        wide = (*(uint32_t*)(edi + 8)) == 1;
+        data = *(uint8_t**)(edi + 4);
+    }
 
-    if (isWide) {
-        const wchar_t* wstr = (const wchar_t*)obj->data;
-        int utf8Len = WideCharToMultiByte(CP_UTF8, 0, wstr, len, nullptr, 0, nullptr, nullptr);
+    if (!data) return false;
+
+    if (outWide) *outWide = wide;
+
+    if (chLen > 0) {
+        // 已知长度: 直接转换
+        if (wide) {
+            int utf8Len = WideCharToMultiByte(CP_UTF8, 0, (const wchar_t*)data, chLen, nullptr, 0, nullptr, nullptr);
+            if (utf8Len <= 0) return false;
+            out.resize(utf8Len);
+            WideCharToMultiByte(CP_UTF8, 0, (const wchar_t*)data, chLen, &out[0], utf8Len, nullptr, nullptr);
+            if (outCharLen) *outCharLen = chLen;
+            return true;
+        } else {
+            int actualLen = strnlen((const char*)data, (size_t)chLen);
+            if (actualLen <= 0) actualLen = chLen;
+            out.assign((const char*)data, actualLen);
+            if (outCharLen) *outCharLen = actualLen;
+            return true;
+        }
+    }
+
+    // 长度未知, 需自行扫描
+    int maxScan = 0;
+    if (wide) {
+        // 用 null terminator 扫描 (上限保护, 避免越界)
+        maxScan = 256;
+        const wchar_t* ws = (const wchar_t*)data;
+        int n = 0;
+        while (n < maxScan && ws[n] != 0) n++;
+        if (n >= maxScan) return false;
+        int utf8Len = WideCharToMultiByte(CP_UTF8, 0, ws, n, nullptr, 0, nullptr, nullptr);
         if (utf8Len <= 0) return false;
         out.resize(utf8Len);
-        WideCharToMultiByte(CP_UTF8, 0, wstr, len, &out[0], utf8Len, nullptr, nullptr);
+        WideCharToMultiByte(CP_UTF8, 0, ws, n, &out[0], utf8Len, nullptr, nullptr);
+        if (outCharLen) *outCharLen = n;
         return true;
     } else {
-        const char* str = (const char*)obj->data;
-        int actualLen = strnlen(str, len);
-        if (actualLen <= 0) {
-            actualLen = obj->extra & 0xFFFFFF;
-            if (actualLen <= 0 || actualLen > len) actualLen = len;
-        }
-        out.assign(str, actualLen);
+        maxScan = 256;
+        const char* cs = (const char*)data;
+        int n = (int)strnlen(cs, maxScan);
+        if (n >= maxScan) return false;
+        out.assign(cs, n);
+        if (outCharLen) *outCharLen = n;
         return true;
     }
 }
 
-// ===================== 返回地址过滤 =====================
-// sub_659820 内部调用 sub_628350 的两个 call site:
-//   0x659896 — call sub_628350 (XML 节点有文本)
-//   0x6598C4 — call sub_628350 (XML 节点为空, 赋空 StrObj)
-// 返回地址 = call 指令的下一条指令地址
-//   从 0x659896 调用: 返回地址 = 0x65989B
-//   从 0x6598C4 调用: 返回地址 = 0x6598C9
-static constexpr uintptr_t XML_CALLSITE_1_RET = 0x65989B;
-static constexpr uintptr_t XML_CALLSITE_2_RET = 0x6598C9;
-
-// ===================== Hook sub_628350 =====================
-// __thiscall(this, src) — 游戏字符串赋值
-// ecx = this (目标 StrObj), [esp+4] = src (源 StrObj*)
-// 用 __fastcall 模拟: ecx=this, edx=unused, stack arg=src
+// ===================== Hook sub_66CA70 (只读诊断) =====================
+// __thiscall(this, a1=startIdx, a2..a6) — 文本渲染核心
+// 用 __fastcall 模拟: ecx=this, edx=unused, a1..a6 走栈
 //
-// v6.5.1: 用 _ReturnAddress() 正确获取返回地址
-//         只在来自 sub_659820 的调用时翻译, 跳过 GPL 脚本字符串
-int __fastcall Hooked_628350(int ecx_this, int edx_unused, int src) {
+// v7 只读: 读取字符串 + 记录 a1 + 查词典 + 打日志, 不修改任何数据,
+//          直接调用原函数继续渲染, 游戏行为不变。
+int __fastcall Hooked_66CA70(int ecx_this, int edx_unused, int a1, int a2, int a3, int a4, int a5, int a6) {
     g_callCount++;
 
-    // v6.5.1: 用 _ReturnAddress() 获取真实返回地址
-    // _ReturnAddress() 在函数序言之前返回调用者的返回地址
-    uintptr_t retAddr = (uintptr_t)_ReturnAddress();
+    // 起始索引统计
+    if (a1 == 0) g_zeroIndexCount++;
+    else g_nonZeroIndexCount++;
 
-    bool fromXml = (retAddr == XML_CALLSITE_1_RET || retAddr == XML_CALLSITE_2_RET);
-
-    // 调试: 记录前 20 条调用的返回地址
-    static int s_debugCount = 0;
-    if (s_debugCount < 20) {
-        s_debugCount++;
-        LogWrite("[CALL %d] retAddr=%08X fromXml=%d src=%08X\n",
-            s_debugCount, (unsigned int)retAddr, (int)fromXml, src);
-    }
-
-    if (!fromXml) {
-        // 不是来自 XML 文本提取, 直接调原函数
-        return g_orig628350(ecx_this, edx_unused, src);
-    }
-
-    StrObj* srcObj = (StrObj*)src;
-
-    // 如果 src 是 wide (已经是中文), pass-through
-    if (srcObj && (*(uint8_t*)((char*)srcObj + 7) & 1) != 0) {
-        return g_orig628350(ecx_this, edx_unused, src);
-    }
-
-    // 提取英文文本
+    // 读取完整字符串
     std::string enText;
-    if (!srcObj || !ExtractTextFromStrObj(srcObj, enText)) {
-        return g_orig628350(ecx_this, edx_unused, src);
+    int chLen = 0;
+    bool wide = false;
+    bool readOk = ReadFullString((int)ecx_this, enText, &chLen, &wide);
+
+    // 记录前 30 条调用 (含 a1, 字符串)
+    static int s_debugCount = 0;
+    if (s_debugCount < 30) {
+        s_debugCount++;
+        LogWrite("[CALL %d] this=%08X a1(startIdx)=%d chLen=%d wide=%d text=\"%s\"\n",
+            s_debugCount, (unsigned int)ecx_this, a1, chLen, (int)wide,
+            enText.substr(0, 80).c_str());
+    }
+
+    if (!readOk || enText.empty()) {
+        // 无法读取或空串, 直接渲染
+        return g_orig66CA70(ecx_this, edx_unused, a1, a2, a3, a4, a5, a6);
     }
 
     g_lookupCount++;
 
-    // 查字典
+    // 查词典
     auto it = g_dict.find(enText);
-    if (it == g_dict.end()) {
-        // MISS: 直接调原函数
-        if (g_missCount < 50) {
-            LogWrite("[MISS] \"%s\"\n", enText.substr(0, 80).c_str());
+    if (it != g_dict.end()) {
+        // HIT: 记录
+        g_hitCount++;
+        if (g_hitCount <= 100) {
+            LogWrite("[HIT %d] a1=%d \"%s\" -> cn(wlen=%d)\n",
+                g_hitCount, a1, enText.substr(0, 80).c_str(), (int)it->second.size());
+        }
+    } else {
+        // MISS: 记录有限条
+        if (g_missCount < 60) {
+            LogWrite("[MISS] a1=%d \"%s\"\n", a1, enText.substr(0, 80).c_str());
             g_missCount++;
         }
-        return g_orig628350(ecx_this, edx_unused, src);
     }
 
-    // HIT: 构造栈上临时 wide StrObj
-    g_hitCount++;
-    const std::wstring& wcn = it->second;
-    int wlen = (int)wcn.size();
-
-    // 栈上分配: BOM(2) + wide data + null term(2)
-    int wideBytes = wlen * 2;
-    int dataAllocSize = 2 + wideBytes + 2;
-    uint8_t* dataBase = (uint8_t*)_alloca(dataAllocSize);
-
-    // 写 BOM 哨兵 (0xFF 0xFE)
-    dataBase[0] = 0xFF;
-    dataBase[1] = 0xFE;
-
-    // data 指针指向 BOM 之后
-    uint8_t* dataPtr = dataBase + 2;
-
-    // 复制 wide 字符串数据
-    memcpy(dataPtr, wcn.c_str(), wideBytes);
-
-    // 写 null terminator
-    *((wchar_t*)(dataPtr + wideBytes)) = 0;
-
-    // 构造栈上临时 StrObj
-    StrObj tmpObj;
-    tmpObj.data = dataPtr;
-    tmpObj.meta = (uint32_t)wlen | 0x1000000;  // 长度 + wide 标志
-    tmpObj.extra = (uint32_t)wlen;
-
-    // 日志前 100 条
-    if (g_hitCount <= 100) {
-        LogWrite("[HIT %d] \"%s\" -> cn(wlen=%d)\n",
-            g_hitCount, enText.substr(0, 80).c_str(), wlen);
-    }
-
-    // 调用原 sub_628350, 用栈上临时 StrObj 作为 src
-    return g_orig628350(ecx_this, edx_unused, (int)&tmpObj);
+    // 只读诊断: 不修改, 直接调原函数渲染
+    return g_orig66CA70(ecx_this, edx_unused, a1, a2, a3, a4, a5, a6);
 }
 
 // ===================== Hook 安装 =====================
 static bool InstallHooks() {
-    uint8_t* p628350 = (uint8_t*)ADDR_628350;
+    uint8_t* p66CA70 = (uint8_t*)ADDR_66CA70;
 
-    LogWrite("[Verify] sub_628350 bytes: %02X %02X %02X %02X\n",
-        p628350[0], p628350[1], p628350[2], p628350[3]);
+    LogWrite("[Verify] sub_66CA70 bytes: %02X %02X %02X %02X %02X\n",
+        p66CA70[0], p66CA70[1], p66CA70[2], p66CA70[3], p66CA70[4]);
 
     MH_STATUS status = MH_Initialize();
     if (status != MH_OK && status != MH_ERROR_ALREADY_INITIALIZED) {
@@ -333,17 +339,17 @@ static bool InstallHooks() {
         return false;
     }
 
-    status = MH_CreateHook((LPVOID)ADDR_628350, (LPVOID)&Hooked_628350, (LPVOID*)&g_orig628350);
+    status = MH_CreateHook((LPVOID)ADDR_66CA70, (LPVOID)&Hooked_66CA70, (LPVOID*)&g_orig66CA70);
     if (status != MH_OK) {
-        LogWrite("[Hook] MH_CreateHook(628350) failed: %s\n", MH_StatusToString(status));
+        LogWrite("[Hook] MH_CreateHook(66CA70) failed: %s\n", MH_StatusToString(status));
         return false;
     }
-    status = MH_EnableHook((LPVOID)ADDR_628350);
+    status = MH_EnableHook((LPVOID)ADDR_66CA70);
     if (status != MH_OK) {
-        LogWrite("[Hook] MH_EnableHook(628350) failed: %s\n", MH_StatusToString(status));
+        LogWrite("[Hook] MH_EnableHook(66CA70) failed: %s\n", MH_StatusToString(status));
         return false;
     }
-    LogWrite("[Hook] sub_628350 hooked, trampoline=%p\n", g_orig628350);
+    LogWrite("[Hook] sub_66CA70 hooked, trampoline=%p\n", g_orig66CA70);
 
     return true;
 }
@@ -374,11 +380,11 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
 
         g_logFile = fopen(logPath, "w");
         if (g_logFile) {
-            fprintf(g_logFile, "[MajestyHD Runtime Localization v6.5.1] DllMain ATTACH\n");
+            fprintf(g_logFile, "[MajestyHD Runtime Localization v7.0 只读诊断] DllMain ATTACH\n");
             fprintf(g_logFile, "  Exe path: %s\n", path);
             fprintf(g_logFile, "  Log path: %s\n", logPath);
-            fprintf(g_logFile, "  Strategy: hook sub_628350 with _ReturnAddress() filter (XML-only)\n");
-            fprintf(g_logFile, "  All malloc/free by game CRT, no cross-CRT issues\n\n");
+            fprintf(g_logFile, "  Strategy: hook sub_66CA70 (render core), read-only diagnostic\n");
+            fprintf(g_logFile, "  NOT modifying render, game behavior unchanged\n\n");
             fflush(g_logFile);
         }
 
@@ -410,8 +416,8 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
     } else if (dwReason == DLL_PROCESS_DETACH) {
         if (g_logFile) {
             fprintf(g_logFile, "\n[DllMain] DETACH\n");
-            fprintf(g_logFile, "  Calls: %d, Lookups: %d, Hits: %d, Misses: %d\n",
-                g_callCount, g_lookupCount, g_hitCount, g_missCount);
+            fprintf(g_logFile, "  Calls=%d zeroIdx=%d nonZeroIdx=%d Lookups=%d Hits=%d Misses=%d\n",
+                g_callCount, g_zeroIndexCount, g_nonZeroIndexCount, g_lookupCount, g_hitCount, g_missCount);
             fclose(g_logFile);
             g_logFile = nullptr;
         }
