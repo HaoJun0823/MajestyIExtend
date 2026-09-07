@@ -1,0 +1,21 @@
+<Majesty>
+	<Quest id="{39315551-0000-0000-0000-000000000000}">
+		<Name>WIZARDS_CURSE</Name>
+		<Description lang="en_US">
+			<Short>解除诅咒有两种方法：[newline][newline]方法一：抓住偷走法术书的流氓，将其归还给法师，然后完成法师认为"足够的善行"。[newline][newline]方法二：消灭愤怒的法师。[newline][newline]你的英雄们被诅咒了，他们不会像往常那样行动……[newline][newline]（本任务中无法师公会和弗瓦斯、克里普塔、阿格蕾拉、克罗尔玛或达罗斯神殿可用。）</Short>
+			<Long> "恕我如此无礼打扰，但有一位愤怒的法师……"[newline][newline]{愤怒的法师}[newline]"让开，你这个卑躬屈膝的癞蛤蟆！[newline]君主！我要和你谈谈。在你这无法无天的治下，你一个愚蠢的子民偷走了我的法术书。那本伟大的典籍价值不可估量！你和你的领地必须为它的损失付出代价！[newline]在做出足够的善行之前，我诅咒这片土地上的所有居民像死者一样愚笨。"</Long>
+		</Description>
+		<DataConfiguration>
+			<Dataset base="Majesty">
+				<Load>
+					<Template>Wizards_Curse.q</Template>
+				</Load>
+				<Unload>
+					<CAM />
+					<GPL />
+					<Constants />
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

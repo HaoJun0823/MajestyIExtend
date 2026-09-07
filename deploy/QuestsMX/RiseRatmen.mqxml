@@ -1,0 +1,21 @@
+<Majesty>
+	<Quest id="{35305158-0000-0000-0000-000000000000}">
+		<Name>RISE_RATMEN</Name>
+		<Description lang="en_US">
+			<Short>消灭鼠王罗登及王国中所有破损下水主管。</Short>
+			<Long>"君主，鼠人日益猖獗。它们的数量似乎在不断增长，从我们的下水道中传来奇怪的新声响。有传言说鼠人中出现了一位新统治者——一只渴望征服地表的鼠王。[newline]我们必须警惕鼠人可能的入侵。如果它们选择发动攻击，我们必须瞄准它们的新首领。没有了统治者，鼠人将无法维持如此规模的攻势。"</Long>
+		</Description>
+		<DataConfiguration>
+			<Dataset base="MajestyExpansion">
+				<Load>
+					<Template>Rise_ratmen.q</Template>
+				</Load>
+				<Unload>
+					<CAM />
+					<GPL />
+					<Constants />
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

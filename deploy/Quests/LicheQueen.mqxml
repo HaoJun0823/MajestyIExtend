@@ -1,0 +1,21 @@
+<Majesty>
+	<Quest id="{34315551-0000-0000-0000-000000000000}">
+		<Name>LICHE_QUEEN</Name>
+		<Description lang="en_US">
+			<Short>将巫妖女王从她的岩穴巢穴中逐出，然后击败她。[newline][newline]（无克里普塔神殿可用。不可建造铁匠铺、酒馆、矮人据点或盗贼公会，但可能有早期定居点的遗迹残留……）</Short>
+			<Long>"陛下。我带着首席税务官的最新报告来了。他报告说本季度即将结束，国库报告赤字……"[newline][newline]{巫妖女王的声音}[newline]"你竟敢干扰巫妖女王的计划？你那碍事的行径如芒在背。我很快就会永远除掉你和你那些可悲的英雄。"[newline][newline]"……此类支出若未与其它领域的开支妥善平衡，可能损害收入潜力。[newline][newline]呃，殿下？您听到我刚才说的话了吗？"</Long>
+		</Description>
+		<DataConfiguration>
+			<Dataset base="Majesty">
+				<Load>
+					<Template>Liche_queen.q</Template>
+				</Load>
+				<Unload>
+					<CAM />
+					<GPL />
+					<Constants />
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

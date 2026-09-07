@@ -1,0 +1,21 @@
+<Majesty>
+	<Quest id="{39305551-0000-0000-0000-000000000000}">
+		<Name>TOMB_DRAGON</Name>
+		<Description lang="en_US">
+			<Short>摧毁三个怪物巢穴以揭示陵墓的位置。[newline][newline]摧毁龙王之墓。[newline][newline]（在这片险恶之地没有卫兵愿意外出，因此你无法建造警卫室。）</Short>
+			<Long>"陛下，我带来了重要的消息。老法师塔西瓦尔通过他的水晶和灵能，占卜出了您王国的命运。他在此类事务上的预见通常相当准确，因此我恳请您重视他的预言。[newline]法师声称看到了一座古墓，已被所有人遗忘。它被重新发现并被许多英雄造访。其中一人最终取出了藏于其中的一把魔剑。塔西瓦尔坚持说为了这片土地的福祉，这件事必须发生。"</Long>
+		</Description>
+		<DataConfiguration>
+			<Dataset base="Majesty">
+				<Load>
+					<Template>Tomb_dragon.q</Template>
+				</Load>
+				<Unload>
+					<CAM />
+					<GPL />
+					<Constants />
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

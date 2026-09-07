@@ -1,0 +1,6868 @@
+{
+  "UI Strings": [
+    {
+      "file": "AP56",
+      "id": 1,
+      "text": "Select a new debug action"
+    },
+    {
+      "file": "AP21",
+      "id": 1,
+      "text": "Strength - how strong this hero is"
+    },
+    {
+      "file": "AP35",
+      "id": 1090519040,
+      "text": "CCEPT"
+    },
+    {
+      "file": "AP40",
+      "id": 1275068416,
+      "text": "ist of kingdom statistics"
+    },
+    {
+      "file": "AP93",
+      "id": 1,
+      "text": "Cast Invisibility."
+    },
+    {
+      "file": "AP93",
+      "id": 2,
+      "text": "Cast Lightning Bolt."
+    },
+    {
+      "file": "APc4",
+      "id": 17,
+      "text": "Toggle this building on or off tax route."
+    },
+    {
+      "file": "APd7",
+      "id": 2,
+      "text": "Please enter the Host Name and Port Number of the game you want to join."
+    },
+    {
+      "file": "AP30",
+      "id": 52,
+      "text": "The Dark Forest"
+    },
+    {
+      "file": "AP30",
+      "id": 53,
+      "text": "Day of Reckoning"
+    },
+    {
+      "file": "AP30",
+      "id": 54,
+      "text": "Tomb of the Dragon King"
+    },
+    {
+      "file": "AP30",
+      "id": 55,
+      "text": "Elven Treachery"
+    },
+    {
+      "file": "AP30",
+      "id": 56,
+      "text": "The Fertile Plains"
+    },
+    {
+      "file": "AP30",
+      "id": 57,
+      "text": "The Forsaken Lands"
+    },
+    {
+      "file": "AP30",
+      "id": 58,
+      "text": "Goblin Hordes"
+    },
+    {
+      "file": "AP30",
+      "id": 59,
+      "text": "The Liche Queen"
+    },
+    {
+      "file": "AP30",
+      "id": 60,
+      "text": "Save the Prince"
+    },
+    {
+      "file": "AP30",
+      "id": 61,
+      "text": "The Magic Ring"
+    },
+    {
+      "file": "AP30",
+      "id": 62,
+      "text": "Slave Pits"
+    },
+    {
+      "file": "AP30",
+      "id": 63,
+      "text": "THe Wizard's Curse"
+    },
+    {
+      "file": "AP30",
+      "id": 64,
+      "text": "Brashnard's Sphere"
+    },
+    {
+      "file": "AP30",
+      "id": 65,
+      "text": "Deal with the Demon"
+    },
+    {
+      "file": "AP30",
+      "id": 66,
+      "text": "Slay the Mighty Dragon"
+    },
+    {
+      "file": "AP30",
+      "id": 67,
+      "text": "holy chalice"
+    },
+    {
+      "file": "AP30",
+      "id": 68,
+      "text": "tomb of dragon king"
+    },
+    {
+      "file": "AP30",
+      "id": 69,
+      "text": "day of reckoning"
+    },
+    {
+      "file": "AP30",
+      "id": 70,
+      "text": "elven treachery"
+    },
+    {
+      "file": "AP30",
+      "id": 71,
+      "text": "The Fertile Plains"
+    },
+    {
+      "file": "AP30",
+      "id": 72,
+      "text": "frame"
+    },
+    {
+      "file": "AP30",
+      "id": 73,
+      "text": "Placeholder Revolving Quest Pog"
+    },
+    {
+      "file": "AP30",
+      "id": 74,
+      "text": "Current Quest Name"
+    },
+    {
+      "file": "AP30",
+      "id": 75,
+      "text": "num    easy medium hard number of times played              high score etc      "
+    },
+    {
+      "file": "AP30",
+      "id": 76,
+      "text": "quest notes"
+    },
+    {
+      "file": "AP30",
+      "id": 77,
+      "text": "ERASE VICTORIES"
+    },
+    {
+      "file": "AP30",
+      "id": 78,
+      "text": "Freestyle Game"
+    },
+    {
+      "file": "AP30",
+      "id": 79,
+      "text": "Cheat All Quests"
+    },
+    {
+      "file": "AP30",
+      "id": 80,
+      "text": "FREESTYLE QUESTS"
+    },
+    {
+      "file": "AP30",
+      "id": 82,
+      "text": "Bonus Downloadable Quest 1 Trigger"
+    },
+    {
+      "file": "AP30",
+      "id": 83,
+      "text": "Bonus Downloadable Quest 3 Trigger"
+    },
+    {
+      "file": "AP30",
+      "id": 84,
+      "text": "Bonus Downloadable Quest 2 Trigger"
+    },
+    {
+      "file": "AP56",
+      "id": 1,
+      "text": "Select a new debug action"
+    },
+    {
+      "file": "AP56",
+      "id": 5,
+      "text": "Vehicles"
+    },
+    {
+      "file": "AP56",
+      "id": 6,
+      "text": "Movement"
+    },
+    {
+      "file": "AP56",
+      "id": 8,
+      "text": "Actions"
+    },
+    {
+      "file": "AP56",
+      "id": 9,
+      "text": "Particle"
+    },
+    {
+      "file": "AP56",
+      "id": 10,
+      "text": "Projectile"
+    },
+    {
+      "file": "AP56",
+      "id": 11,
+      "text": "Terrain"
+    },
+    {
+      "file": "AP92",
+      "id": 22,
+      "text": "Cast Change of Heart"
+    },
+    {
+      "file": "AP92",
+      "id": 23,
+      "text": "Cast Frost Field"
+    },
+    {
+      "file": "AP92",
+      "id": 24,
+      "text": "Cast Earthquake"
+    },
+    {
+      "file": "AP92",
+      "id": 25,
+      "text": "Cast Chain Lightning."
+    },
+    {
+      "file": "AP92",
+      "id": 26,
+      "text": "Cast Gate."
+    },
+    {
+      "file": "AP92",
+      "id": 27,
+      "text": "Cast Dismiss."
+    },
+    {
+      "file": "AP92",
+      "id": 28,
+      "text": "Spell Timer"
+    },
+    {
+      "file": "AP29",
+      "id": 14,
+      "text": "play btn trigger 1"
+    },
+    {
+      "file": "AP29",
+      "id": 15,
+      "text": "play btn trigger 2"
+    },
+    {
+      "file": "AP29",
+      "id": 16,
+      "text": "play btn trigger 4"
+    },
+    {
+      "file": "AP29",
+      "id": 17,
+      "text": "play btn trigger 3"
+    },
+    {
+      "file": "AP29",
+      "id": 18,
+      "text": "credits btn trigger 1"
+    },
+    {
+      "file": "AP29",
+      "id": 19,
+      "text": "credits btn trigger 2"
+    },
+    {
+      "file": "AP29",
+      "id": 20,
+      "text": "credits btn trigger 3"
+    },
+    {
+      "file": "AP29",
+      "id": 21,
+      "text": "load btn trigger 1"
+    },
+    {
+      "file": "AP29",
+      "id": 22,
+      "text": "score trigger 1"
+    },
+    {
+      "file": "AP29",
+      "id": 23,
+      "text": "levels btn trigger 1"
+    },
+    {
+      "file": "AP29",
+      "id": 24,
+      "text": "cine btn trigger 1"
+    },
+    {
+      "file": "AP29",
+      "id": 25,
+      "text": "mplay btn trigger 1"
+    },
+    {
+      "file": "AP29",
+      "id": 26,
+      "text": "exit btn trigger 1"
+    }
+  ],
+  "Months": [
+    {
+      "file": "MNTH",
+      "id": 1,
+      "text": "February"
+    },
+    {
+      "file": "MNTH",
+      "id": 2,
+      "text": "March"
+    }
+  ],
+  "Game Messages": [
+    {
+      "file": "GMTX",
+      "id": 6,
+      "text": " is "
+    },
+    {
+      "file": "GMTX",
+      "id": 6,
+      "text": " is "
+    },
+    {
+      "file": "GMTX",
+      "id": 388,
+      "text": "Tonic of Speed"
+    },
+    {
+      "file": "GMTX",
+      "id": 389,
+      "text": "Firebalm"
+    },
+    {
+      "file": "GMTX",
+      "id": 390,
+      "text": "Dirgo Strength"
+    },
+    {
+      "file": "GMTX",
+      "id": 391,
+      "text": "Regeneration"
+    },
+    {
+      "file": "GMTX",
+      "id": 392,
+      "text": "Invisibility"
+    },
+    {
+      "file": "GMTX",
+      "id": 393,
+      "text": "Shapeshift Tincture"
+    },
+    {
+      "file": "GMTX",
+      "id": 394,
+      "text": "No more than %d of this type are permitted"
+    },
+    {
+      "file": "GMTX",
+      "id": 395,
+      "text": "No buildings of this type are permitted"
+    },
+    {
+      "file": "GMTX",
+      "id": 396,
+      "text": " (Limit %d)"
+    },
+    {
+      "file": "GMTX",
+      "id": 397,
+      "text": "No more than %d upgrades of this type are permitted"
+    },
+    {
+      "file": "GMTX",
+      "id": 398,
+      "text": "No upgrades of this type are permitted"
+    },
+    {
+      "file": "GMTX",
+      "id": 399,
+      "text": "PLAYER FORCES"
+    },
+    {
+      "file": "GMTX",
+      "id": 400,
+      "text": "ENEMY FORCES"
+    },
+    {
+      "file": "GMTX",
+      "id": 401,
+      "text": "WANDERING MONSTERS"
+    },
+    {
+      "file": "GMTX",
+      "id": 402,
+      "text": "LANDSCAPE"
+    },
+    {
+      "file": "GMTX",
+      "id": 403,
+      "text": "STARTING GOLD"
+    },
+    {
+      "file": "GMTX",
+      "id": 404,
+      "text": "VICTORY CONDITIONS"
+    },
+    {
+      "file": "GMTX",
+      "id": 405,
+      "text": "VICTORY LIMITS"
+    },
+    {
+      "file": "GMTX",
+      "id": 406,
+      "text": "DIFFICULTY"
+    },
+    {
+      "file": "GMTX",
+      "id": 407,
+      "text": "CHEATS"
+    },
+    {
+      "file": "GMTX",
+      "id": 408,
+      "text": "BUILDING LIMITS"
+    },
+    {
+      "file": "GMTX",
+      "id": 409,
+      "text": "Illegal File Name"
+    },
+    {
+      "file": "GMTX",
+      "id": 410,
+      "text": "The filename is reserved, or the file does not exist"
+    },
+    {
+      "file": "GMTX",
+      "id": 411,
+      "text": "Default Settings"
+    },
+    {
+      "file": "GMTX",
+      "id": 412,
+      "text": "Calling Champions"
+    },
+    {
+      "file": "GMTX",
+      "id": 413,
+      "text": "SPECIAL EVENTS"
+    },
+    {
+      "file": "GMTX",
+      "id": 414,
+      "text": "Open Embassy"
+    },
+    {
+      "file": "GMTX",
+      "id": 415,
+      "text": "Close Embassy"
+    },
+    {
+      "file": "GMTX",
+      "id": 416,
+      "text": "Cost = %d"
+    },
+    {
+      "file": "GMTX",
+      "id": 417,
+      "text": "ALL GUILDS FULL"
+    },
+    {
+      "file": "GMTX",
+      "id": 418,
+      "text": "All guilds are full."
+    },
+    {
+      "file": "GMTX",
+      "id": 419,
+      "text": "Master"
+    },
+    {
+      "file": "GMTX",
+      "id": 420,
+      "text": "\u0001FFFFFF%s,\n%d Slain"
+    },
+    {
+      "file": "GMTX",
+      "id": 421,
+      "text": "OUTPOST HEROES"
+    },
+    {
+      "file": "GMTX",
+      "id": 422,
+      "text": "OUTPOST ROSTER"
+    },
+    {
+      "file": "GMTX",
+      "id": 423,
+      "text": "OUTPOST BUILDINGS"
+    },
+    {
+      "file": "GMTX",
+      "id": 424,
+      "text": "OUTPOST REWARDS"
+    },
+    {
+      "file": "GMTX",
+      "id": 425,
+      "text": "Invisibility"
+    },
+    {
+      "file": "GMTX",
+      "id": 426,
+      "text": "Fire Balm"
+    },
+    {
+      "file": "GMTX",
+      "id": 427,
+      "text": "Shape Shift"
+    },
+    {
+      "file": "GMTX",
+      "id": 428,
+      "text": "Regeneration Elixir"
+    },
+    {
+      "file": "GMTX",
+      "id": 429,
+      "text": "Medusa Slow"
+    },
+    {
+      "file": "GMTX",
+      "id": 430,
+      "text": "Frost Field"
+    },
+    {
+      "file": "GMTX",
+      "id": 431,
+      "text": "Flame Shield"
+    },
+    {
+      "file": "GMTX",
+      "id": 432,
+      "text": "Power Shock"
+    },
+    {
+      "file": "GMTX",
+      "id": 433,
+      "text": "Rat Plague"
+    },
+    {
+      "file": "GMTX",
+      "id": 434,
+      "text": "Speed Tonic"
+    },
+    {
+      "file": "GMTX",
+      "id": 435,
+      "text": "Dirgo Strength"
+    },
+    {
+      "file": "GMTX",
+      "id": 436,
+      "text": "Vigor"
+    },
+    {
+      "file": "GMTX",
+      "id": 437,
+      "text": "Damage Shield"
+    },
+    {
+      "file": "GMTX",
+      "id": 438,
+      "text": "Double Attack"
+    },
+    {
+      "file": "GMTX",
+      "id": 439,
+      "text": "Superstrike"
+    },
+    {
+      "file": "GMTX",
+      "id": 440,
+      "text": "PLANET FARGO"
+    },
+    {
+      "file": "GMTX",
+      "id": 441,
+      "text": "What up, Phatness?\r"
+    }
+  ],
+  "Hotkeys": [
+    {
+      "file": "HKTX",
+      "id": 1280463939,
+      "text": "Ctrl"
+    },
+    {
+      "file": "HKTX",
+      "id": 1413892179,
+      "text": "Shift"
+    }
+  ],
+  "Unit Names": [
+    {
+      "file": "UNTN",
+      "id": 828790338,
+      "text": "Lorphus (Jabberwok)"
+    }
+  ],
+  "Debugger": [
+    {
+      "file": "GDB1",
+      "id": 1,
+      "text": "Step Over"
+    },
+    {
+      "file": "GDB1",
+      "id": 2,
+      "text": "Step Out"
+    },
+    {
+      "file": "GDB2",
+      "id": 1,
+      "text": "Debugger"
+    },
+    {
+      "file": "GDB2",
+      "id": 2,
+      "text": "Profiler"
+    },
+    {
+      "file": "GDB3",
+      "id": 1,
+      "text": "Xml Data"
+    },
+    {
+      "file": "GDB3",
+      "id": 2,
+      "text": "Debugger"
+    },
+    {
+      "file": "GDB4",
+      "id": 1,
+      "text": "Global Identifier Management"
+    },
+    {
+      "file": "GDB4",
+      "id": 2,
+      "text": "C-Attribs."
+    },
+    {
+      "file": "GDB5",
+      "id": 1,
+      "text": "Debugger"
+    },
+    {
+      "file": "GDB5",
+      "id": 2,
+      "text": "Game Object and Script Tracking"
+    },
+    {
+      "file": "GDB6",
+      "id": 1,
+      "text": "Debugger"
+    },
+    {
+      "file": "GDB6",
+      "id": 2,
+      "text": "Attributes"
+    },
+    {
+      "file": "GDB7",
+      "id": 1,
+      "text": "Debugger"
+    },
+    {
+      "file": "GDB7",
+      "id": 2,
+      "text": "Attributes"
+    },
+    {
+      "file": "GDB8",
+      "id": 1,
+      "text": "Debugger"
+    },
+    {
+      "file": "GDB8",
+      "id": 2,
+      "text": "Attributes"
+    }
+  ],
+  "Other": [
+    {
+      "file": "ErS0",
+      "id": 0,
+      "text": "This map file needs version %s of the program to load, you have version %s."
+    },
+    {
+      "file": "ErS0",
+      "id": 1,
+      "text": "This file does not appear to be a map file."
+    },
+    {
+      "file": "ErS0",
+      "id": 2,
+      "text": "This file is for another great Cyberlore game, not this one."
+    },
+    {
+      "file": "ErS0",
+      "id": 3,
+      "text": "An error occurred while reading the file."
+    },
+    {
+      "file": "ErS0",
+      "id": 4,
+      "text": "Unable to allocate enough memory."
+    },
+    {
+      "file": "ErS0",
+      "id": 5,
+      "text": "The Quest definition is missing."
+    },
+    {
+      "file": "ErS0",
+      "id": 6,
+      "text": "The Quest definition is corrupt."
+    },
+    {
+      "file": "HPTX",
+      "id": 808465000,
+      "text": "- The Avatar of Krolm is a massive figure embodying the power and fury of the go"
+    },
+    {
+      "file": "HPTX",
+      "id": 825242216,
+      "text": "- The Altars of Krolm are holy places consecrated solely to his worship. To desp"
+    },
+    {
+      "file": "LOSX",
+      "id": 825246797,
+      "text": "Krolm's power has proven to be too great for you & his will remains supreme in t"
+    },
+    {
+      "file": "MX00",
+      "id": 0,
+      "text": "The Blacksmith forges new weapons and armor for your heroes."
+    },
+    {
+      "file": "MX00",
+      "id": 1,
+      "text": "Hall Of Champions"
+    },
+    {
+      "file": "MX00",
+      "id": 2,
+      "text": "Destroy this Hall of Champions."
+    },
+    {
+      "file": "MX00",
+      "id": 3,
+      "text": "Goto tips and details about this building."
+    },
+    {
+      "file": "MX00",
+      "id": 5,
+      "text": "Repair this building once."
+    },
+    {
+      "file": "MX00",
+      "id": 7,
+      "text": "Toggle this building on or off the repair route."
+    },
+    {
+      "file": "MX00",
+      "id": 8,
+      "text": "Zoom the Main Map to this building."
+    },
+    {
+      "file": "MX00",
+      "id": 9,
+      "text": "Track this building in the Tracking Window."
+    },
+    {
+      "file": "MX00",
+      "id": 10,
+      "text": "15 of 72"
+    },
+    {
+      "file": "MX00",
+      "id": 11,
+      "text": "This building's current Hit Points"
+    },
+    {
+      "file": "MX00",
+      "id": 12,
+      "text": "Place Bounty     "
+    },
+    {
+      "file": "MX00",
+      "id": 13,
+      "text": "Goto this building's Bounty Window."
+    },
+    {
+      "file": "MX00",
+      "id": 14,
+      "text": "This building's bounty timer"
+    },
+    {
+      "file": "MX00",
+      "id": 15,
+      "text": "200 Gold for Ratman"
+    },
+    {
+      "file": "MX00",
+      "id": 17,
+      "text": "Go to this building's Visitors Window."
+    },
+    {
+      "file": "MX01",
+      "id": 0,
+      "text": "Known monster types"
+    },
+    {
+      "file": "MX01",
+      "id": 1,
+      "text": "Hall Of Champions"
+    },
+    {
+      "file": "MX01",
+      "id": 2,
+      "text": "Return to this building's Main Window."
+    },
+    {
+      "file": "MX01",
+      "id": 3,
+      "text": "Toggle verbose or short list."
+    },
+    {
+      "file": "MX01",
+      "id": 4,
+      "text": "Track this building in the Tracking Window."
+    },
+    {
+      "file": "MX01",
+      "id": 5,
+      "text": "Zoom the Main Map to selected building."
+    },
+    {
+      "file": "MX01",
+      "id": 6,
+      "text": "VANQUISHED"
+    },
+    {
+      "file": "MX01",
+      "id": 7,
+      "text": "1000"
+    },
+    {
+      "file": "MX01",
+      "id": 8,
+      "text": "Place a short duration bounty on the selected monster type."
+    },
+    {
+      "file": "MX01",
+      "id": 9,
+      "text": "2000"
+    },
+    {
+      "file": "MX01",
+      "id": 10,
+      "text": "Place a long duration bounty on the selected monster type."
+    },
+    {
+      "file": "MX02",
+      "id": 0,
+      "text": "The Blacksmith forges new weapons and armor for your heroes."
+    },
+    {
+      "file": "MX02",
+      "id": 1,
+      "text": "Magic Bazaar"
+    },
+    {
+      "file": "MX02",
+      "id": 3,
+      "text": "Goto this building's Visitors Window."
+    },
+    {
+      "file": "MX02",
+      "id": 4,
+      "text": "Destroy this Magic Bazaar."
+    },
+    {
+      "file": "MX02",
+      "id": 5,
+      "text": "Goto tips and details about this building."
+    },
+    {
+      "file": "MX02",
+      "id": 7,
+      "text": "Repair this building once."
+    },
+    {
+      "file": "MX02",
+      "id": 9,
+      "text": "Tax this building once."
+    },
+    {
+      "file": "MX02",
+      "id": 11,
+      "text": "Toggle this building on or off the repair route."
+    },
+    {
+      "file": "MX02",
+      "id": 13,
+      "text": "Toggle this building on or off the tax route."
+    },
+    {
+      "file": "MX02",
+      "id": 14,
+      "text": "Coffers hold 2000 gold"
+    },
+    {
+      "file": "MX02",
+      "id": 15,
+      "text": "Zoom the Main Map to this building."
+    },
+    {
+      "file": "MX02",
+      "id": 16,
+      "text": "Track this building in the Tracking Window."
+    },
+    {
+      "file": "MX02",
+      "id": 17,
+      "text": "15 of 72"
+    },
+    {
+      "file": "MX02",
+      "id": 18,
+      "text": "This building's current Hit Points"
+    },
+    {
+      "file": "MX02",
+      "id": 19,
+      "text": "LVL"
+    },
+    {
+      "file": "MX02",
+      "id": 21,
+      "text": "This building's current level"
+    },
+    {
+      "file": "MX02",
+      "id": 22,
+      "text": "RESEARCH        "
+    },
+    {
+      "file": "MX02",
+      "id": 23,
+      "text": "Goto this building's Research Window."
+    },
+    {
+      "file": "MX02",
+      "id": 25,
+      "text": "2000"
+    },
+    {
+      "file": "MX02",
+      "id": 26,
+      "text": "This building's current research progress"
+    },
+    {
+      "file": "MX02",
+      "id": 27,
+      "text": "Researching Teleportation Amulets"
+    },
+    {
+      "file": "MX03",
+      "id": 0,
+      "text": "Magic Bazaar"
+    },
+    {
+      "file": "MX03",
+      "id": 1,
+      "text": "Tonic of Speed"
+    },
+    {
+      "file": "MX03",
+      "id": 2,
+      "text": "Gives heroes a temporary but considerable speed boost."
+    },
+    {
+      "file": "MX03",
+      "id": 3,
+      "text": "Fire Balm"
+    },
+    {
+      "file": "MX03",
+      "id": 4,
+      "text": "Temporarily ignites missiles for bows and crossbows."
+    },
+    {
+      "file": "MX03",
+      "id": 5,
+      "text": "Dirgo Strength"
+    },
+    {
+      "file": "MX03",
+      "id": 6,
+      "text": "Provides an enormous but temporary strength boost."
+    },
+    {
+      "file": "MX03",
+      "id": 7,
+      "text": "Research Potions"
+    },
+    {
+      "file": "MX03",
+      "id": 8,
+      "text": "Shapeshift"
+    },
+    {
+      "file": "MX03",
+      "id": 9,
+      "text": "Causes a hero to transform into a powerful creature for a time."
+    },
+    {
+      "file": "MX03",
+      "id": 10,
+      "text": "Regeneration"
+    },
+    {
+      "file": "MX03",
+      "id": 11,
+      "text": "The imbiber's natural healing rate is greatly increased for a time."
+    },
+    {
+      "file": "MX03",
+      "id": 12,
+      "text": "Invisibility"
+    },
+    {
+      "file": "MX03",
+      "id": 13,
+      "text": "Turns a hero completely invisible for a short duration."
+    },
+    {
+      "file": "MX03",
+      "id": 14,
+      "text": "Track this building in the Tracking Window."
+    },
+    {
+      "file": "MX03",
+      "id": 15,
+      "text": "Zoom the Main Map to this building."
+    },
+    {
+      "file": "MX03",
+      "id": 16,
+      "text": "Return to this building's Main Window."
+    },
+    {
+      "file": "MX03",
+      "id": 17,
+      "text": "2000"
+    },
+    {
+      "file": "MX03",
+      "id": 18,
+      "text": "2000"
+    },
+    {
+      "file": "MX03",
+      "id": 19,
+      "text": "2000"
+    },
+    {
+      "file": "MX03",
+      "id": 20,
+      "text": "2000"
+    },
+    {
+      "file": "MX03",
+      "id": 21,
+      "text": "2000"
+    },
+    {
+      "file": "MX03",
+      "id": 22,
+      "text": "2000"
+    },
+    {
+      "file": "MX04",
+      "id": 0,
+      "text": "MAUSOLEUM"
+    },
+    {
+      "file": "MX04",
+      "id": 1,
+      "text": "LIST OF DEAD"
+    },
+    {
+      "file": "MX04",
+      "id": 2,
+      "text": "Show the current list of dead heroes."
+    },
+    {
+      "file": "MX04",
+      "id": 3,
+      "text": "Track this building in the Tracking Window."
+    },
+    {
+      "file": "MX04",
+      "id": 4,
+      "text": "Zoom the Main Map to this building."
+    },
+    {
+      "file": "MX04",
+      "id": 5,
+      "text": "Goto tips and details about this building."
+    },
+    {
+      "file": "MX04",
+      "id": 6,
+      "text": "X heroes buried here"
+    },
+    {
+      "file": "MX04",
+      "id": 7,
+      "text": "15 of 72"
+    },
+    {
+      "file": "MX04",
+      "id": 8,
+      "text": "This building's current Hit Points"
+    },
+    {
+      "file": "MX04",
+      "id": 10,
+      "text": "Repair this building once."
+    },
+    {
+      "file": "MX04",
+      "id": 12,
+      "text": "Toggle this building on or off the repair route."
+    },
+    {
+      "file": "MX04",
+      "id": 13,
+      "text": "Destroy this Mausoleum."
+    },
+    {
+      "file": "MX05",
+      "id": 0,
+      "text": "Deceased heroes."
+    },
+    {
+      "file": "MX05",
+      "id": 1,
+      "text": "MAUSOLEUM"
+    },
+    {
+      "file": "MX05",
+      "id": 2,
+      "text": "Return to this building's Main Window."
+    },
+    {
+      "file": "MX05",
+      "id": 3,
+      "text": "Toggle verbose or short list."
+    },
+    {
+      "file": "MX05",
+      "id": 4,
+      "text": "Track this building in the Tracking Window."
+    },
+    {
+      "file": "MX05",
+      "id": 5,
+      "text": "Zoom the Main Map to selected hero."
+    },
+    {
+      "file": "MX05",
+      "id": 6,
+      "text": "LIST OF DEAD HEROES"
+    },
+    {
+      "file": "MX05",
+      "id": 8,
+      "text": "Resurrect the selected hero"
+    },
+    {
+      "file": "MX05",
+      "id": 9,
+      "text": "1500"
+    },
+    {
+      "file": "MX05",
+      "id": 10,
+      "text": "Cost to resurrect selected hero"
+    },
+    {
+      "file": "MX06",
+      "id": 0,
+      "text": "The Sorcerer's Abode supplies you with powerful spells and enchantments."
+    },
+    {
+      "file": "MX06",
+      "id": 1,
+      "text": "Sorcerer's Abode"
+    },
+    {
+      "file": "MX06",
+      "id": 2,
+      "text": "Destroy this Sorcerer's Abode."
+    },
+    {
+      "file": "MX06",
+      "id": 3,
+      "text": "Goto tips and details about this building."
+    },
+    {
+      "file": "MX06",
+      "id": 5,
+      "text": "Repair this building once."
+    },
+    {
+      "file": "MX06",
+      "id": 7,
+      "text": "Toggle this building on or off the repair route."
+    },
+    {
+      "file": "MX06",
+      "id": 8,
+      "text": "Zoom the Main Map to this building."
+    },
+    {
+      "file": "MX06",
+      "id": 9,
+      "text": "Track this building in the Tracking Window."
+    },
+    {
+      "file": "MX06",
+      "id": 10,
+      "text": "15 of 72"
+    },
+    {
+      "file": "MX06",
+      "id": 11,
+      "text": "This building's current Hit Points"
+    },
+    {
+      "file": "MX06",
+      "id": 12,
+      "text": "LVL"
+    },
+    {
+      "file": "MX06",
+      "id": 14,
+      "text": "This building's current level"
+    },
+    {
+      "file": "MX06",
+      "id": 16,
+      "text": "Goto this building's Spell list"
+    },
+    {
+      "file": "MX06",
+      "id": 18,
+      "text": "2000"
+    },
+    {
+      "file": "MX06",
+      "id": 19,
+      "text": "The Sorcerer in this building is resting and recharging."
+    },
+    {
+      "file": "MX06",
+      "id": 20,
+      "text": "Sorcerer Is Resting"
+    },
+    {
+      "file": "MX07",
+      "id": 0,
+      "text": "Sorcerer's Abode"
+    },
+    {
+      "file": "MX07",
+      "id": 1,
+      "text": "Change Of Heart"
+    },
+    {
+      "file": "MX07",
+      "id": 2,
+      "text": "Change Of Heart"
+    },
+    {
+      "file": "MX07",
+      "id": 3,
+      "text": "Frost Field"
+    },
+    {
+      "file": "MX07",
+      "id": 4,
+      "text": "Frost Field"
+    },
+    {
+      "file": "MX07",
+      "id": 5,
+      "text": "Earthquake"
+    },
+    {
+      "file": "MX07",
+      "id": 6,
+      "text": "Earthquake"
+    },
+    {
+      "file": "MX07",
+      "id": 7,
+      "text": "Chain Lightning"
+    },
+    {
+      "file": "MX07",
+      "id": 8,
+      "text": "Chain Lightning"
+    },
+    {
+      "file": "MX07",
+      "id": 9,
+      "text": "Gate"
+    },
+    {
+      "file": "MX07",
+      "id": 10,
+      "text": "Gate"
+    },
+    {
+      "file": "MX07",
+      "id": 11,
+      "text": "Dismiss"
+    },
+    {
+      "file": "MX07",
+      "id": 12,
+      "text": "Dismiss"
+    },
+    {
+      "file": "MX07",
+      "id": 13,
+      "text": "Return to this building's Main Window."
+    },
+    {
+      "file": "MX07",
+      "id": 14,
+      "text": "Track this building in the Tracking Window."
+    },
+    {
+      "file": "MX07",
+      "id": 15,
+      "text": "Zoom the Main Map to this building."
+    },
+    {
+      "file": "MX07",
+      "id": 16,
+      "text": "SORCERER'S SPELLS"
+    },
+    {
+      "file": "MX07",
+      "id": 17,
+      "text": "2000"
+    },
+    {
+      "file": "MX07",
+      "id": 18,
+      "text": "2000"
+    },
+    {
+      "file": "MX07",
+      "id": 19,
+      "text": "2000"
+    },
+    {
+      "file": "MX07",
+      "id": 20,
+      "text": "2000"
+    },
+    {
+      "file": "MX07",
+      "id": 21,
+      "text": "2000"
+    },
+    {
+      "file": "MX07",
+      "id": 22,
+      "text": "2000"
+    },
+    {
+      "file": "MX08",
+      "id": 0,
+      "text": "REWARDS"
+    },
+    {
+      "file": "MX08",
+      "id": 1,
+      "text": "Goto Place Reward Flag Window."
+    },
+    {
+      "file": "MX08",
+      "id": 3,
+      "text": "Goto Building Construction Window."
+    },
+    {
+      "file": "MX08",
+      "id": 4,
+      "text": "Zoom the Main Map to the Palace."
+    },
+    {
+      "file": "MX08",
+      "id": 5,
+      "text": "Put the Palace in the Tracking Window."
+    },
+    {
+      "file": "MX08",
+      "id": 7,
+      "text": "Goto the Kingdom Statistics and Hero Window."
+    },
+    {
+      "file": "MX08",
+      "id": 8,
+      "text": "Outpost"
+    },
+    {
+      "file": "MX08",
+      "id": 9,
+      "text": "Current maximum number of Palace Guards"
+    },
+    {
+      "file": "MX08",
+      "id": 10,
+      "text": "Current maximum number of Tax Collectors"
+    },
+    {
+      "file": "MX08",
+      "id": 11,
+      "text": "Current maximum number of Peasants"
+    },
+    {
+      "file": "MX08",
+      "id": 13,
+      "text": "Current maximum number of Palace Guards"
+    },
+    {
+      "file": "MX08",
+      "id": 15,
+      "text": "Current maximum number of Tax Collectors"
+    },
+    {
+      "file": "MX08",
+      "id": 17,
+      "text": "Current maximum number of Peasants"
+    },
+    {
+      "file": "MX08",
+      "id": 18,
+      "text": "ROSTER"
+    },
+    {
+      "file": "MX08",
+      "id": 19,
+      "text": "Goto the Palace's Roster Window: heroes, henchmen, and buildings."
+    },
+    {
+      "file": "MX08",
+      "id": 20,
+      "text": "Goto tips and details about this Palace."
+    },
+    {
+      "file": "MX08",
+      "id": 21,
+      "text": "15 of 72"
+    },
+    {
+      "file": "MX08",
+      "id": 22,
+      "text": "The Palace's current Hit Points"
+    },
+    {
+      "file": "MX08",
+      "id": 23,
+      "text": "Add the Palace to the repair queue."
+    },
+    {
+      "file": "MX08",
+      "id": 24,
+      "text": "Repair this Palace once."
+    },
+    {
+      "file": "MX08",
+      "id": 26,
+      "text": "Current number of heroes."
+    },
+    {
+      "file": "MX08",
+      "id": 27,
+      "text": "This building's current number of heroes"
+    },
+    {
+      "file": "MX09",
+      "id": 0,
+      "text": "The Blacksmith forges new weapons and armor for your heroes."
+    },
+    {
+      "file": "MX09",
+      "id": 1,
+      "text": "ZOO"
+    },
+    {
+      "file": "MX09",
+      "id": 3,
+      "text": "Goto this building's Visitors Window."
+    },
+    {
+      "file": "MX09",
+      "id": 4,
+      "text": "Destroy this Blacksmith."
+    },
+    {
+      "file": "MX09",
+      "id": 5,
+      "text": "Goto tips and details about this building."
+    },
+    {
+      "file": "MX09",
+      "id": 7,
+      "text": "Repair this building once."
+    },
+    {
+      "file": "MX09",
+      "id": 9,
+      "text": "Tax this building once."
+    },
+    {
+      "file": "MX09",
+      "id": 11,
+      "text": "Toggle this building on or off the repair route."
+    },
+    {
+      "file": "MX09",
+      "id": 13,
+      "text": "Toggle this building on or off the tax route."
+    },
+    {
+      "file": "MX09",
+      "id": 14,
+      "text": "Coffers hold 2000 gold"
+    },
+    {
+      "file": "MX09",
+      "id": 15,
+      "text": "Zoom the Main Map to this building."
+    },
+    {
+      "file": "MX09",
+      "id": 16,
+      "text": "Track this building in the Tracking Window."
+    },
+    {
+      "file": "MX09",
+      "id": 17,
+      "text": "15 of 72"
+    },
+    {
+      "file": "MX09",
+      "id": 18,
+      "text": "This building's current Hit Points"
+    },
+    {
+      "file": "MX09",
+      "id": 19,
+      "text": "LVL"
+    },
+    {
+      "file": "MX09",
+      "id": 21,
+      "text": "This building's current level"
+    },
+    {
+      "file": "MX09",
+      "id": 22,
+      "text": "Place Reward"
+    },
+    {
+      "file": "MX09",
+      "id": 23,
+      "text": "Goto this building's Reward Dialog"
+    },
+    {
+      "file": "MX09",
+      "id": 25,
+      "text": "2000"
+    },
+    {
+      "file": "MX13",
+      "id": 0,
+      "text": "Cast Change of Heart"
+    },
+    {
+      "file": "MX13",
+      "id": 1,
+      "text": "Cast Frost Field"
+    },
+    {
+      "file": "MX13",
+      "id": 2,
+      "text": "Cast Earthquake"
+    },
+    {
+      "file": "MX13",
+      "id": 3,
+      "text": "Cast Chain Lightning."
+    },
+    {
+      "file": "MX13",
+      "id": 4,
+      "text": "Cast Gate."
+    },
+    {
+      "file": "MX13",
+      "id": 5,
+      "text": "Cast Dismiss."
+    },
+    {
+      "file": "MX13",
+      "id": 6,
+      "text": "Spell Timer"
+    },
+    {
+      "file": "MX14",
+      "id": 0,
+      "text": "BROKEN SEWERS"
+    },
+    {
+      "file": "MX14",
+      "id": 1,
+      "text": "Track this Sewer in the Tracking Window."
+    },
+    {
+      "file": "MX14",
+      "id": 2,
+      "text": "Zoom the Main Map to this Sewer."
+    },
+    {
+      "file": "MX14",
+      "id": 3,
+      "text": "Go to tips and details about this Sewer."
+    },
+    {
+      "file": "MX14",
+      "id": 4,
+      "text": "15 of 72"
+    },
+    {
+      "file": "MX14",
+      "id": 5,
+      "text": "This lair's current Hit Points"
+    },
+    {
+      "file": "MX15",
+      "id": 0,
+      "text": "Rat Nest"
+    },
+    {
+      "file": "MX15",
+      "id": 1,
+      "text": "Object Type"
+    },
+    {
+      "file": "MX15",
+      "id": 2,
+      "text": "Track this lair in the Tracking Window."
+    },
+    {
+      "file": "MX15",
+      "id": 3,
+      "text": "Zoom the Main Map to this lair."
+    },
+    {
+      "file": "MX15",
+      "id": 4,
+      "text": "Go to tips and details about this lair."
+    },
+    {
+      "file": "MX15",
+      "id": 5,
+      "text": "15 of 72"
+    },
+    {
+      "file": "MX15",
+      "id": 6,
+      "text": "This lair's current Hit Points"
+    },
+    {
+      "file": "MX16",
+      "id": 0,
+      "text": "Ancient Graveyard"
+    },
+    {
+      "file": "MX16",
+      "id": 1,
+      "text": "Object Type"
+    },
+    {
+      "file": "MX16",
+      "id": 2,
+      "text": "Track this lair in the Tracking Window."
+    },
+    {
+      "file": "MX16",
+      "id": 3,
+      "text": "Zoom the Main Map to this lair."
+    },
+    {
+      "file": "MX16",
+      "id": 4,
+      "text": "Go to tips and details about this lair."
+    },
+    {
+      "file": "MX16",
+      "id": 5,
+      "text": "15 of 72"
+    },
+    {
+      "file": "MX16",
+      "id": 6,
+      "text": "This lair's current Hit Points"
+    },
+    {
+      "file": "MX17",
+      "id": 2,
+      "text": "SETTINGS SAVE NAME"
+    },
+    {
+      "file": "MX17",
+      "id": 3,
+      "text": "Chat Box Display"
+    },
+    {
+      "file": "MX17",
+      "id": 4,
+      "text": "Single Player Freestyle Options"
+    },
+    {
+      "file": "MX17",
+      "id": 5,
+      "text": "CHAT ROOM"
+    },
+    {
+      "file": "MX17",
+      "id": 6,
+      "text": "SEND CHAT"
+    },
+    {
+      "file": "MX17",
+      "id": 7,
+      "text": "Chat Box Entry"
+    },
+    {
+      "file": "MX17",
+      "id": 8,
+      "text": "Quest Pog Icon"
+    },
+    {
+      "file": "MX17",
+      "id": 9,
+      "text": "LANDSCAPE"
+    },
+    {
+      "file": "MX17",
+      "id": 10,
+      "text": "STARTING GOLD"
+    },
+    {
+      "file": "MX17",
+      "id": 11,
+      "text": "(Amount of Starting Gold)"
+    },
+    {
+      "file": "MX17",
+      "id": 12,
+      "text": "VICTORY CONDITIONS"
+    },
+    {
+      "file": "MX17",
+      "id": 13,
+      "text": "VICTORY LIMITS"
+    },
+    {
+      "file": "MX17",
+      "id": 14,
+      "text": "Choose a gold amount."
+    },
+    {
+      "file": "MX17",
+      "id": 15,
+      "text": "Descriptive Text for Each Goal"
+    },
+    {
+      "file": "MX17",
+      "id": 16,
+      "text": "Descriptive Text for Each Goal"
+    },
+    {
+      "file": "MX17",
+      "id": 17,
+      "text": "DIFFICULTY"
+    },
+    {
+      "file": "MX17",
+      "id": 18,
+      "text": "This will show the difficulty"
+    },
+    {
+      "file": "MX17",
+      "id": 19,
+      "text": "HARD"
+    },
+    {
+      "file": "MX17",
+      "id": 20,
+      "text": "This will show the difficulty"
+    },
+    {
+      "file": "MX17",
+      "id": 21,
+      "text": "PLAYER FORCES"
+    },
+    {
+      "file": "MX17",
+      "id": 22,
+      "text": "Initial arrangement of player buildings and heros"
+    },
+    {
+      "file": "MX17",
+      "id": 23,
+      "text": "Initial arrangement of monsters and lairs"
+    },
+    {
+      "file": "MX17",
+      "id": 24,
+      "text": "Initial setting for random monsters (advanced)"
+    },
+    {
+      "file": "MX17",
+      "id": 25,
+      "text": "WANDERING MONSTERS"
+    },
+    {
+      "file": "MX17",
+      "id": 26,
+      "text": "ENEMY FORCES"
+    },
+    {
+      "file": "MX17",
+      "id": 27,
+      "text": "Press ENTER to send chat."
+    },
+    {
+      "file": "MX17",
+      "id": 28,
+      "text": "BUILDING EDIT MENU"
+    },
+    {
+      "file": "MX17",
+      "id": 29,
+      "text": "BUILDING LIMITATIONS"
+    },
+    {
+      "file": "MX17",
+      "id": 30,
+      "text": "ALLOW CHEATS"
+    },
+    {
+      "file": "MX17",
+      "id": 31,
+      "text": "SPECIAL EVENT 1"
+    },
+    {
+      "file": "MX17",
+      "id": 32,
+      "text": "Initial setting for special event 1"
+    },
+    {
+      "file": "MX17",
+      "id": 33,
+      "text": "999"
+    },
+    {
+      "file": "MX17",
+      "id": 34,
+      "text": "MAP NUMBER"
+    },
+    {
+      "file": "MX17",
+      "id": 35,
+      "text": "LOAD"
+    },
+    {
+      "file": "MX17",
+      "id": 36,
+      "text": "SAVE"
+    },
+    {
+      "file": "MX17",
+      "id": 37,
+      "text": "SPECIAL EVENT 2"
+    },
+    {
+      "file": "MX17",
+      "id": 38,
+      "text": "Initial setting for special event 2"
+    },
+    {
+      "file": "MX18",
+      "id": 0,
+      "text": "SAVE"
+    },
+    {
+      "file": "MX18",
+      "id": 2,
+      "text": "DELETE"
+    },
+    {
+      "file": "MX18",
+      "id": 3,
+      "text": "Build Tree Editor"
+    },
+    {
+      "file": "MX18",
+      "id": 4,
+      "text": "Chat Box Display"
+    },
+    {
+      "file": "MX18",
+      "id": 5,
+      "text": "CHAT ROOM"
+    },
+    {
+      "file": "MX18",
+      "id": 6,
+      "text": "SEND CHAT"
+    },
+    {
+      "file": "MX18",
+      "id": 7,
+      "text": "Chat Box Entry"
+    },
+    {
+      "file": "MX18",
+      "id": 8,
+      "text": "Placeholder Revolving Quest Pog"
+    },
+    {
+      "file": "MX18",
+      "id": 9,
+      "text": "Press ENTER to send chat."
+    },
+    {
+      "file": "MX18",
+      "id": 10,
+      "text": "SAVE AS:"
+    },
+    {
+      "file": "MX18",
+      "id": 11,
+      "text": "Sample save name"
+    },
+    {
+      "file": "MX18",
+      "id": 12,
+      "text": "SET ALL"
+    },
+    {
+      "file": "MX18",
+      "id": 13,
+      "text": "REMOVE ALL"
+    },
+    {
+      "file": "MX19",
+      "id": 0,
+      "text": "ADJUST SETTINGS"
+    },
+    {
+      "file": "MX19",
+      "id": 1,
+      "text": "PLAYER 1 BORDER"
+    },
+    {
+      "file": "MX19",
+      "id": 2,
+      "text": "player 2 background plate"
+    },
+    {
+      "file": "MX19",
+      "id": 3,
+      "text": "PLAYER 4 BORDER"
+    },
+    {
+      "file": "MX19",
+      "id": 4,
+      "text": "PLAYER 3 BORDER"
+    },
+    {
+      "file": "MX19",
+      "id": 5,
+      "text": "PLAYER 2 BORDER"
+    },
+    {
+      "file": "MX19",
+      "id": 6,
+      "text": "player 4 background plate"
+    },
+    {
+      "file": "MX19",
+      "id": 7,
+      "text": "player 3 background plate"
+    },
+    {
+      "file": "MX19",
+      "id": 8,
+      "text": "START GAME"
+    },
+    {
+      "file": "MX19",
+      "id": 9,
+      "text": "Ready"
+    },
+    {
+      "file": "MX19",
+      "id": 10,
+      "text": "player 2 background plate"
+    },
+    {
+      "file": "MX19",
+      "id": 12,
+      "text": "Chat Box Display"
+    },
+    {
+      "file": "MX19",
+      "id": 14,
+      "text": "Player1 Name"
+    },
+    {
+      "file": "MX19",
+      "id": 15,
+      "text": "PLAYER 1 HOST"
+    },
+    {
+      "file": "MX19",
+      "id": 16,
+      "text": "Player2 Name"
+    },
+    {
+      "file": "MX19",
+      "id": 17,
+      "text": "Player3 Name"
+    },
+    {
+      "file": "MX19",
+      "id": 18,
+      "text": "Player4 Name"
+    },
+    {
+      "file": "MX19",
+      "id": 19,
+      "text": "PLAYER 2 STATUS"
+    },
+    {
+      "file": "MX19",
+      "id": 20,
+      "text": "PLAYER 3 STATUS"
+    },
+    {
+      "file": "MX19",
+      "id": 21,
+      "text": "PLAYER 4 STATUS"
+    },
+    {
+      "file": "MX19",
+      "id": 22,
+      "text": "Session Name"
+    },
+    {
+      "file": "MX19",
+      "id": 23,
+      "text": "Start Replay"
+    },
+    {
+      "file": "MX19",
+      "id": 24,
+      "text": "SETTINGS"
+    },
+    {
+      "file": "MX19",
+      "id": 25,
+      "text": "Loaded Game Name"
+    },
+    {
+      "file": "MX19",
+      "id": 26,
+      "text": "CHAT ROOM"
+    },
+    {
+      "file": "MX19",
+      "id": 27,
+      "text": "SEND CHAT"
+    },
+    {
+      "file": "MX19",
+      "id": 28,
+      "text": "Blinking Cursor"
+    },
+    {
+      "file": "MX19",
+      "id": 29,
+      "text": "Quest Pog Icon"
+    },
+    {
+      "file": "MX19",
+      "id": 30,
+      "text": "GAME NAME"
+    },
+    {
+      "file": "MX19",
+      "id": 31,
+      "text": "Press ENTER to send chat"
+    },
+    {
+      "file": "MX19",
+      "id": 32,
+      "text": "Settings Display"
+    },
+    {
+      "file": "MX20",
+      "id": 0,
+      "text": "LOAD SETTINGS"
+    },
+    {
+      "file": "MX20",
+      "id": 2,
+      "text": "DELETE SETTINGS"
+    },
+    {
+      "file": "MX20",
+      "id": 3,
+      "text": "SAVED FREESTYLE GAMES"
+    },
+    {
+      "file": "MX20",
+      "id": 4,
+      "text": "Load Freestyle Options"
+    },
+    {
+      "file": "MX20",
+      "id": 5,
+      "text": "Multiplayer Setup"
+    },
+    {
+      "file": "MX20",
+      "id": 6,
+      "text": "Chat Box Display"
+    },
+    {
+      "file": "MX20",
+      "id": 7,
+      "text": "CHAT ROOM"
+    },
+    {
+      "file": "MX20",
+      "id": 8,
+      "text": "SEND CHAT"
+    },
+    {
+      "file": "MX20",
+      "id": 9,
+      "text": "Chat Box Entry"
+    },
+    {
+      "file": "MX20",
+      "id": 10,
+      "text": "Placeholder Revolving Quest Pog"
+    },
+    {
+      "file": "MX20",
+      "id": 11,
+      "text": "Press ENTER to send chat."
+    },
+    {
+      "file": "MX21",
+      "id": 0,
+      "text": "SAVE SETTINGS"
+    },
+    {
+      "file": "MX21",
+      "id": 2,
+      "text": "DELETE SETTINGS"
+    },
+    {
+      "file": "MX21",
+      "id": 3,
+      "text": "SAVE FREESTYLE AS"
+    },
+    {
+      "file": "MX21",
+      "id": 4,
+      "text": "Save Freestyle Options"
+    },
+    {
+      "file": "MX21",
+      "id": 5,
+      "text": "Multiplayer Setup"
+    },
+    {
+      "file": "MX21",
+      "id": 6,
+      "text": "Chat Box Display"
+    },
+    {
+      "file": "MX21",
+      "id": 7,
+      "text": "CHAT ROOM"
+    },
+    {
+      "file": "MX21",
+      "id": 8,
+      "text": "SEND CHAT"
+    },
+    {
+      "file": "MX21",
+      "id": 9,
+      "text": "Chat Box Entry"
+    },
+    {
+      "file": "MX21",
+      "id": 10,
+      "text": "Placeholder Revolving Quest Pog"
+    },
+    {
+      "file": "MX21",
+      "id": 11,
+      "text": "Press ENTER to send chat."
+    },
+    {
+      "file": "MX21",
+      "id": 12,
+      "text": "Sample settings name"
+    },
+    {
+      "file": "MX22",
+      "id": 0,
+      "text": "CLOSE EMBASSY"
+    },
+    {
+      "file": "MX22",
+      "id": 1,
+      "text": "Close this Embassy."
+    },
+    {
+      "file": "MX22",
+      "id": 2,
+      "text": "OPEN EMBASSY"
+    },
+    {
+      "file": "MX22",
+      "id": 3,
+      "text": "Open this Embassy."
+    },
+    {
+      "file": "MX22",
+      "id": 4,
+      "text": "The Blacksmith forges new weapons and armor for your heroes."
+    },
+    {
+      "file": "MX22",
+      "id": 7,
+      "text": "Goto this building's Hero list."
+    },
+    {
+      "file": "MX22",
+      "id": 8,
+      "text": "Destroy this Embassy."
+    },
+    {
+      "file": "MX22",
+      "id": 9,
+      "text": "Goto tips and details about this building."
+    },
+    {
+      "file": "MX22",
+      "id": 11,
+      "text": "Repair this building once."
+    },
+    {
+      "file": "MX22",
+      "id": 12,
+      "text": "Tax this building once."
+    },
+    {
+      "file": "MX22",
+      "id": 14,
+      "text": "Toggle this building on or off the repair route."
+    },
+    {
+      "file": "MX22",
+      "id": 16,
+      "text": "Toggle this building on or off the tax route."
+    },
+    {
+      "file": "MX22",
+      "id": 17,
+      "text": "Coffers hold 2000 gold"
+    },
+    {
+      "file": "MX22",
+      "id": 18,
+      "text": "Zoom the Main Map to this building."
+    },
+    {
+      "file": "MX22",
+      "id": 19,
+      "text": "Track this building in the Tracking Window."
+    },
+    {
+      "file": "MX22",
+      "id": 20,
+      "text": "15 of 72"
+    },
+    {
+      "file": "MX22",
+      "id": 21,
+      "text": "This building's current Hit Points"
+    },
+    {
+      "file": "MX22",
+      "id": 22,
+      "text": "This building's current research progress"
+    },
+    {
+      "file": "MX22",
+      "id": 25,
+      "text": "This building's current number of members"
+    },
+    {
+      "file": "MX22",
+      "id": 26,
+      "text": "This building's current number of members"
+    },
+    {
+      "file": "AITX",
+      "id": 177,
+      "text": "empty"
+    },
+    {
+      "file": "AITX",
+      "id": 178,
+      "text": "empty"
+    },
+    {
+      "file": "AITX",
+      "id": 179,
+      "text": "empty"
+    },
+    {
+      "file": "AITX",
+      "id": 180,
+      "text": "empty"
+    },
+    {
+      "file": "AITX",
+      "id": 181,
+      "text": "empty"
+    },
+    {
+      "file": "AITX",
+      "id": 182,
+      "text": "empty"
+    },
+    {
+      "file": "AITX",
+      "id": 183,
+      "text": "empty"
+    },
+    {
+      "file": "AITX",
+      "id": 184,
+      "text": "empty"
+    },
+    {
+      "file": "AITX",
+      "id": 185,
+      "text": "empty"
+    },
+    {
+      "file": "AITX",
+      "id": 186,
+      "text": "empty"
+    },
+    {
+      "file": "AITX",
+      "id": 187,
+      "text": "empty"
+    },
+    {
+      "file": "AITX",
+      "id": 188,
+      "text": "empty"
+    },
+    {
+      "file": "AITX",
+      "id": 189,
+      "text": "empty"
+    },
+    {
+      "file": "AITX",
+      "id": 190,
+      "text": "empty"
+    },
+    {
+      "file": "AITX",
+      "id": 191,
+      "text": "empty"
+    },
+    {
+      "file": "AITX",
+      "id": 192,
+      "text": "empty"
+    },
+    {
+      "file": "AITX",
+      "id": 193,
+      "text": "empty"
+    },
+    {
+      "file": "AITX",
+      "id": 194,
+      "text": "empty"
+    },
+    {
+      "file": "AITX",
+      "id": 195,
+      "text": "empty"
+    },
+    {
+      "file": "AITX",
+      "id": 196,
+      "text": "empty"
+    },
+    {
+      "file": "AITX",
+      "id": 197,
+      "text": "empty"
+    },
+    {
+      "file": "AITX",
+      "id": 198,
+      "text": "empty"
+    },
+    {
+      "file": "AITX",
+      "id": 199,
+      "text": "empty"
+    },
+    {
+      "file": "AITX",
+      "id": 200,
+      "text": "Purchasing Speed Tonic"
+    },
+    {
+      "file": "AITX",
+      "id": 201,
+      "text": "Purchasing Fire Balm"
+    },
+    {
+      "file": "AITX",
+      "id": 202,
+      "text": "Purchasing Strength Potion"
+    },
+    {
+      "file": "AITX",
+      "id": 203,
+      "text": "Purchasing Regeneration Elixer"
+    },
+    {
+      "file": "AITX",
+      "id": 204,
+      "text": "Purchasing Invisibility Brew"
+    },
+    {
+      "file": "AITX",
+      "id": 205,
+      "text": "Purchasing Shapeshift Potion"
+    },
+    {
+      "file": "AITX",
+      "id": 206,
+      "text": "Too close to the Palace or an Outpost"
+    },
+    {
+      "file": "AITX",
+      "id": 207,
+      "text": "Heeding call for Champions"
+    },
+    {
+      "file": "AITX",
+      "id": 208,
+      "text": "To the kingdom of Va'en"
+    },
+    {
+      "file": "AITX",
+      "id": 209,
+      "text": "To the kingdom of Meridia"
+    },
+    {
+      "file": "AITX",
+      "id": 210,
+      "text": "To the kingdom of Kosinth"
+    },
+    {
+      "file": "AITX",
+      "id": 211,
+      "text": "To the kingdom of Burman"
+    },
+    {
+      "file": "AITX",
+      "id": 212,
+      "text": "This is one of the four trade routes leading into our kingom, Your Majesty. We m"
+    },
+    {
+      "file": "AITX",
+      "id": 213,
+      "text": "This is one of the four trade routes leading into our kingom, Your Majesty. We m"
+    },
+    {
+      "file": "AITX",
+      "id": 214,
+      "text": "This is one of the four trade routes leading into our kingom, Your Majesty. We m"
+    },
+    {
+      "file": "AITX",
+      "id": 215,
+      "text": "This is one of the four trade routes leading into our kingom, Your Majesty. We m"
+    },
+    {
+      "file": "AITX",
+      "id": 216,
+      "text": "Your Majesty, the lady of Va'en sends us a warm greetings and congratulations on"
+    },
+    {
+      "file": "AITX",
+      "id": 217,
+      "text": "The trade lords of Burman have sent word that they approve of your progress thus"
+    },
+    {
+      "file": "AITX",
+      "id": 218,
+      "text": "A Kosinth merchant recently dropped by complaining of the impassable roads and d"
+    },
+    {
+      "file": "AITX",
+      "id": 219,
+      "text": "The Meridian king has demanded an explanation for the loss of so many caravans, "
+    },
+    {
+      "file": "AITX",
+      "id": 220,
+      "text": "The Burman lords have sent a letter of glowing praise to thank you for the fine "
+    },
+    {
+      "file": "AITX",
+      "id": 221,
+      "text": "The Kosinth merchant guilds have sent a messenger to thank us for the efforts we"
+    },
+    {
+      "file": "AITX",
+      "id": 222,
+      "text": "The fair Lady of Va'en asks that we do all we can to step up our efforts in defe"
+    },
+    {
+      "file": "AITX",
+      "id": 223,
+      "text": "The King of Meridia seems quite put out with our apparently paltry effort to def"
+    },
+    {
+      "file": "AITX",
+      "id": 224,
+      "text": "The guildmaster of Kosinth is overwhelmed with gratitude for our efforts. He has"
+    },
+    {
+      "file": "AITX",
+      "id": 225,
+      "text": "The King of Meridia has sent word that he finds our progress in defending his ca"
+    },
+    {
+      "file": "AITX",
+      "id": 226,
+      "text": "The Burman lords claim that we may be in danger of reneging on our hard won trea"
+    },
+    {
+      "file": "AITX",
+      "id": 227,
+      "text": "The Lady of Va'en has sent a letter suggesting that perhaps we were never truly "
+    },
+    {
+      "file": "AITX",
+      "id": 228,
+      "text": "The trade lords of Burman have assured us that the treaty will soon be signed. T"
+    },
+    {
+      "file": "AITX",
+      "id": 229,
+      "text": "The Meridian king seems cautiously optimistic that we will indeed soon have a pe"
+    },
+    {
+      "file": "AITX",
+      "id": 230,
+      "text": "The Lady of Va'en send word hoping that matters will soon improve in our kingdom"
+    },
+    {
+      "file": "AITX",
+      "id": 231,
+      "text": "The Guildmaster of Kosinth apparently lost several servants just trying to reach"
+    },
+    {
+      "file": "AITX",
+      "id": 232,
+      "text": "The Lady of Va'en herself has come forth to offer the deepest appreciation of al"
+    },
+    {
+      "file": "AITX",
+      "id": 233,
+      "text": "The Kosinth guildmaster is happy to inform you that the permanent treaty has bee"
+    },
+    {
+      "file": "AITX",
+      "id": 234,
+      "text": "Your Majesty, today we recieved a final letter from the trade lords of Burman.  "
+    },
+    {
+      "file": "AITX",
+      "id": 235,
+      "text": "Your Majesty, it seems that the loss of such a great number of caravans has the "
+    },
+    {
+      "file": "AITX",
+      "id": 236,
+      "text": "Your Majesty! It seems hard to believe, but our accountants have noted the loss "
+    },
+    {
+      "file": "AITX",
+      "id": 237,
+      "text": "Bands of goblins have blockaded the routes into our kingdom, your Majesty!"
+    },
+    {
+      "file": "AITX",
+      "id": 238,
+      "text": "A trio of dragons has reportedly begun preying upon caravans on the outskirts of"
+    },
+    {
+      "file": "AITX",
+      "id": 239,
+      "text": "Several deadly gorgons have entered our realm, your Majesty..."
+    },
+    {
+      "file": "AITX",
+      "id": 240,
+      "text": "Terrible news, your Majesty... It appears that some stealthy rapscallion has mad"
+    },
+    {
+      "file": "AITX",
+      "id": 241,
+      "text": "The castle physician has informed me that a debilitating plague has spread among"
+    },
+    {
+      "file": "AITX",
+      "id": 242,
+      "text": "Your Majesty, a wandering priestess of Krypta has warned us that the dead are re"
+    },
+    {
+      "file": "AITX",
+      "id": 243,
+      "text": "Your majesty, it appears that the rogues and elves who dwell in this corrupt kin"
+    },
+    {
+      "file": "AITX",
+      "id": 244,
+      "text": "The corrupted peasants have taken up arms against you. They are angry at your de"
+    },
+    {
+      "file": "AITX",
+      "id": 245,
+      "text": "The denizens of this kingdom have sent for aid from the neighboring goblins -- a"
+    },
+    {
+      "file": "AITX",
+      "id": 246,
+      "text": "Rhoden, the Rat King, has burst up from the sewers to take over your kingdom! De"
+    },
+    {
+      "file": "AITX",
+      "id": 247,
+      "text": "Your Majesty, a terrible earthquake is wreaking great havoc upon our kingdom!"
+    },
+    {
+      "file": "AITX",
+      "id": 248,
+      "text": "Something has angered the Goddess Krypta your Majesty! She has placed a great cu"
+    },
+    {
+      "file": "AITX",
+      "id": 249,
+      "text": "Good news, your Majesty. A recent tally of the castle stores accidentally discov"
+    },
+    {
+      "file": "AITX",
+      "id": 250,
+      "text": "It appears that a small group of wandering heroes has decided to swear allegianc"
+    },
+    {
+      "file": "AITX",
+      "id": 251,
+      "text": "Your Majesty, there appears to have been some kind of terrible magical accident "
+    },
+    {
+      "file": "AITX",
+      "id": 252,
+      "text": "A small group of bandits has reportedly been preying on the outskirts of our fai"
+    },
+    {
+      "file": "AITX",
+      "id": 253,
+      "text": "It appears that news of your enlightened policies have been spreading your Majes"
+    },
+    {
+      "file": "AITX",
+      "id": 254,
+      "text": "Agrela smiles upon us, your Majesty. A cleansing wind sweeps across the land, br"
+    },
+    {
+      "file": "AITX",
+      "id": 255,
+      "text": "In a completely unprecedented turn of events, a renegade tribe of Goblins pledge"
+    },
+    {
+      "file": "AITX",
+      "id": 256,
+      "text": "The Goblins have sent reinforcements to help defend the realm."
+    },
+    {
+      "file": "AITX",
+      "id": 257,
+      "text": "A contingent of travel-weary elves has entered your realm. They formally request"
+    },
+    {
+      "file": "AITX",
+      "id": 258,
+      "text": "Elven bungalows are being setup in your kingdom in order to hold the influx of e"
+    },
+    {
+      "file": "AITX",
+      "id": 259,
+      "text": "Sewers have broken open and released Rats into your kingdom!"
+    },
+    {
+      "file": "AITX",
+      "id": 260,
+      "text": "The Goblins have erected Watchtowers nearby your Palace!"
+    },
+    {
+      "file": "AITX",
+      "id": 261,
+      "text": "Your Highness! Our enemies have surrendered before our onslaught. Our efforts to"
+    },
+    {
+      "file": "AITX",
+      "id": 262,
+      "text": "Elven heroes from all corners of Ardania are on their way! They should arrive wi"
+    },
+    {
+      "file": "AITX",
+      "id": 263,
+      "text": "Elven champions have arrived to save their brethren and rid the land of the evil"
+    },
+    {
+      "file": "AITX",
+      "id": 264,
+      "text": "Your Majesty, The mighty Fortress of Ixmil has fallen before the skill and brave"
+    },
+    {
+      "file": "AITX",
+      "id": 265,
+      "text": "Visiting Hall of Champions"
+    },
+    {
+      "file": "AITX",
+      "id": 266,
+      "text": "Ye have intruded upon the domain of Ixmil the All Powerful - Prepare ye to taste"
+    },
+    {
+      "file": "AITX",
+      "id": 267,
+      "text": "Unconscious"
+    },
+    {
+      "file": "AITX",
+      "id": 268,
+      "text": "Knocked unconscious: %s"
+    },
+    {
+      "file": "AITX",
+      "id": 269,
+      "text": "It seems a small group of bandits has set up a hideout within the boundaries of "
+    },
+    {
+      "file": "AITX",
+      "id": 270,
+      "text": "Poor hunting has driven a pack of starving and brutal Vargs into our settlement."
+    },
+    {
+      "file": "AITX",
+      "id": 271,
+      "text": "Pollen season seems rather harsh in this region, Your Majesty.  Deadly stranglew"
+    },
+    {
+      "file": "AITX",
+      "id": 272,
+      "text": "Your Majesty! A horde of northern Barbarians has entered our domain bent on mayh"
+    },
+    {
+      "file": "AITX",
+      "id": 273,
+      "text": "%s has arrived at the Embassy!"
+    },
+    {
+      "file": "AITX",
+      "id": 274,
+      "text": "Unfortunate news, Your Majesty. It seems the goblins have re-built a number of c"
+    },
+    {
+      "file": "AITX",
+      "id": 275,
+      "text": "It seems that the land itself resents our intrusion, Your Majesty. A number of D"
+    },
+    {
+      "file": "AITX",
+      "id": 276,
+      "text": "Your Majesty! Nests of rust spitters have been found upon the roads leading into"
+    },
+    {
+      "file": "AITX",
+      "id": 277,
+      "text": "Your Cultists have charmed a small band of Wendigo that were displaced by the en"
+    },
+    {
+      "file": "AITX",
+      "id": 278,
+      "text": "Interred in Mausoleum"
+    },
+    {
+      "file": "AITX",
+      "id": 279,
+      "text": "Word has arrive that a party of veteran Gnomes have agreed to help defend the El"
+    },
+    {
+      "file": "AITX",
+      "id": 280,
+      "text": "The Gnomes have arrived, and with them the rarest of the rare - a Gnomish Mage!"
+    },
+    {
+      "file": "AITX",
+      "id": 281,
+      "text": "More startling reports have arrived - a Dwarven army is on the move. They have f"
+    },
+    {
+      "file": "AITX",
+      "id": 282,
+      "text": "The Dwarven army has arrived in your realm. The army features a pair of Dwarven "
+    },
+    {
+      "file": "AITX",
+      "id": 283,
+      "text": "You have taken too long to destroy the Ancient Barrows, and the ground beneath y"
+    },
+    {
+      "file": "AITX",
+      "id": 284,
+      "text": "You have managed to destroy one of the Ancient Barrows, but doing so has caused "
+    },
+    {
+      "file": "AITX",
+      "id": 285,
+      "text": "Another Ancient Barrow has fallen, and with it another earthquake has been unlea"
+    },
+    {
+      "file": "AITX",
+      "id": 286,
+      "text": "Yet another Ancient Barrow has been razed. There are three more Barrows left..."
+    },
+    {
+      "file": "AITX",
+      "id": 287,
+      "text": "A fourth Ancient Barrow has succumbed to the might of your heroes! Rally the tro"
+    },
+    {
+      "file": "AITX",
+      "id": 288,
+      "text": "You have destroyed the fifth Ancient Barrow mound. Hurry to destroy the last one"
+    },
+    {
+      "file": "AITX",
+      "id": 289,
+      "text": "Your Majesty, we have intercepted very few of Borjin's caravans over the last fe"
+    },
+    {
+      "file": "AITX",
+      "id": 290,
+      "text": "Your Majesty, we have intercepted very few of Borjin's caravans over the last fe"
+    },
+    {
+      "file": "AITX",
+      "id": 291,
+      "text": "Your Majesty, we have intercepted very few of Borjin's caravans over the last fe"
+    },
+    {
+      "file": "AITX",
+      "id": 292,
+      "text": "Your Majesty, we have intercepted very few of Borjin's caravans over the last fe"
+    },
+    {
+      "file": "AITX",
+      "id": 293,
+      "text": "Your Majesty, we have intercepted a handful of Borjin's caravans over the last f"
+    },
+    {
+      "file": "AITX",
+      "id": 294,
+      "text": "Your Majesty, we have intercepted a handful of Borjin's caravans over the last f"
+    },
+    {
+      "file": "AITX",
+      "id": 295,
+      "text": "Your Majesty, we have intercepted a handful of Borjin's caravans over the last f"
+    },
+    {
+      "file": "AITX",
+      "id": 296,
+      "text": "Your Majesty, we have intercepted a handful of Borjin's caravans over the last f"
+    },
+    {
+      "file": "AITX",
+      "id": 297,
+      "text": "Your Majesty, we have intercepted about half of Borjin's caravans over the last "
+    },
+    {
+      "file": "AITX",
+      "id": 298,
+      "text": "Your Majesty, we have intercepted about half of Borjin's caravans over the last "
+    },
+    {
+      "file": "AITX",
+      "id": 299,
+      "text": "Your Majesty, we have intercepted about half of Borjin's caravans over the last "
+    },
+    {
+      "file": "AITX",
+      "id": 300,
+      "text": "Your Majesty, we have intercepted about half of Borjin's caravans over the last "
+    },
+    {
+      "file": "AITX",
+      "id": 301,
+      "text": "Your Majesty, we have intercepted many of Borjin's caravans over the last few da"
+    },
+    {
+      "file": "AITX",
+      "id": 302,
+      "text": "Your Majesty, we have intercepted many of Borjin's caravans over the last few da"
+    },
+    {
+      "file": "AITX",
+      "id": 303,
+      "text": "Your Majesty, we have intercepted many of Borjin's caravans over the last few da"
+    },
+    {
+      "file": "AITX",
+      "id": 304,
+      "text": "Your Majesty, we have intercepted many of Borjin's caravans over the last few da"
+    },
+    {
+      "file": "AITX",
+      "id": 305,
+      "text": "Your Majesty, we have intercepted most of Borjin's caravans over the last few da"
+    },
+    {
+      "file": "AITX",
+      "id": 306,
+      "text": "Your Majesty, we have intercepted most of Borjin's caravans over the last few da"
+    },
+    {
+      "file": "AITX",
+      "id": 307,
+      "text": "Your Majesty, we have intercepted most of Borjin's caravans over the last few da"
+    },
+    {
+      "file": "AITX",
+      "id": 308,
+      "text": "Your Majesty, we have intercepted most of Borjin's caravans over the last few da"
+    },
+    {
+      "file": "ENTX",
+      "id": 1162760014,
+      "text": "None"
+    },
+    {
+      "file": "ENTX",
+      "id": 825251397,
+      "text": "Respawning Lairs"
+    },
+    {
+      "file": "ENTX",
+      "id": 842028613,
+      "text": "Reinforcements"
+    },
+    {
+      "file": "ENTX",
+      "id": 858805829,
+      "text": "Random Disasters"
+    },
+    {
+      "file": "ENTX",
+      "id": 875583045,
+      "text": "Cannon Fodder"
+    },
+    {
+      "file": "ENTX",
+      "id": 892360261,
+      "text": "The Hunters"
+    },
+    {
+      "file": "ENTX",
+      "id": 909137477,
+      "text": "Dead Heroes"
+    },
+    {
+      "file": "ENTX",
+      "id": 925914693,
+      "text": "Dark Magics"
+    },
+    {
+      "file": "ENTX",
+      "id": 942691909,
+      "text": "Goblin attack!"
+    },
+    {
+      "file": "ENTX",
+      "id": 959469125,
+      "text": "Super Lairs"
+    },
+    {
+      "file": "ENTX",
+      "id": 808539717,
+      "text": "Treasure"
+    },
+    {
+      "file": "ENTX",
+      "id": 825316933,
+      "text": "Ritual of Pain"
+    },
+    {
+      "file": "ENTX",
+      "id": 842094149,
+      "text": "Abomination"
+    },
+    {
+      "file": "ENTX",
+      "id": 858871365,
+      "text": "Wake the Hunters"
+    },
+    {
+      "file": "ENTX",
+      "id": 875648581,
+      "text": "Evil Everywhere"
+    },
+    {
+      "file": "ENTX",
+      "id": 892425797,
+      "text": "Veteran Heroes"
+    },
+    {
+      "file": "EDTX",
+      "id": 1162760014,
+      "text": "No special events"
+    },
+    {
+      "file": "EDTX",
+      "id": 825251397,
+      "text": "Lairs that are destroyed respawn after a duration."
+    },
+    {
+      "file": "EDTX",
+      "id": 842028613,
+      "text": "At random intervals, different heroes enter the realm from the map edges."
+    },
+    {
+      "file": "EDTX",
+      "id": 858805829,
+      "text": "At random intervals, dangerous natural (or unnatural) disasters may strike your "
+    },
+    {
+      "file": "EDTX",
+      "id": 875583045,
+      "text": "Huge waves of different weak creature types will regularly invade your kingdoms."
+    },
+    {
+      "file": "EDTX",
+      "id": 892360261,
+      "text": "Small but powerful waves of creatures begin hunting down your heroes, one by one"
+    },
+    {
+      "file": "EDTX",
+      "id": 909137477,
+      "text": "Each kingdom starts with a Mausoleum that contains several high-level dead heroe"
+    },
+    {
+      "file": "EDTX",
+      "id": 925914693,
+      "text": "Featuring the Witch King and the Liche Queen from the original Majesty!"
+    },
+    {
+      "file": "EDTX",
+      "id": 942691909,
+      "text": "Now you can have goblin waves in freestyle! They are everywhere!"
+    },
+    {
+      "file": "EDTX",
+      "id": 959469125,
+      "text": "The monster lairs dump out more than their usual number of evil creatures, in a "
+    },
+    {
+      "file": "EDTX",
+      "id": 808539717,
+      "text": "Treasure chests are liberally sprinkled across the landscape."
+    },
+    {
+      "file": "EDTX",
+      "id": 825316933,
+      "text": "Lightning bolts and earthquakes appear throughout the land periodically!"
+    },
+    {
+      "file": "EDTX",
+      "id": 842094149,
+      "text": "The Abomination appears after many days to harass the realm."
+    },
+    {
+      "file": "EDTX",
+      "id": 858871365,
+      "text": "Rrongol and Url Shekk lay asleep in random lairs. Woe be to the heroes that wake"
+    },
+    {
+      "file": "EDTX",
+      "id": 875648581,
+      "text": "At random intervals, evil creatures appear out of thin air."
+    },
+    {
+      "file": "EDTX",
+      "id": 892425797,
+      "text": "All heroes start out at high level."
+    },
+    {
+      "file": "EVSC",
+      "id": 1162760014,
+      "text": "0 none"
+    },
+    {
+      "file": "EVSC",
+      "id": 825251397,
+      "text": "60 Respawning_Lairs"
+    },
+    {
+      "file": "EVSC",
+      "id": 842028613,
+      "text": "39 Friendly_Heroes"
+    },
+    {
+      "file": "EVSC",
+      "id": 858805829,
+      "text": "45 Random_Disasters"
+    },
+    {
+      "file": "EVSC",
+      "id": 875583045,
+      "text": "60 Crunch_All_You_Want"
+    },
+    {
+      "file": "EVSC",
+      "id": 892360261,
+      "text": "70 The_Hunters"
+    },
+    {
+      "file": "EVSC",
+      "id": 909137477,
+      "text": "39 Dead_Heroes"
+    },
+    {
+      "file": "EVSC",
+      "id": 925914693,
+      "text": "95 Dark_magics"
+    },
+    {
+      "file": "EVSC",
+      "id": 942691909,
+      "text": "70 Goblin_attack"
+    },
+    {
+      "file": "EVSC",
+      "id": 959469125,
+      "text": "70 Super_lairs"
+    },
+    {
+      "file": "EVSC",
+      "id": 808539717,
+      "text": "39 Treasure"
+    },
+    {
+      "file": "EVSC",
+      "id": 825316933,
+      "text": "75 Ritual_of_pain"
+    },
+    {
+      "file": "EVSC",
+      "id": 842094149,
+      "text": "85 Abomination_appear_event"
+    },
+    {
+      "file": "EVSC",
+      "id": 858871365,
+      "text": "80 Wake_the_Hunters"
+    },
+    {
+      "file": "EVSC",
+      "id": 875648581,
+      "text": "70 Evil_Everywhere"
+    },
+    {
+      "file": "EVSC",
+      "id": 892425797,
+      "text": "20 Veteran_Heroes"
+    },
+    {
+      "file": "HPTX",
+      "id": 943010152,
+      "text": "- Lets you place a timed bounty on all members of any previously defeated monste"
+    },
+    {
+      "file": "HPTX",
+      "id": 959787368,
+      "text": "Can research and sell magic potions\n\n- Tonic of Speed\n\n- Fire Balm\n\n\u0001DDBB44Upgra"
+    },
+    {
+      "file": "HPTX",
+      "id": 808857960,
+      "text": "Can research and sell magic potions\n\n- Potion of Dirgo Strength\n\n- Elixir of Reg"
+    },
+    {
+      "file": "HPTX",
+      "id": 825635176,
+      "text": "Can research and sell magic potions\n\n- Invisibility Brew\n\n- Shapeshift Tincture\n"
+    },
+    {
+      "file": "HPTX",
+      "id": 842412392,
+      "text": "- Stores dead heroes for resurrection\n\n- Releases Undead if destroyed\n\n\n\u0001BCBCFFT"
+    },
+    {
+      "file": "HPTX",
+      "id": 859189608,
+      "text": "- Grants Sovereign spells Change of Heart and Frost Field\n\n- Magically construct"
+    },
+    {
+      "file": "HPTX",
+      "id": 875966824,
+      "text": "- Grants Sovereign spells Earthquake and Chain Lightning\n\n\u0001DDBB44Upgrading adds\n"
+    },
+    {
+      "file": "HPTX",
+      "id": 892744040,
+      "text": "- Grants Sovereign spells Dismiss and Gate\n\n\n\u0001BCBCFFPassersby can occasionally g"
+    },
+    {
+      "file": "HPTX",
+      "id": 909521256,
+      "text": "- Serves as a refuge if your Palace is destroyed\n\n- Supports 2 Peasants, 1 Tax C"
+    },
+    {
+      "file": "HPTX",
+      "id": 926298472,
+      "text": "- Periodically recruits random heroes\n\nCan support up to 2 heroes\n\nIn multiplaye"
+    },
+    {
+      "file": "HPTX",
+      "id": 943075688,
+      "text": "- Uses the spells Terrify, Mind Warp, and Horrify\n\n\n\u0001BCBCFFThis creature had onl"
+    },
+    {
+      "file": "HPTX",
+      "id": 959852904,
+      "text": "- Employs spell Summon Rats\n\n\n\u0001BCBCFFRecently ascending to power among the Rat u"
+    },
+    {
+      "file": "HPTX",
+      "id": 808923496,
+      "text": "- Can cast Strengthen Shadow Beasts\n\n -Will resurrect unless Stones is also kill"
+    },
+    {
+      "file": "HPTX",
+      "id": 825700712,
+      "text": "- Can summon Shadow Beasts\n\n- Will resurrect unless Styx is also killed\n\n- His r"
+    },
+    {
+      "file": "HPTX",
+      "id": 842477928,
+      "text": "- High combat stats, for a Goblin\n\n- Highly intelligent, for a Goblin\n\n- Protect"
+    },
+    {
+      "file": "HPTX",
+      "id": 859255144,
+      "text": "- Casts spell Petrify\n\n- Casts spell Summon Medusa\n\n- Casts spell Medusa Enchant"
+    },
+    {
+      "file": "HPTX",
+      "id": 876032360,
+      "text": "- Impressive armor\n\n- Often leads raiding parties\n\n\n\u0001BCBCFFThese massive beasts "
+    },
+    {
+      "file": "HPTX",
+      "id": 892809576,
+      "text": "- Wields spell Damage Shield\n\n- Can cast Plague\n\n\n\u0001BCBCFFOnly the most wily and "
+    },
+    {
+      "file": "HPTX",
+      "id": 909586792,
+      "text": "- Does heavy damage by hurling an explosive round\n\n\n\u0001BCBCFFThe Ratmen have built"
+    },
+    {
+      "file": "HPTX",
+      "id": 926364008,
+      "text": "- Unusually fast\n\n- Powerful attacks\n\n\n\u0001BCBCFFHard to detect, these undead beast"
+    },
+    {
+      "file": "HPTX",
+      "id": 943141224,
+      "text": "- Incredibly strong\n\n- Fast and intelligent\n\n\n\u0001BCBCFFOne of the deadliest creatu"
+    },
+    {
+      "file": "HPTX",
+      "id": 959918440,
+      "text": "- Breathes freezing ice blast\n\n\n\u0001BCBCFFDwelling in glacial caves, Ice Dragons ar"
+    },
+    {
+      "file": "HPTX",
+      "id": 808989032,
+      "text": "- Spawns undead\n\n- Located in the wilderness\n\n- Can be destroyed\n\n\n\u0001BCBCFFWith a"
+    },
+    {
+      "file": "HPTX",
+      "id": 825766248,
+      "text": "- Allows vermin and siege engines to enter your settlement\n\n- Automatically appe"
+    },
+    {
+      "file": "HPTX",
+      "id": 842543464,
+      "text": "- Spawns monsters, including Yeti and Ice Dragon\n\n\n\u0001BCBCFFThese intolerably cold"
+    },
+    {
+      "file": "HPTX",
+      "id": 859320680,
+      "text": "- Spawns Goblins\n\n- More HPs than Goblin Encampment\n\n- Auto-repairs over time\n\n\n"
+    },
+    {
+      "file": "HPTX",
+      "id": 876097896,
+      "text": "- Shoots arrows at the Goblin's enemies\n\n- Spawns Goblin Archer if destroyed\n\n\n\u0001"
+    },
+    {
+      "file": "HPTX",
+      "id": 892875112,
+      "text": "- Spawns all types of Rats/Ratmen\n\n- Auto-spawns more Rat Nests over time\n\n- Can"
+    },
+    {
+      "file": "HPTX",
+      "id": 909652328,
+      "text": "- Spawns monsters\n\n- Fires bolts of magical energy\n\n- May respawn\n\n\n\u0001BCBCFFLegen"
+    },
+    {
+      "file": "HPTX",
+      "id": 926429544,
+      "text": "- Releases hordes of monsters\n\n- Unpredictably teleports between locations\n\n\n\u0001BC"
+    },
+    {
+      "file": "HPTX",
+      "id": 943206760,
+      "text": "- Can spawn powerful creatures of evil\n\n\n\u0001BCBCFFTombs such as this are occasiona"
+    },
+    {
+      "file": "HPTX",
+      "id": 959983976,
+      "text": "- Spawns Greater Gorgons and Medusae\n\n\n\u0001BCBCFFThese lairs serve as a place of wo"
+    },
+    {
+      "file": "HPTX",
+      "id": 809054568,
+      "text": "- Can hold magical artifacts\n\n- Can hold dire adversaries\n\n\n\u0001BCBCFFThese ancient"
+    },
+    {
+      "file": "HPTX",
+      "id": 825831784,
+      "text": "- Supports 6 Peasants, 2 Palace Guards, and 3 Tax Collectors\n\n- Stronghold of yo"
+    },
+    {
+      "file": "HPTX",
+      "id": 842609000,
+      "text": "- Can teleport over short distances\n\n- Very quick reflexes\n\n- Incredibly strong\n"
+    },
+    {
+      "file": "HPTX",
+      "id": 859386216,
+      "text": "\u0001BCBCFFThe Shrine of Light is thought to have been built in the years just after"
+    },
+    {
+      "file": "HPTX",
+      "id": 876163432,
+      "text": "\u0001BCBCFFThe Shrine of Darkness is nearly identical to the Shrine of Light, the on"
+    },
+    {
+      "file": "DPTX",
+      "id": 829375041,
+      "text": "requires a Palace Lvl 3"
+    },
+    {
+      "file": "DPTX",
+      "id": 829440577,
+      "text": "There are no prerequisites for this structure."
+    },
+    {
+      "file": "DPTX",
+      "id": 829178433,
+      "text": "requires a Palace Lvl 2 or higher"
+    },
+    {
+      "file": "DPTX",
+      "id": 829243969,
+      "text": "requires a Palace Lvl 2 or higher"
+    },
+    {
+      "file": "DPTX",
+      "id": 829571649,
+      "text": "requires a Palace Lvl 2 or higher"
+    },
+    {
+      "file": "DPTX",
+      "id": 829506113,
+      "text": "requires a Magic Bazaar Lvl 1 or higher"
+    },
+    {
+      "file": "LOSX",
+      "id": 826626630,
+      "text": "You have lost this game!"
+    },
+    {
+      "file": "LOSX",
+      "id": 825250136,
+      "text": "You failed to rid the land of all Goblin and Rat lairs!"
+    },
+    {
+      "file": "LOSX",
+      "id": 842027352,
+      "text": "Styx and Stones have broken your kingdom!"
+    },
+    {
+      "file": "LOSX",
+      "id": 858804568,
+      "text": "You failed to destroy the Fortress of Ixmil!"
+    },
+    {
+      "file": "LOSX",
+      "id": 875581784,
+      "text": "Your legendary heroes failed to raze all of the Ancient Barrows!"
+    },
+    {
+      "file": "LOSX",
+      "id": 892359000,
+      "text": "You failed to prevent the rise of the Ratmen!"
+    },
+    {
+      "file": "LOSX",
+      "id": 909136216,
+      "text": "Your failed to destroy the Scions of Chaos!"
+    },
+    {
+      "file": "LOSX",
+      "id": 925913432,
+      "text": "Borjin has conquered you!"
+    },
+    {
+      "file": "LOSX",
+      "id": 942690648,
+      "text": "The Spires of Death have prevented you from reaching your destination!"
+    },
+    {
+      "file": "LOSX",
+      "id": 959467864,
+      "text": "The neighboring kingdoms refuse to continue trade with you, as you have failed t"
+    },
+    {
+      "file": "LOSX",
+      "id": 808538456,
+      "text": "You failed to clean up your kingdom!"
+    },
+    {
+      "file": "LOSX",
+      "id": 825315672,
+      "text": "You failed to protect the Elves! The Serpents are victorious, and the serpent em"
+    },
+    {
+      "file": "LOSX",
+      "id": 842092888,
+      "text": "You failed to avenge the death of Glohrea Oathtaker!"
+    },
+    {
+      "file": "LOSX",
+      "id": 826560856,
+      "text": "You have failed to destroy the Phantoms!"
+    },
+    {
+      "file": "HN01",
+      "id": 35,
+      "text": "Saphune"
+    },
+    {
+      "file": "HN01",
+      "id": 36,
+      "text": "Gevin"
+    },
+    {
+      "file": "HN01",
+      "id": 37,
+      "text": "Parvil"
+    },
+    {
+      "file": "HN01",
+      "id": 38,
+      "text": "Nirm"
+    },
+    {
+      "file": "HN02",
+      "id": 32,
+      "text": " Nimblefoot"
+    },
+    {
+      "file": "HN02",
+      "id": 33,
+      "text": " Quickback"
+    },
+    {
+      "file": "HN02",
+      "id": 34,
+      "text": " of the Wood"
+    },
+    {
+      "file": "HN02",
+      "id": 35,
+      "text": " of the Wind"
+    },
+    {
+      "file": "HN02",
+      "id": 36,
+      "text": " the Rapid"
+    },
+    {
+      "file": "HN02",
+      "id": 37,
+      "text": " the Darter"
+    },
+    {
+      "file": "HN02",
+      "id": 38,
+      "text": " Brightrace"
+    },
+    {
+      "file": "HN02",
+      "id": 39,
+      "text": " Moonriser"
+    },
+    {
+      "file": "HN02",
+      "id": 40,
+      "text": " Dusksprinter"
+    },
+    {
+      "file": "HN05",
+      "id": 33,
+      "text": "Tundur"
+    },
+    {
+      "file": "HN05",
+      "id": 34,
+      "text": "Gara"
+    },
+    {
+      "file": "HN05",
+      "id": 35,
+      "text": "Fugg"
+    },
+    {
+      "file": "HN05",
+      "id": 36,
+      "text": "Vull"
+    },
+    {
+      "file": "HN05",
+      "id": 37,
+      "text": "Norak"
+    },
+    {
+      "file": "HN05",
+      "id": 38,
+      "text": "Groon"
+    },
+    {
+      "file": "HN05",
+      "id": 39,
+      "text": "Skrevon"
+    },
+    {
+      "file": "HN05",
+      "id": 40,
+      "text": "Dordak"
+    },
+    {
+      "file": "HN05",
+      "id": 41,
+      "text": "Rudgr"
+    },
+    {
+      "file": "HN05",
+      "id": 42,
+      "text": "Torvan"
+    },
+    {
+      "file": "HN05",
+      "id": 43,
+      "text": "Raim"
+    },
+    {
+      "file": "HN05",
+      "id": 44,
+      "text": "Lundar"
+    },
+    {
+      "file": "HN06",
+      "id": 33,
+      "text": " Poundwell"
+    },
+    {
+      "file": "HN06",
+      "id": 34,
+      "text": " the Pummeler"
+    },
+    {
+      "file": "HN06",
+      "id": 35,
+      "text": " of Big Trees"
+    },
+    {
+      "file": "HN06",
+      "id": 36,
+      "text": " the Tracker"
+    },
+    {
+      "file": "HN06",
+      "id": 37,
+      "text": " Hardswing"
+    },
+    {
+      "file": "HN06",
+      "id": 38,
+      "text": " of the Axe"
+    },
+    {
+      "file": "HN06",
+      "id": 39,
+      "text": " Treefeller"
+    },
+    {
+      "file": "HN06",
+      "id": 40,
+      "text": " Mountain Mover"
+    },
+    {
+      "file": "HN06",
+      "id": 41,
+      "text": " of Downstream"
+    },
+    {
+      "file": "HN06",
+      "id": 42,
+      "text": " the  Gutteral"
+    },
+    {
+      "file": "HN06",
+      "id": 43,
+      "text": " Broadtrunk"
+    },
+    {
+      "file": "HN06",
+      "id": 44,
+      "text": " Tallfrond"
+    },
+    {
+      "file": "HN06",
+      "id": 45,
+      "text": " of No Town"
+    },
+    {
+      "file": "HN06",
+      "id": 46,
+      "text": " Grubnibbler"
+    },
+    {
+      "file": "HN06",
+      "id": 47,
+      "text": " Big Blades"
+    },
+    {
+      "file": "HN09",
+      "id": 32,
+      "text": "Zesty"
+    },
+    {
+      "file": "HN09",
+      "id": 33,
+      "text": "Wonderful"
+    },
+    {
+      "file": "HN09",
+      "id": 34,
+      "text": "Yellow"
+    },
+    {
+      "file": "HN09",
+      "id": 35,
+      "text": "Puce"
+    },
+    {
+      "file": "HN09",
+      "id": 36,
+      "text": "Glowing"
+    },
+    {
+      "file": "HN09",
+      "id": 37,
+      "text": "Peaceful"
+    },
+    {
+      "file": "HN09",
+      "id": 38,
+      "text": "Sparkling"
+    },
+    {
+      "file": "HN09",
+      "id": 39,
+      "text": "Vivid"
+    },
+    {
+      "file": "HN09",
+      "id": 40,
+      "text": "Raucous"
+    },
+    {
+      "file": "HN09",
+      "id": 41,
+      "text": "Cheerful"
+    },
+    {
+      "file": "HN09",
+      "id": 42,
+      "text": "Ecstatic"
+    },
+    {
+      "file": "HN09",
+      "id": 43,
+      "text": "Lavender"
+    },
+    {
+      "file": "HN09",
+      "id": 44,
+      "text": "Scampering"
+    },
+    {
+      "file": "HN10",
+      "id": 33,
+      "text": " Pebble"
+    },
+    {
+      "file": "HN10",
+      "id": 34,
+      "text": " Bird"
+    },
+    {
+      "file": "HN10",
+      "id": 35,
+      "text": " Vine"
+    },
+    {
+      "file": "HN10",
+      "id": 36,
+      "text": " Ocelot"
+    },
+    {
+      "file": "HN10",
+      "id": 37,
+      "text": " Toad"
+    },
+    {
+      "file": "HN10",
+      "id": 38,
+      "text": " Fog"
+    },
+    {
+      "file": "HN10",
+      "id": 39,
+      "text": " Mist"
+    },
+    {
+      "file": "HN10",
+      "id": 40,
+      "text": " Moss"
+    },
+    {
+      "file": "HN10",
+      "id": 41,
+      "text": " Brook"
+    },
+    {
+      "file": "HN10",
+      "id": 42,
+      "text": " Bee"
+    },
+    {
+      "file": "HN10",
+      "id": 43,
+      "text": " Gator"
+    },
+    {
+      "file": "HN13",
+      "id": 32,
+      "text": "Craterus"
+    },
+    {
+      "file": "HN13",
+      "id": 33,
+      "text": "Proverbius"
+    },
+    {
+      "file": "HN13",
+      "id": 34,
+      "text": "Inciticus"
+    },
+    {
+      "file": "HN13",
+      "id": 35,
+      "text": "Marcus"
+    },
+    {
+      "file": "HN13",
+      "id": 36,
+      "text": "Naughteous"
+    },
+    {
+      "file": "HN13",
+      "id": 37,
+      "text": "Grovahss"
+    },
+    {
+      "file": "HN13",
+      "id": 38,
+      "text": "Spauldinus"
+    },
+    {
+      "file": "HN13",
+      "id": 39,
+      "text": "Myntonus"
+    },
+    {
+      "file": "HN13",
+      "id": 40,
+      "text": "Skuttinor"
+    },
+    {
+      "file": "HN13",
+      "id": 41,
+      "text": "Jadanav"
+    },
+    {
+      "file": "HN13",
+      "id": 42,
+      "text": "Tohlinus"
+    },
+    {
+      "file": "HN13",
+      "id": 43,
+      "text": "Kon"
+    },
+    {
+      "file": "HN14",
+      "id": 34,
+      "text": " the Masher"
+    },
+    {
+      "file": "HN14",
+      "id": 35,
+      "text": " the Unpredictable"
+    },
+    {
+      "file": "HN14",
+      "id": 36,
+      "text": " the Palid"
+    },
+    {
+      "file": "HN14",
+      "id": 37,
+      "text": " the Disconnected"
+    },
+    {
+      "file": "HN14",
+      "id": 38,
+      "text": " the Random"
+    },
+    {
+      "file": "HN14",
+      "id": 39,
+      "text": ", Master of Pain"
+    },
+    {
+      "file": "HN14",
+      "id": 40,
+      "text": ", Chaos' Tool"
+    },
+    {
+      "file": "HN14",
+      "id": 41,
+      "text": " the Biter"
+    },
+    {
+      "file": "HN14",
+      "id": 42,
+      "text": ", Insanity's Son"
+    },
+    {
+      "file": "HN14",
+      "id": 43,
+      "text": " the Undisciplined"
+    },
+    {
+      "file": "HN17",
+      "id": 31,
+      "text": "Tarrek"
+    },
+    {
+      "file": "HN17",
+      "id": 32,
+      "text": "Vovok"
+    },
+    {
+      "file": "HN17",
+      "id": 33,
+      "text": "Tribuur"
+    },
+    {
+      "file": "HN17",
+      "id": 34,
+      "text": "Blarmin"
+    },
+    {
+      "file": "HN17",
+      "id": 35,
+      "text": "Scovvy"
+    },
+    {
+      "file": "HN17",
+      "id": 36,
+      "text": "Bivvar"
+    },
+    {
+      "file": "HN17",
+      "id": 37,
+      "text": "Dondru"
+    },
+    {
+      "file": "HN17",
+      "id": 38,
+      "text": "Kompy"
+    },
+    {
+      "file": "HN17",
+      "id": 39,
+      "text": "Zevzim"
+    },
+    {
+      "file": "HN17",
+      "id": 40,
+      "text": "Gribbler"
+    },
+    {
+      "file": "HN17",
+      "id": 41,
+      "text": "Yustin"
+    },
+    {
+      "file": "HN17",
+      "id": 42,
+      "text": "Tubo"
+    },
+    {
+      "file": "HN18",
+      "id": 32,
+      "text": " the Resourceful"
+    },
+    {
+      "file": "HN18",
+      "id": 33,
+      "text": " the Boisterous"
+    },
+    {
+      "file": "HN18",
+      "id": 34,
+      "text": " Brightbeard"
+    },
+    {
+      "file": "HN18",
+      "id": 35,
+      "text": " Hardhelm"
+    },
+    {
+      "file": "HN18",
+      "id": 36,
+      "text": " Anvilworth"
+    },
+    {
+      "file": "HN18",
+      "id": 37,
+      "text": " Fulcrumson"
+    },
+    {
+      "file": "HN18",
+      "id": 38,
+      "text": " Sprocketon"
+    },
+    {
+      "file": "HN18",
+      "id": 39,
+      "text": " Suresmith"
+    },
+    {
+      "file": "HN18",
+      "id": 40,
+      "text": " Digright"
+    },
+    {
+      "file": "HN18",
+      "id": 41,
+      "text": " Bangwell"
+    },
+    {
+      "file": "HN18",
+      "id": 42,
+      "text": " Scragglebeard"
+    },
+    {
+      "file": "HN18",
+      "id": 43,
+      "text": " Wheelwise"
+    },
+    {
+      "file": "HN21",
+      "id": 32,
+      "text": "Elrand"
+    },
+    {
+      "file": "HN21",
+      "id": 33,
+      "text": "Solex"
+    },
+    {
+      "file": "HN21",
+      "id": 34,
+      "text": "Nerrian"
+    },
+    {
+      "file": "HN21",
+      "id": 35,
+      "text": "Gligan"
+    },
+    {
+      "file": "HN21",
+      "id": 36,
+      "text": "Juranda"
+    },
+    {
+      "file": "HN21",
+      "id": 37,
+      "text": "Meyrvun"
+    },
+    {
+      "file": "HN21",
+      "id": 38,
+      "text": "Bavian"
+    },
+    {
+      "file": "HN21",
+      "id": 39,
+      "text": "Reljino"
+    },
+    {
+      "file": "HN21",
+      "id": 40,
+      "text": "Quanda"
+    },
+    {
+      "file": "HN21",
+      "id": 41,
+      "text": "Valburon"
+    },
+    {
+      "file": "HN21",
+      "id": 42,
+      "text": "Quinnos"
+    },
+    {
+      "file": "HN22",
+      "id": 32,
+      "text": " Fateseer"
+    },
+    {
+      "file": "HN22",
+      "id": 33,
+      "text": " Pintwise"
+    },
+    {
+      "file": "HN22",
+      "id": 34,
+      "text": " Quicksmile"
+    },
+    {
+      "file": "HN22",
+      "id": 35,
+      "text": " Stronghand"
+    },
+    {
+      "file": "HN22",
+      "id": 36,
+      "text": " Betright"
+    },
+    {
+      "file": "HN22",
+      "id": 37,
+      "text": " Sprystep"
+    },
+    {
+      "file": "HN22",
+      "id": 38,
+      "text": " Easygrin"
+    },
+    {
+      "file": "HN22",
+      "id": 39,
+      "text": " Finequill"
+    },
+    {
+      "file": "HN22",
+      "id": 40,
+      "text": " Fullquiver"
+    },
+    {
+      "file": "HN22",
+      "id": 41,
+      "text": " Winalott"
+    },
+    {
+      "file": "HN22",
+      "id": 42,
+      "text": " Happypurse"
+    },
+    {
+      "file": "HN22",
+      "id": 43,
+      "text": " Spendwell"
+    },
+    {
+      "file": "HN22",
+      "id": 44,
+      "text": " Sharpwit"
+    },
+    {
+      "file": "HN22",
+      "id": 45,
+      "text": " The Hedonist"
+    },
+    {
+      "file": "HN22",
+      "id": 46,
+      "text": " Drinkdeep"
+    },
+    {
+      "file": "HN25",
+      "id": 34,
+      "text": "Jedd"
+    },
+    {
+      "file": "HN25",
+      "id": 35,
+      "text": "Limay"
+    },
+    {
+      "file": "HN25",
+      "id": 36,
+      "text": "Joobi"
+    },
+    {
+      "file": "HN25",
+      "id": 37,
+      "text": "Lilgi"
+    },
+    {
+      "file": "HN25",
+      "id": 38,
+      "text": "Bimjo"
+    },
+    {
+      "file": "HN25",
+      "id": 39,
+      "text": "Zook"
+    },
+    {
+      "file": "HN25",
+      "id": 40,
+      "text": "Kit"
+    },
+    {
+      "file": "HN25",
+      "id": 41,
+      "text": "Quido"
+    },
+    {
+      "file": "HN25",
+      "id": 42,
+      "text": "Mub"
+    },
+    {
+      "file": "HN25",
+      "id": 43,
+      "text": "Veni"
+    },
+    {
+      "file": "HN25",
+      "id": 44,
+      "text": "Sklo"
+    },
+    {
+      "file": "HN25",
+      "id": 45,
+      "text": "Bryp"
+    },
+    {
+      "file": "HN25",
+      "id": 46,
+      "text": "Niv"
+    },
+    {
+      "file": "HN29",
+      "id": 31,
+      "text": "Dyvella"
+    },
+    {
+      "file": "HN29",
+      "id": 32,
+      "text": "Suzia"
+    },
+    {
+      "file": "HN29",
+      "id": 33,
+      "text": "Jentra"
+    },
+    {
+      "file": "HN29",
+      "id": 34,
+      "text": "Bandri"
+    },
+    {
+      "file": "HN29",
+      "id": 35,
+      "text": "Porphia"
+    },
+    {
+      "file": "HN29",
+      "id": 36,
+      "text": "Nayleen"
+    },
+    {
+      "file": "HN29",
+      "id": 37,
+      "text": "Rylinda"
+    },
+    {
+      "file": "HN29",
+      "id": 38,
+      "text": "Hyjara"
+    },
+    {
+      "file": "HN29",
+      "id": 39,
+      "text": "Seema"
+    },
+    {
+      "file": "HN29",
+      "id": 40,
+      "text": "Dynora"
+    },
+    {
+      "file": "HN29",
+      "id": 41,
+      "text": "Rhaya"
+    },
+    {
+      "file": "HN29",
+      "id": 42,
+      "text": "Wyenda"
+    },
+    {
+      "file": "HN30",
+      "id": 24,
+      "text": " the Placid"
+    },
+    {
+      "file": "HN30",
+      "id": 25,
+      "text": " Axadrin"
+    },
+    {
+      "file": "HN30",
+      "id": 26,
+      "text": " Byufrain"
+    },
+    {
+      "file": "HN30",
+      "id": 27,
+      "text": " Niquell"
+    },
+    {
+      "file": "HN30",
+      "id": 28,
+      "text": " Daquell"
+    },
+    {
+      "file": "HN30",
+      "id": 29,
+      "text": " Suphid"
+    },
+    {
+      "file": "HN30",
+      "id": 30,
+      "text": " Kindtouch"
+    },
+    {
+      "file": "HN30",
+      "id": 31,
+      "text": " Clearskies"
+    },
+    {
+      "file": "HN30",
+      "id": 32,
+      "text": " the Soother"
+    },
+    {
+      "file": "HN30",
+      "id": 33,
+      "text": " Killdaria"
+    },
+    {
+      "file": "HN30",
+      "id": 34,
+      "text": " Wellbeing"
+    },
+    {
+      "file": "HN30",
+      "id": 35,
+      "text": " Makoi"
+    },
+    {
+      "file": "HN30",
+      "id": 36,
+      "text": " Kartir"
+    },
+    {
+      "file": "HN30",
+      "id": 37,
+      "text": " of the Green"
+    },
+    {
+      "file": "HN30",
+      "id": 38,
+      "text": " Ailnaught"
+    },
+    {
+      "file": "HN30",
+      "id": 39,
+      "text": ", Tender of Souls"
+    },
+    {
+      "file": "HN30",
+      "id": 40,
+      "text": " the Calming"
+    },
+    {
+      "file": "HN30",
+      "id": 41,
+      "text": " D'troyt"
+    },
+    {
+      "file": "HN30",
+      "id": 42,
+      "text": " Jekylla"
+    },
+    {
+      "file": "HN33",
+      "id": 27,
+      "text": "Thelonius"
+    },
+    {
+      "file": "HN33",
+      "id": 28,
+      "text": "Chi Quen"
+    },
+    {
+      "file": "HN33",
+      "id": 29,
+      "text": "Lu"
+    },
+    {
+      "file": "HN33",
+      "id": 30,
+      "text": "Vaan"
+    },
+    {
+      "file": "HN33",
+      "id": 31,
+      "text": "Eshu"
+    },
+    {
+      "file": "HN33",
+      "id": 32,
+      "text": "Vevin"
+    },
+    {
+      "file": "HN33",
+      "id": 33,
+      "text": "Yaran"
+    },
+    {
+      "file": "HN33",
+      "id": 34,
+      "text": "Olinn"
+    },
+    {
+      "file": "HN33",
+      "id": 35,
+      "text": "Zobon"
+    },
+    {
+      "file": "HN33",
+      "id": 36,
+      "text": "Lanz"
+    },
+    {
+      "file": "HN33",
+      "id": 37,
+      "text": "Agilla"
+    },
+    {
+      "file": "HN33",
+      "id": 38,
+      "text": "Wewan"
+    },
+    {
+      "file": "HN33",
+      "id": 39,
+      "text": "Juken"
+    },
+    {
+      "file": "HN33",
+      "id": 40,
+      "text": "Kwo Chi"
+    },
+    {
+      "file": "HN33",
+      "id": 41,
+      "text": "Mmmnn"
+    },
+    {
+      "file": "HN33",
+      "id": 42,
+      "text": "Ivo"
+    },
+    {
+      "file": "HN34",
+      "id": 27,
+      "text": " the Quiet One"
+    },
+    {
+      "file": "HN34",
+      "id": 28,
+      "text": " the Raucous One"
+    },
+    {
+      "file": "HN34",
+      "id": 29,
+      "text": " the Reclusive One"
+    },
+    {
+      "file": "HN34",
+      "id": 30,
+      "text": " the Reflective One"
+    },
+    {
+      "file": "HN34",
+      "id": 31,
+      "text": " the Reverent One"
+    },
+    {
+      "file": "HN34",
+      "id": 32,
+      "text": " the Righteous One"
+    },
+    {
+      "file": "HN34",
+      "id": 33,
+      "text": " the Serene One"
+    },
+    {
+      "file": "HN34",
+      "id": 34,
+      "text": " the Silent One"
+    },
+    {
+      "file": "HN34",
+      "id": 35,
+      "text": " the Solitary One"
+    },
+    {
+      "file": "HN34",
+      "id": 36,
+      "text": " the Sullen One"
+    },
+    {
+      "file": "HN34",
+      "id": 37,
+      "text": " the Spiritual One"
+    },
+    {
+      "file": "HN34",
+      "id": 38,
+      "text": " the Stoic One"
+    },
+    {
+      "file": "HN34",
+      "id": 39,
+      "text": " the Studious One"
+    },
+    {
+      "file": "HN34",
+      "id": 40,
+      "text": " the Stalwart One"
+    },
+    {
+      "file": "HN34",
+      "id": 41,
+      "text": " the Thoughtful One"
+    },
+    {
+      "file": "HN34",
+      "id": 42,
+      "text": " the Tranquil One"
+    },
+    {
+      "file": "HN37",
+      "id": 28,
+      "text": "Minrhael"
+    },
+    {
+      "file": "HN37",
+      "id": 29,
+      "text": "Jone"
+    },
+    {
+      "file": "HN37",
+      "id": 30,
+      "text": "Zina"
+    },
+    {
+      "file": "HN37",
+      "id": 31,
+      "text": "Aydrea"
+    },
+    {
+      "file": "HN37",
+      "id": 32,
+      "text": "Vaydria"
+    },
+    {
+      "file": "HN37",
+      "id": 33,
+      "text": "Jeearia"
+    },
+    {
+      "file": "HN37",
+      "id": 34,
+      "text": "Audrian"
+    },
+    {
+      "file": "HN37",
+      "id": 35,
+      "text": "Ullavan"
+    },
+    {
+      "file": "HN37",
+      "id": 36,
+      "text": "Molliva"
+    },
+    {
+      "file": "HN37",
+      "id": 37,
+      "text": "Wevynn"
+    },
+    {
+      "file": "HN37",
+      "id": 38,
+      "text": "Bevli"
+    },
+    {
+      "file": "HN37",
+      "id": 39,
+      "text": "Yinda"
+    },
+    {
+      "file": "HN37",
+      "id": 40,
+      "text": "Chanet"
+    },
+    {
+      "file": "HN37",
+      "id": 41,
+      "text": "Nara"
+    },
+    {
+      "file": "HN37",
+      "id": 42,
+      "text": "Wiola"
+    },
+    {
+      "file": "HN38",
+      "id": 19,
+      "text": " the Decisive"
+    },
+    {
+      "file": "HN38",
+      "id": 20,
+      "text": " the Cleanser"
+    },
+    {
+      "file": "HN38",
+      "id": 21,
+      "text": " the Purifier"
+    },
+    {
+      "file": "HN38",
+      "id": 22,
+      "text": " of Few Words"
+    },
+    {
+      "file": "HN38",
+      "id": 23,
+      "text": " of Quick Action"
+    },
+    {
+      "file": "HN38",
+      "id": 24,
+      "text": " the Chosen"
+    },
+    {
+      "file": "HN38",
+      "id": 25,
+      "text": " the Vessel"
+    },
+    {
+      "file": "HN38",
+      "id": 27,
+      "text": " Sharpslice"
+    },
+    {
+      "file": "HN38",
+      "id": 28,
+      "text": " of True Vision"
+    },
+    {
+      "file": "HN38",
+      "id": 29,
+      "text": " of Pure Heart"
+    },
+    {
+      "file": "HN38",
+      "id": 30,
+      "text": " the Observant"
+    },
+    {
+      "file": "HN38",
+      "id": 31,
+      "text": " the Watchful"
+    },
+    {
+      "file": "HN38",
+      "id": 32,
+      "text": " the Resolved"
+    },
+    {
+      "file": "HN38",
+      "id": 33,
+      "text": " the Determined"
+    },
+    {
+      "file": "HN38",
+      "id": 34,
+      "text": ", Evil's Bane"
+    },
+    {
+      "file": "HN38",
+      "id": 35,
+      "text": " Indriana"
+    },
+    {
+      "file": "HN38",
+      "id": 36,
+      "text": " of Fierce Spirit"
+    },
+    {
+      "file": "HN38",
+      "id": 37,
+      "text": " the Dedicated"
+    },
+    {
+      "file": "HN38",
+      "id": 38,
+      "text": " the Insightful"
+    },
+    {
+      "file": "HN38",
+      "id": 39,
+      "text": " the Fullfilled"
+    },
+    {
+      "file": "HN38",
+      "id": 40,
+      "text": " the Bold"
+    },
+    {
+      "file": "HN38",
+      "id": 41,
+      "text": " the Insistant"
+    },
+    {
+      "file": "HN38",
+      "id": 42,
+      "text": " the Unstoppable"
+    },
+    {
+      "file": "HN42",
+      "id": 22,
+      "text": " Fearuin"
+    },
+    {
+      "file": "HN42",
+      "id": 23,
+      "text": " Delvra"
+    },
+    {
+      "file": "HN42",
+      "id": 24,
+      "text": " Vendra"
+    },
+    {
+      "file": "HN42",
+      "id": 25,
+      "text": " Nightide"
+    },
+    {
+      "file": "HN42",
+      "id": 26,
+      "text": " Dyrissa"
+    },
+    {
+      "file": "HN42",
+      "id": 27,
+      "text": " Terral"
+    },
+    {
+      "file": "HN42",
+      "id": 28,
+      "text": " Darksight"
+    },
+    {
+      "file": "HN42",
+      "id": 29,
+      "text": " Hellin"
+    },
+    {
+      "file": "HN42",
+      "id": 30,
+      "text": " Zarbin"
+    },
+    {
+      "file": "HN42",
+      "id": 31,
+      "text": " Blacksleep"
+    },
+    {
+      "file": "HN42",
+      "id": 32,
+      "text": " Symmins"
+    },
+    {
+      "file": "HN42",
+      "id": 33,
+      "text": " Kophlin"
+    },
+    {
+      "file": "HN42",
+      "id": 34,
+      "text": " Trepidy"
+    },
+    {
+      "file": "HN42",
+      "id": 35,
+      "text": " Diregrin"
+    },
+    {
+      "file": "HN42",
+      "id": 36,
+      "text": " Quietwalk"
+    },
+    {
+      "file": "HN42",
+      "id": 37,
+      "text": " Shadowveil"
+    },
+    {
+      "file": "HN42",
+      "id": 38,
+      "text": " Darkspirit"
+    },
+    {
+      "file": "HN42",
+      "id": 39,
+      "text": " Gothia"
+    },
+    {
+      "file": "HN42",
+      "id": 40,
+      "text": " Everdark"
+    },
+    {
+      "file": "HN42",
+      "id": 41,
+      "text": " Lastbreath"
+    },
+    {
+      "file": "HN42",
+      "id": 42,
+      "text": " Nuralla"
+    },
+    {
+      "file": "HN42",
+      "id": 43,
+      "text": " Onyx"
+    },
+    {
+      "file": "HN42",
+      "id": 44,
+      "text": " Coldtouch"
+    },
+    {
+      "file": "HN42",
+      "id": 45,
+      "text": " Palidia"
+    },
+    {
+      "file": "HN42",
+      "id": 46,
+      "text": " Rigorella"
+    },
+    {
+      "file": "HN42",
+      "id": 47,
+      "text": " Seph"
+    },
+    {
+      "file": "HN42",
+      "id": 48,
+      "text": " Mortari"
+    },
+    {
+      "file": "HN42",
+      "id": 49,
+      "text": " Oblivia"
+    },
+    {
+      "file": "HN42",
+      "id": 50,
+      "text": " Terminus"
+    },
+    {
+      "file": "HN42",
+      "id": 51,
+      "text": " Expiria"
+    },
+    {
+      "file": "HN42",
+      "id": 52,
+      "text": " Quietomb"
+    },
+    {
+      "file": "HN42",
+      "id": 53,
+      "text": " Knyflan"
+    },
+    {
+      "file": "HN45",
+      "id": 29,
+      "text": "Onden"
+    },
+    {
+      "file": "HN45",
+      "id": 30,
+      "text": "Praul"
+    },
+    {
+      "file": "HN45",
+      "id": 31,
+      "text": "Rittan"
+    },
+    {
+      "file": "HN45",
+      "id": 32,
+      "text": "Ruvontino"
+    },
+    {
+      "file": "HN45",
+      "id": 33,
+      "text": "Sterling"
+    },
+    {
+      "file": "HN45",
+      "id": 34,
+      "text": "Steth"
+    },
+    {
+      "file": "HN45",
+      "id": 35,
+      "text": "Sylves"
+    },
+    {
+      "file": "HN45",
+      "id": 36,
+      "text": "Teeve"
+    },
+    {
+      "file": "HN45",
+      "id": 37,
+      "text": "Tendann"
+    },
+    {
+      "file": "HN45",
+      "id": 38,
+      "text": "Thyriad"
+    },
+    {
+      "file": "HN45",
+      "id": 39,
+      "text": "Vandon"
+    },
+    {
+      "file": "HN45",
+      "id": 40,
+      "text": "Velar"
+    },
+    {
+      "file": "HN45",
+      "id": 41,
+      "text": "Venstar"
+    },
+    {
+      "file": "HN45",
+      "id": 42,
+      "text": "Zugon"
+    },
+    {
+      "file": "HN46",
+      "id": 19,
+      "text": " Lakescouter"
+    },
+    {
+      "file": "HN46",
+      "id": 20,
+      "text": " Bushbreaker"
+    },
+    {
+      "file": "HN46",
+      "id": 21,
+      "text": " the Bushwacker"
+    },
+    {
+      "file": "HN46",
+      "id": 22,
+      "text": " the Solitary"
+    },
+    {
+      "file": "HN46",
+      "id": 23,
+      "text": " Brookford"
+    },
+    {
+      "file": "HN46",
+      "id": 24,
+      "text": " the Quiet"
+    },
+    {
+      "file": "HN46",
+      "id": 25,
+      "text": " Cairnmaker"
+    },
+    {
+      "file": "HN46",
+      "id": 26,
+      "text": " Sharpeyes"
+    },
+    {
+      "file": "HN46",
+      "id": 27,
+      "text": " of Treldan Wood"
+    },
+    {
+      "file": "HN46",
+      "id": 28,
+      "text": " of Dark Woods"
+    },
+    {
+      "file": "HN46",
+      "id": 29,
+      "text": " of Laughing Brook"
+    },
+    {
+      "file": "HN46",
+      "id": 30,
+      "text": " of Sylvan Knoll"
+    },
+    {
+      "file": "HN46",
+      "id": 31,
+      "text": " Highriver"
+    },
+    {
+      "file": "HN46",
+      "id": 32,
+      "text": " the Steady"
+    },
+    {
+      "file": "HN46",
+      "id": 33,
+      "text": " the Loner"
+    },
+    {
+      "file": "HN46",
+      "id": 34,
+      "text": " the Inquisitive"
+    },
+    {
+      "file": "HN46",
+      "id": 35,
+      "text": " Farjourney"
+    },
+    {
+      "file": "HN46",
+      "id": 36,
+      "text": " the Trekker"
+    },
+    {
+      "file": "HN46",
+      "id": 37,
+      "text": " Surescout"
+    },
+    {
+      "file": "HN46",
+      "id": 38,
+      "text": " the Traveller"
+    },
+    {
+      "file": "HN46",
+      "id": 39,
+      "text": " of Ten Troll Dell"
+    },
+    {
+      "file": "HN46",
+      "id": 40,
+      "text": " Wildwater"
+    },
+    {
+      "file": "HN46",
+      "id": 41,
+      "text": " Overhill"
+    },
+    {
+      "file": "HN46",
+      "id": 42,
+      "text": " Sorefoot"
+    },
+    {
+      "file": "HN49",
+      "id": 34,
+      "text": "Skulley"
+    },
+    {
+      "file": "HN49",
+      "id": 35,
+      "text": "Dugsy"
+    },
+    {
+      "file": "HN49",
+      "id": 36,
+      "text": "Zubba"
+    },
+    {
+      "file": "HN49",
+      "id": 37,
+      "text": "Runo"
+    },
+    {
+      "file": "HN49",
+      "id": 38,
+      "text": "Beedo"
+    },
+    {
+      "file": "HN49",
+      "id": 39,
+      "text": "Riss"
+    },
+    {
+      "file": "HN49",
+      "id": 40,
+      "text": "Devit"
+    },
+    {
+      "file": "HN49",
+      "id": 41,
+      "text": "Rino"
+    },
+    {
+      "file": "HN49",
+      "id": 42,
+      "text": "Meese"
+    },
+    {
+      "file": "HN50",
+      "id": 34,
+      "text": " of the Alley"
+    },
+    {
+      "file": "HN50",
+      "id": 35,
+      "text": " the Mercenary"
+    },
+    {
+      "file": "HN50",
+      "id": 36,
+      "text": " the Despised"
+    },
+    {
+      "file": "HN50",
+      "id": 37,
+      "text": " the Greedy"
+    },
+    {
+      "file": "HN50",
+      "id": 38,
+      "text": " the Needy"
+    },
+    {
+      "file": "HN50",
+      "id": 39,
+      "text": " Foulbolt"
+    },
+    {
+      "file": "HN50",
+      "id": 40,
+      "text": " the Poisoner"
+    },
+    {
+      "file": "HN50",
+      "id": 41,
+      "text": " the Bow"
+    },
+    {
+      "file": "HN50",
+      "id": 42,
+      "text": " the Collector"
+    },
+    {
+      "file": "HN53",
+      "id": 26,
+      "text": "Lumina"
+    },
+    {
+      "file": "HN53",
+      "id": 27,
+      "text": "Morne"
+    },
+    {
+      "file": "HN53",
+      "id": 28,
+      "text": "Nune"
+    },
+    {
+      "file": "HN53",
+      "id": 29,
+      "text": "Nova"
+    },
+    {
+      "file": "HN53",
+      "id": 30,
+      "text": "Pyreena"
+    },
+    {
+      "file": "HN53",
+      "id": 31,
+      "text": "Phocelle"
+    },
+    {
+      "file": "HN53",
+      "id": 32,
+      "text": "Radiella"
+    },
+    {
+      "file": "HN53",
+      "id": 33,
+      "text": "Rhetnia"
+    },
+    {
+      "file": "HN53",
+      "id": 34,
+      "text": "Solaria"
+    },
+    {
+      "file": "HN53",
+      "id": 35,
+      "text": "Staria"
+    },
+    {
+      "file": "HN53",
+      "id": 36,
+      "text": "Stella"
+    },
+    {
+      "file": "HN53",
+      "id": 37,
+      "text": "Sreene"
+    },
+    {
+      "file": "HN53",
+      "id": 38,
+      "text": "Sunni"
+    },
+    {
+      "file": "HN53",
+      "id": 39,
+      "text": "Sundra"
+    },
+    {
+      "file": "HN53",
+      "id": 40,
+      "text": "Traddi"
+    },
+    {
+      "file": "HN53",
+      "id": 41,
+      "text": "Veshi"
+    },
+    {
+      "file": "HN53",
+      "id": 42,
+      "text": "Yewvi"
+    },
+    {
+      "file": "HN54",
+      "id": 24,
+      "text": " Asher"
+    },
+    {
+      "file": "HN54",
+      "id": 25,
+      "text": " Shinebright"
+    },
+    {
+      "file": "HN54",
+      "id": 26,
+      "text": " Deepscorch"
+    },
+    {
+      "file": "HN54",
+      "id": 27,
+      "text": " Warmtouch"
+    },
+    {
+      "file": "HN54",
+      "id": 28,
+      "text": "of the New Temple"
+    },
+    {
+      "file": "HN54",
+      "id": 29,
+      "text": ", Chosen of Helia"
+    },
+    {
+      "file": "HN54",
+      "id": 30,
+      "text": " Brightburst"
+    },
+    {
+      "file": "HN54",
+      "id": 31,
+      "text": " Conflaguratus"
+    },
+    {
+      "file": "HN54",
+      "id": 32,
+      "text": " Seardark"
+    },
+    {
+      "file": "HN54",
+      "id": 33,
+      "text": ", Guardian of the Flame"
+    },
+    {
+      "file": "HN54",
+      "id": 34,
+      "text": " Amberfist"
+    },
+    {
+      "file": "HN61",
+      "id": 32,
+      "text": "Draemeus"
+    },
+    {
+      "file": "HN61",
+      "id": 33,
+      "text": "Tyrollian"
+    },
+    {
+      "file": "HN61",
+      "id": 34,
+      "text": "Zagadu"
+    },
+    {
+      "file": "HN61",
+      "id": 35,
+      "text": "Rendi"
+    },
+    {
+      "file": "HN61",
+      "id": 36,
+      "text": "Shallefex"
+    },
+    {
+      "file": "HN61",
+      "id": 37,
+      "text": "Huranthell"
+    },
+    {
+      "file": "HN61",
+      "id": 38,
+      "text": "Mozadus"
+    },
+    {
+      "file": "HN61",
+      "id": 39,
+      "text": "Viscoldius"
+    },
+    {
+      "file": "HN61",
+      "id": 40,
+      "text": "Pyrinn"
+    },
+    {
+      "file": "HN61",
+      "id": 41,
+      "text": "Maskedor"
+    },
+    {
+      "file": "HN61",
+      "id": 42,
+      "text": "Omarian"
+    },
+    {
+      "file": "HN61",
+      "id": 43,
+      "text": "Reger"
+    },
+    {
+      "file": "HN62",
+      "id": 34,
+      "text": " the Uncertain"
+    },
+    {
+      "file": "HN62",
+      "id": 35,
+      "text": " the Focused"
+    },
+    {
+      "file": "HN62",
+      "id": 36,
+      "text": ", Teacher of Quidd"
+    },
+    {
+      "file": "HN62",
+      "id": 37,
+      "text": " of Purest Energies"
+    },
+    {
+      "file": "HN62",
+      "id": 38,
+      "text": " the Lesser"
+    },
+    {
+      "file": "HN62",
+      "id": 39,
+      "text": " the Peerless"
+    },
+    {
+      "file": "HN62",
+      "id": 40,
+      "text": " the Somewhat Certain"
+    },
+    {
+      "file": "HN62",
+      "id": 41,
+      "text": " the Shambler"
+    },
+    {
+      "file": "HN62",
+      "id": 42,
+      "text": " the Mystic"
+    },
+    {
+      "file": "HN62",
+      "id": 43,
+      "text": " of Tholaria"
+    },
+    {
+      "file": "BN01",
+      "id": 32,
+      "text": "Keefer's Rest"
+    },
+    {
+      "file": "BN01",
+      "id": 33,
+      "text": "Pippin's Hideaway"
+    },
+    {
+      "file": "BN01",
+      "id": 34,
+      "text": "Dewey's Den"
+    },
+    {
+      "file": "BN01",
+      "id": 35,
+      "text": "The Peasant's Pint"
+    },
+    {
+      "file": "BN01",
+      "id": 36,
+      "text": "LaPorte's Lodge"
+    },
+    {
+      "file": "BN01",
+      "id": 37,
+      "text": "The Tiger's Shadow"
+    },
+    {
+      "file": "BN01",
+      "id": 38,
+      "text": "The Busy Badger"
+    },
+    {
+      "file": "BN01",
+      "id": 39,
+      "text": "The Bed and Bucket"
+    },
+    {
+      "file": "BN01",
+      "id": 40,
+      "text": "Uncle Elrond's"
+    },
+    {
+      "file": "BN01",
+      "id": 41,
+      "text": "The Outside Inn"
+    },
+    {
+      "file": "BN01",
+      "id": 42,
+      "text": "The Cocky Gnome"
+    },
+    {
+      "file": "LNTX",
+      "id": 1632139339,
+      "text": "K'Hal-Kratis"
+    },
+    {
+      "file": "LNTX",
+      "id": 1632925764,
+      "text": "D'Tar-Mordin"
+    },
+    {
+      "file": "LNTX",
+      "id": 1819243083,
+      "text": "Krolm's Anvil"
+    },
+    {
+      "file": "LNTX",
+      "id": 1987015239,
+      "text": "Grov-Urtat"
+    },
+    {
+      "file": "LNTX",
+      "id": 2020761927,
+      "text": "Gar Uta"
+    },
+    {
+      "file": "LNTX",
+      "id": 2020767047,
+      "text": "Gur-Mechina"
+    }
+  ],
+  "Hero Names (Expansion)": [
+    {
+      "file": "HN58",
+      "id": 26,
+      "text": " Duvane"
+    },
+    {
+      "file": "HN58",
+      "id": 27,
+      "text": " Nelton"
+    },
+    {
+      "file": "HN58",
+      "id": 28,
+      "text": " Dremenon"
+    },
+    {
+      "file": "HN58",
+      "id": 29,
+      "text": " Norvus"
+    },
+    {
+      "file": "HN58",
+      "id": 30,
+      "text": " Bhyll"
+    },
+    {
+      "file": "HN58",
+      "id": 26,
+      "text": " Tremon"
+    },
+    {
+      "file": "HN58",
+      "id": 27,
+      "text": " Valian"
+    },
+    {
+      "file": "HN58",
+      "id": 28,
+      "text": " Willem"
+    },
+    {
+      "file": "HN58",
+      "id": 29,
+      "text": " Duvane"
+    },
+    {
+      "file": "HN58",
+      "id": 30,
+      "text": " Nelton"
+    },
+    {
+      "file": "HN58",
+      "id": 31,
+      "text": " Dremenon"
+    },
+    {
+      "file": "HN58",
+      "id": 32,
+      "text": " Norvus"
+    },
+    {
+      "file": "HN58",
+      "id": 33,
+      "text": " Bhyll"
+    },
+    {
+      "file": "HN58",
+      "id": 34,
+      "text": " Talon"
+    },
+    {
+      "file": "HN58",
+      "id": 35,
+      "text": " Gerwyn"
+    },
+    {
+      "file": "HN58",
+      "id": 36,
+      "text": " Vorten"
+    },
+    {
+      "file": "HN58",
+      "id": 37,
+      "text": " Seevin"
+    },
+    {
+      "file": "HN58",
+      "id": 38,
+      "text": " Spalwin"
+    },
+    {
+      "file": "HN58",
+      "id": 39,
+      "text": " Algin"
+    },
+    {
+      "file": "HN58",
+      "id": 40,
+      "text": " Dorander"
+    },
+    {
+      "file": "HN58",
+      "id": 41,
+      "text": " Kraye"
+    },
+    {
+      "file": "HN58",
+      "id": 42,
+      "text": " Gurdain"
+    },
+    {
+      "file": "HN58",
+      "id": 43,
+      "text": " Telenar"
+    },
+    {
+      "file": "HN58",
+      "id": 44,
+      "text": " Voyt"
+    },
+    {
+      "file": "HN58",
+      "id": 45,
+      "text": " Avyn"
+    },
+    {
+      "file": "HN58",
+      "id": 46,
+      "text": " Brador"
+    },
+    {
+      "file": "HN58",
+      "id": 47,
+      "text": " Deen"
+    },
+    {
+      "file": "HN58",
+      "id": 48,
+      "text": " Mezurak"
+    },
+    {
+      "file": "HN58",
+      "id": 49,
+      "text": " Wodenthal"
+    },
+    {
+      "file": "HN58",
+      "id": 50,
+      "text": " Chomdel"
+    },
+    {
+      "file": "HN58",
+      "id": 51,
+      "text": " Trevian"
+    },
+    {
+      "file": "HN58",
+      "id": 52,
+      "text": " Vence"
+    },
+    {
+      "file": "HN58",
+      "id": 53,
+      "text": " Kethon"
+    },
+    {
+      "file": "HN58",
+      "id": 54,
+      "text": " Dronn"
+    },
+    {
+      "file": "HN58",
+      "id": 55,
+      "text": " Xayter"
+    }
+  ],
+  "Hero Titles": [
+    {
+      "file": "HN59",
+      "id": 0,
+      "text": " Broadedge"
+    },
+    {
+      "file": "HN59",
+      "id": 1,
+      "text": " Headlopper"
+    },
+    {
+      "file": "HN59",
+      "id": 2,
+      "text": " Keenswing"
+    },
+    {
+      "file": "HN59",
+      "id": 3,
+      "text": " Knightly"
+    },
+    {
+      "file": "HN59",
+      "id": 4,
+      "text": " of the Bloody Blade"
+    },
+    {
+      "file": "HN59",
+      "id": 5,
+      "text": " Sharpwit"
+    },
+    {
+      "file": "HN59",
+      "id": 6,
+      "text": " Silveredge"
+    },
+    {
+      "file": "HN59",
+      "id": 7,
+      "text": " Solidfist"
+    },
+    {
+      "file": "HN59",
+      "id": 8,
+      "text": ", Son of Kolar"
+    },
+    {
+      "file": "HN59",
+      "id": 9,
+      "text": " Stoneblade"
+    },
+    {
+      "file": "HN59",
+      "id": 10,
+      "text": " Strongwill"
+    },
+    {
+      "file": "HN59",
+      "id": 11,
+      "text": " Swiftblade"
+    },
+    {
+      "file": "HN59",
+      "id": 12,
+      "text": " the Battlemaster"
+    },
+    {
+      "file": "HN59",
+      "id": 13,
+      "text": " the Blue"
+    },
+    {
+      "file": "HN59",
+      "id": 14,
+      "text": " the Courageous"
+    },
+    {
+      "file": "HN59",
+      "id": 15,
+      "text": " the Loyal"
+    },
+    {
+      "file": "HN59",
+      "id": 16,
+      "text": " the Slicer"
+    },
+    {
+      "file": "HN59",
+      "id": 17,
+      "text": " the Victorious"
+    },
+    {
+      "file": "HN59",
+      "id": 18,
+      "text": " the Worthy"
+    },
+    {
+      "file": "HN59",
+      "id": 19,
+      "text": " of Longridge"
+    },
+    {
+      "file": "HN59",
+      "id": 20,
+      "text": " Vunderson"
+    },
+    {
+      "file": "HN59",
+      "id": 21,
+      "text": " Quickparry"
+    },
+    {
+      "file": "HN59",
+      "id": 22,
+      "text": ", the Fairly Swift"
+    },
+    {
+      "file": "HN59",
+      "id": 23,
+      "text": ", the Mighty"
+    },
+    {
+      "file": "HN59",
+      "id": 24,
+      "text": " of Kranal's Creek"
+    },
+    {
+      "file": "HN59",
+      "id": 25,
+      "text": " of North Glen"
+    },
+    {
+      "file": "HN59",
+      "id": 0,
+      "text": " Broadedge"
+    },
+    {
+      "file": "HN59",
+      "id": 1,
+      "text": " Headlopper"
+    },
+    {
+      "file": "HN59",
+      "id": 2,
+      "text": " Keenswing"
+    },
+    {
+      "file": "HN59",
+      "id": 3,
+      "text": " Knightly"
+    },
+    {
+      "file": "HN59",
+      "id": 4,
+      "text": " of the Bloody Blade"
+    },
+    {
+      "file": "HN59",
+      "id": 5,
+      "text": " Sharpwit"
+    },
+    {
+      "file": "HN59",
+      "id": 6,
+      "text": " Silveredge"
+    },
+    {
+      "file": "HN59",
+      "id": 7,
+      "text": " Solidfist"
+    },
+    {
+      "file": "HN59",
+      "id": 8,
+      "text": ", Son of Kolar"
+    },
+    {
+      "file": "HN59",
+      "id": 9,
+      "text": " Stoneblade"
+    },
+    {
+      "file": "HN59",
+      "id": 10,
+      "text": " Strongwill"
+    },
+    {
+      "file": "HN59",
+      "id": 11,
+      "text": " Swiftblade"
+    },
+    {
+      "file": "HN59",
+      "id": 12,
+      "text": " the Battlemaster"
+    },
+    {
+      "file": "HN59",
+      "id": 13,
+      "text": " the Blue"
+    },
+    {
+      "file": "HN59",
+      "id": 14,
+      "text": " the Courageous"
+    },
+    {
+      "file": "HN59",
+      "id": 15,
+      "text": " the Loyal"
+    },
+    {
+      "file": "HN59",
+      "id": 16,
+      "text": " the Slicer"
+    },
+    {
+      "file": "HN59",
+      "id": 17,
+      "text": " the Victorious"
+    },
+    {
+      "file": "HN59",
+      "id": 18,
+      "text": " the Worthy"
+    },
+    {
+      "file": "HN59",
+      "id": 19,
+      "text": " of Longridge"
+    },
+    {
+      "file": "HN59",
+      "id": 20,
+      "text": " Vunderson"
+    },
+    {
+      "file": "HN59",
+      "id": 21,
+      "text": " Quickparry"
+    },
+    {
+      "file": "HN59",
+      "id": 22,
+      "text": ", the Fairly Swift"
+    },
+    {
+      "file": "HN59",
+      "id": 23,
+      "text": ", the Mighty"
+    },
+    {
+      "file": "HN59",
+      "id": 24,
+      "text": " of Kranal's Creek"
+    },
+    {
+      "file": "HN59",
+      "id": 25,
+      "text": " of North Glen"
+    }
+  ],
+  "Map Names (Expansion)": [
+    {
+      "file": "FNTX",
+      "id": 1633773635,
+      "text": "Champions of Discord (Advanced)"
+    },
+    {
+      "file": "FNTX",
+      "id": 1147494756,
+      "text": "Dead Lands (Advanced) - S"
+    },
+    {
+      "file": "FNTX",
+      "id": 1181904762,
+      "text": "Frozen Wrath (Expert)"
+    },
+    {
+      "file": "FNTX",
+      "id": 1282372196,
+      "text": "Lords of the North (Advanced)"
+    },
+    {
+      "file": "FNTX",
+      "id": 1315267442,
+      "text": "Necropolis (Advanced) - S"
+    },
+    {
+      "file": "FNTX",
+      "id": 1315926644,
+      "text": "Northern Kings (Expert)"
+    },
+    {
+      "file": "FNTX",
+      "id": 1333097584,
+      "text": "Outposts (Expert)"
+    },
+    {
+      "file": "FNTX",
+      "id": 1382119013,
+      "text": "Ravenous (Expert) - L"
+    },
+    {
+      "file": "FNTX",
+      "id": 1383032693,
+      "text": "Rogues Haven (Advanced)"
+    },
+    {
+      "file": "FNTX",
+      "id": 1383036263,
+      "text": "Rogues Haven (Advanced)"
+    },
+    {
+      "file": "FNTX",
+      "id": 1383426414,
+      "text": "Ruinous Domain (Expert) - S"
+    },
+    {
+      "file": "FNTX",
+      "id": 1449489005,
+      "text": "Vermin Assault (Advanced)"
+    },
+    {
+      "file": "FNTX",
+      "id": 1466526820,
+      "text": "Wild Expanse (Advanced) - H"
+    },
+    {
+      "file": "FNTX",
+      "id": 1466527348,
+      "text": "Winter Behemoths (Expert) - L"
+    },
+    {
+      "file": "FNTX",
+      "id": 1466530401,
+      "text": "Wizard Lords (Beginner)"
+    },
+    {
+      "file": "FNTX",
+      "id": 1499821161,
+      "text": "Yeti Rampage (Expert) - S"
+    },
+    {
+      "file": "FNTX",
+      "id": 1633773635,
+      "text": "Champions of Discord (Advanced)"
+    },
+    {
+      "file": "FNTX",
+      "id": 1633773651,
+      "text": "Shanty Town (Expert)"
+    },
+    {
+      "file": "FNTX",
+      "id": 1633907265,
+      "text": "Arcane Ally (Advanced)"
+    },
+    {
+      "file": "FNTX",
+      "id": 1634168658,
+      "text": "Rogues Haven (Advanced)"
+    },
+    {
+      "file": "FNTX",
+      "id": 1634233941,
+      "text": "Unholy Strife (Advanced)"
+    },
+    {
+      "file": "FNTX",
+      "id": 1634627395,
+      "text": "Conclave of Shamans (Advanced) - L"
+    },
+    {
+      "file": "FNTX",
+      "id": 1634628948,
+      "text": "Tundra Raiders (Expert) - L "
+    },
+    {
+      "file": "FNTX",
+      "id": 1634889543,
+      "text": "Gorgon Onslaught (Advanced)"
+    },
+    {
+      "file": "FNTX",
+      "id": 1634889550,
+      "text": "Outposts (Expert)"
+    },
+    {
+      "file": "FNTX",
+      "id": 1635022159,
+      "text": "Outpost (Expert)"
+    },
+    {
+      "file": "FNTX",
+      "id": 1650550867,
+      "text": "Shadow Beasts (Expert)"
+    },
+    {
+      "file": "FNTX",
+      "id": 1650684481,
+      "text": "Arcane Struggle (Advanced)"
+    },
+    {
+      "file": "FNTX",
+      "id": 1650945874,
+      "text": "Rogues Haven (Advanced)"
+    },
+    {
+      "file": "FNTX",
+      "id": 1651078482,
+      "text": "Ruins of Esterhausen (Advanced) - S"
+    },
+    {
+      "file": "FNTX",
+      "id": 1651664211,
+      "text": "Serpent Assault (Expert) - L"
+    },
+    {
+      "file": "FNTX",
+      "id": 1651666766,
+      "text": "Northern Kings (Expert) "
+    },
+    {
+      "file": "FNTX",
+      "id": 1667328083,
+      "text": "Shanty Towns (Advanced)"
+    },
+    {
+      "file": "FNTX",
+      "id": 1667395399,
+      "text": "Goblin Fort (Beginner) - L"
+    },
+    {
+      "file": "FNTX",
+      "id": 1668443982,
+      "text": "North Watch (Advanced)"
+    },
+    {
+      "file": "FNTX",
+      "id": 1668837198,
+      "text": "No Monsters (Last Palace Standing) - S"
+    },
+    {
+      "file": "FNTX",
+      "id": 1684105299,
+      "text": "Shadow's Guardians (Advanced) - H"
+    },
+    {
+      "file": "FNTX",
+      "id": 1684172615,
+      "text": "Goblin War Parties (Advanced)"
+    },
+    {
+      "file": "FNTX",
+      "id": 1684960596,
+      "text": "Tundra Lords (Beginner)"
+    },
+    {
+      "file": "FNTX",
+      "id": 1685614414,
+      "text": "No Monsters (Last Palace Standing) - H"
+    },
+    {
+      "file": "FNTX",
+      "id": 1700882515,
+      "text": "Shanty Towns (Advanced)"
+    },
+    {
+      "file": "FNTX",
+      "id": 1700949831,
+      "text": "Goblin Caves (Beginner) - L"
+    },
+    {
+      "file": "FNTX",
+      "id": 1701080661,
+      "text": "Undead Assault (Beginner) - S"
+    },
+    {
+      "file": "FNTX",
+      "id": 1717727047,
+      "text": "Goblin Stronghold (Expert) - S"
+    },
+    {
+      "file": "FNTX",
+      "id": 1734436172,
+      "text": "League of Heroes (Advanced)"
+    },
+    {
+      "file": "FNTX",
+      "id": 1734439494,
+      "text": "Fragile Alliance (Expert)"
+    },
+    {
+      "file": "FNTX",
+      "id": 1734504263,
+      "text": "Goblin Outpost (Beginner) - S"
+    },
+    {
+      "file": "FNTX",
+      "id": 1735552839,
+      "text": "Gorgon Realm (Advanced) - S"
+    },
+    {
+      "file": "FNTX",
+      "id": 1769235801,
+      "text": "Yeti Caves (Expert) - L"
+    },
+    {
+      "file": "FNTX",
+      "id": 1851877459,
+      "text": "Shanty Towns (Advanced)"
+    },
+    {
+      "file": "FNTX",
+      "id": 1886680399,
+      "text": "Outposts (Expert)"
+    },
+    {
+      "file": "FNTX",
+      "id": 1918990148,
+      "text": "Dwarven Stronghold (Beginner)"
+    },
+    {
+      "file": "FNTX",
+      "id": 1953066581,
+      "text": "United Faiths (Beginner)"
+    },
+    {
+      "file": "FNTX",
+      "id": 1953392983,
+      "text": "Winter Behemoths (Expert) - S"
+    },
+    {
+      "file": "FNTX",
+      "id": 1953656654,
+      "text": "Northern Triumverate (Advanced)"
+    },
+    {
+      "file": "FNTX",
+      "id": 1953719634,
+      "text": "Restless Dead (Advanced) - S"
+    },
+    {
+      "file": "FNTX",
+      "id": 2020893010,
+      "text": "Rat Scouts (Beginner) - S"
+    },
+    {
+      "file": "FNTX",
+      "id": 2037149512,
+      "text": "Holy Struggle (Advanced)"
+    },
+    {
+      "file": "FNTX",
+      "id": 2054124102,
+      "text": "Frozen Death(Expert)"
+    },
+    {
+      "file": "FDTX",
+      "id": 1147494756,
+      "text": "Undead from local graveyards will make periodic attacks on your settlements."
+    },
+    {
+      "file": "FDTX",
+      "id": 1181904762,
+      "text": "Yetis and Ice Dragons will raid your settlement from the nearby wilderness."
+    },
+    {
+      "file": "FDTX",
+      "id": 1282372196,
+      "text": "Each settlement starts with only a level three Palace."
+    },
+    {
+      "file": "FDTX",
+      "id": 1315267442,
+      "text": "A council of Vampires have establish a collective presence in this region. They "
+    },
+    {
+      "file": "FDTX",
+      "id": 1315926644,
+      "text": "Each settlement starts with a level two Palace."
+    },
+    {
+      "file": "FDTX",
+      "id": 1333097584,
+      "text": "Each settlement starts with only an Outpost."
+    },
+    {
+      "file": "FDTX",
+      "id": 1382119013,
+      "text": "Carnivorous beasts roam this region in search of their next meal."
+    },
+    {
+      "file": "FDTX",
+      "id": 1383032693,
+      "text": "Settlement starts with a level one Palace, a level two Rogues Guild, a Magic Baz"
+    },
+    {
+      "file": "FDTX",
+      "id": 1383036263,
+      "text": "Each settlement starts with a level one Palace, a level two Rogues Guild, a Magi"
+    },
+    {
+      "file": "FDTX",
+      "id": 1383426414,
+      "text": "Several Ratman communities have sprung up in this region."
+    },
+    {
+      "file": "FDTX",
+      "id": 1449489005,
+      "text": "Ratman Champions supported by Shamans and Ratapults will invade this region from"
+    },
+    {
+      "file": "FDTX",
+      "id": 1466526820,
+      "text": "Wendigo, Werewolves, Vargs and Hellbears dominate this huge expanse of wildernes"
+    },
+    {
+      "file": "FDTX",
+      "id": 1466527348,
+      "text": "Yetis and Wendigo stalk this frozen region.\n(A few very strong monsters present)"
+    },
+    {
+      "file": "FDTX",
+      "id": 1466530401,
+      "text": "Each settlement starts with a level one Palace, a level one Wizards Guild, a Lib"
+    },
+    {
+      "file": "FDTX",
+      "id": 1499821161,
+      "text": "Yetis run amok in this frozen region.\n(A few very strong monsters are present)"
+    },
+    {
+      "file": "FDTX",
+      "id": 1633773651,
+      "text": "Settlement starts with a level one Palace and four Gnome Hovels."
+    },
+    {
+      "file": "FDTX",
+      "id": 1633907265,
+      "text": "Settlement starts with a level 2 Palace, a Sorcerers Abode, and a Magic Bazaar."
+    },
+    {
+      "file": "FDTX",
+      "id": 1634168658,
+      "text": "Each settlement starts with a level one Palace, a level two Rogues Guild, a Magi"
+    },
+    {
+      "file": "FDTX",
+      "id": 1634233941,
+      "text": "Each settlement starts with a level one Palace, a Guardhouse and a Temple to Kry"
+    },
+    {
+      "file": "FDTX",
+      "id": 1634627395,
+      "text": "Shamans from a warren of Ratmen and a tribe of Goblins have begun meeting in a s"
+    },
+    {
+      "file": "FDTX",
+      "id": 1634628948,
+      "text": "Yetis and Ice Dragons inhabit the frozen Ice Caves of this region.  A pair of ru"
+    },
+    {
+      "file": "FDTX",
+      "id": 1634889543,
+      "text": "Gorgons and Medusae will enter the region from the nearby wilderness."
+    },
+    {
+      "file": "FDTX",
+      "id": 1634889550,
+      "text": "Each settlement starts with only an Outpost."
+    },
+    {
+      "file": "FDTX",
+      "id": 1635022159,
+      "text": "Settlement starts with only an Outpost."
+    },
+    {
+      "file": "FDTX",
+      "id": 1650550867,
+      "text": "Huge packs of Shadow Beasts will run amok in your settlement."
+    },
+    {
+      "file": "FDTX",
+      "id": 1650684481,
+      "text": "Each settlement starts with a level two Palace, a Sorcerers Abode, and a Magic B"
+    },
+    {
+      "file": "FDTX",
+      "id": 1650945874,
+      "text": "Each settlement starts with a level one Palace, a level two Rogues Guild, a Magi"
+    },
+    {
+      "file": "FDTX",
+      "id": 1651078482,
+      "text": "A single Ratman settlement has sprung up in this region. If it is not destroyed,"
+    },
+    {
+      "file": "FDTX",
+      "id": 1651664211,
+      "text": "A sizeable force of aggressive serpents have established several lairs in this r"
+    },
+    {
+      "file": "FDTX",
+      "id": 1651666766,
+      "text": "Each settlement starts with a level two Palace."
+    },
+    {
+      "file": "FDTX",
+      "id": 1667328083,
+      "text": "Each settlement starts with a level one Palace and four Gnome Hovels."
+    },
+    {
+      "file": "FDTX",
+      "id": 1667395399,
+      "text": "Goblins have fortified this region with a single Goblin Fortress and several wat"
+    },
+    {
+      "file": "FDTX",
+      "id": 1668443982,
+      "text": "Settlement starts with an Outpost and two Rangers Guilds."
+    },
+    {
+      "file": "FDTX",
+      "id": 1668837198,
+      "text": "There are no monster lairs in this region.\n(This pattern is included for Last Pa"
+    },
+    {
+      "file": "FDTX",
+      "id": 1684105299,
+      "text": "Numerous Ancient Graveyards and undead lairs litter the landscape in this expans"
+    },
+    {
+      "file": "FDTX",
+      "id": 1684172615,
+      "text": "War parties of various goblin tribes will make periodic assaults on your settlem"
+    },
+    {
+      "file": "FDTX",
+      "id": 1684960596,
+      "text": "First settlement is dedicated to Fervus.\nSecond settlement is dedicated to Krolm"
+    },
+    {
+      "file": "FDTX",
+      "id": 1685614414,
+      "text": "There are no monster lairs in this region.\n(This pattern is included for Last Pa"
+    },
+    {
+      "file": "FDTX",
+      "id": 1700882515,
+      "text": "Each settlement starts with a level one Palace and four Gnome Hovels."
+    },
+    {
+      "file": "FDTX",
+      "id": 1700949831,
+      "text": "Some Goblin castaways have set up a small tribe of their own in some local caves"
+    },
+    {
+      "file": "FDTX",
+      "id": 1701080661,
+      "text": "The restless dead in this region have been making open assaults on Kingdom settl"
+    },
+    {
+      "file": "FDTX",
+      "id": 1717727047,
+      "text": "Goblins have heavily fortified their camps in this region.\n(Many weak to strong "
+    },
+    {
+      "file": "FDTX",
+      "id": 1734436172,
+      "text": "Settlement starts with a level one Palace, a Hall of Champions, a Warriors Guild"
+    },
+    {
+      "file": "FDTX",
+      "id": 1734439494,
+      "text": "Each settlement starts with a level one Palace and an Embassy."
+    },
+    {
+      "file": "FDTX",
+      "id": 1734504263,
+      "text": "A single Fortified Goblin Camp is protected by several Goblin Watchtowers.\n(A fe"
+    },
+    {
+      "file": "FDTX",
+      "id": 1735552839,
+      "text": "Greater Gorgons patrol this region. There is evidence that they are guarding at "
+    },
+    {
+      "file": "FDTX",
+      "id": 1769235801,
+      "text": "The region is home to numerous Yeti.\n(A few very strong monsters present)"
+    },
+    {
+      "file": "FDTX",
+      "id": 1851877459,
+      "text": "Each settlement starts with a level one Palace and four Gnome Hovels."
+    },
+    {
+      "file": "FDTX",
+      "id": 1886680399,
+      "text": "Each settlement starts with only an Outpost."
+    },
+    {
+      "file": "FDTX",
+      "id": 1918990148,
+      "text": "Settlement starts with a level two Palace, a level three Blacksmith, a Dwarven S"
+    },
+    {
+      "file": "FDTX",
+      "id": 1953066581,
+      "text": "Settlement starts with a level one Palace,  a Temple to Agrela, a Temple to Daur"
+    },
+    {
+      "file": "FDTX",
+      "id": 1953392983,
+      "text": "Yetis and Wendigo stalk this frozen region.\n(A few very strong monsters present)"
+    },
+    {
+      "file": "FDTX",
+      "id": 1953656654,
+      "text": "Each settlement has a only a level three Palace."
+    },
+    {
+      "file": "FDTX",
+      "id": 1953719634,
+      "text": "Undead in this region will rise up to assault your town.\n(Many weak to strong mo"
+    },
+    {
+      "file": "FDTX",
+      "id": 2020893010,
+      "text": "A scouting force of Ratmen has occupied several caves in this region.\n(A few wea"
+    },
+    {
+      "file": "FDTX",
+      "id": 2037149512,
+      "text": "Each settlement starts with a level two Palace, a Temple to Dauros and a Warrior"
+    },
+    {
+      "file": "FDTX",
+      "id": 2054124102,
+      "text": "Yetis and Ice Dragons will enter the region from the nearby wilderness."
+    }
+  ],
+  "Quest Endings": [
+    {
+      "file": "QEND",
+      "id": 825246797,
+      "text": "Well done, Your Majesty. With the defeat of Krolm's Avatar, his influence over t"
+    },
+    {
+      "file": "QEND",
+      "id": 826626630,
+      "text": "Congratulations!  You have won the game."
+    },
+    {
+      "file": "QEND",
+      "id": 825250136,
+      "text": "At last our streets are peaceful again... albeit drenched in Goblin spittle and "
+    },
+    {
+      "file": "QEND",
+      "id": 842027352,
+      "text": "At last, Styx AND Stones are dead. With the destruction of this disruptive prese"
+    },
+    {
+      "file": "QEND",
+      "id": 858804568,
+      "text": "Ixmil's fortress has been destroyed, and  the Wizard defeated! This victory is d"
+    },
+    {
+      "file": "QEND",
+      "id": 875581784,
+      "text": "Your heroes have recovered many amazing artifacts, including Stoneback's Shield "
+    },
+    {
+      "file": "QEND",
+      "id": 892359000,
+      "text": "The death of the Ratman leader, Rhoden, sent those vermin scurrying back to the "
+    },
+    {
+      "file": "QEND",
+      "id": 909136216,
+      "text": "It's a new day for the northlands, as our victorious heroes assume the mantle of"
+    },
+    {
+      "file": "QEND",
+      "id": 925913432,
+      "text": "We've done it! Borjin's resistance has crumbled and his influence is no longer a"
+    },
+    {
+      "file": "QEND",
+      "id": 942690648,
+      "text": "With the destruction of the last spire, the way to the fertile reaches is open t"
+    },
+    {
+      "file": "QEND",
+      "id": 959467864,
+      "text": "Your heroes have once again proven their worth, Majesty. Thanks to the fine job "
+    },
+    {
+      "file": "QEND",
+      "id": 808538456,
+      "text": "Good job, Highness! We are now free of such Elven threats as gambling, relaxatio"
+    },
+    {
+      "file": "QEND",
+      "id": 825315672,
+      "text": "Fine work, Majesty! You've ended the Greater Gorgons' treacherous plan to resurr"
+    },
+    {
+      "file": "QEND",
+      "id": 842092888,
+      "text": "We've atoned for Glohrea's loss.. but at what cost? While the Abomination has be"
+    },
+    {
+      "file": "QEND",
+      "id": 826560856,
+      "text": "You have resanctified the despoiled Shrine of Light and driven away the Phantoms"
+    }
+  ],
+  "Quest Names (Expansion)": [
+    {
+      "file": "QUES",
+      "id": 825250136,
+      "text": "The Clash of Empires"
+    },
+    {
+      "file": "QUES",
+      "id": 842027352,
+      "text": "Darkness Falls"
+    },
+    {
+      "file": "QUES",
+      "id": 858804568,
+      "text": "The Fortress of Ixmil"
+    },
+    {
+      "file": "QUES",
+      "id": 875581784,
+      "text": "Legendary Heroes"
+    },
+    {
+      "file": "QUES",
+      "id": 892359000,
+      "text": "Rise of the Ratmen"
+    },
+    {
+      "file": "QUES",
+      "id": 909136216,
+      "text": "Scions of Chaos"
+    },
+    {
+      "file": "QUES",
+      "id": 925913432,
+      "text": "The Siege"
+    },
+    {
+      "file": "QUES",
+      "id": 942690648,
+      "text": "Spires of Death"
+    },
+    {
+      "file": "QUES",
+      "id": 959467864,
+      "text": "Trade Routes"
+    },
+    {
+      "file": "QUES",
+      "id": 808538456,
+      "text": "Urban Renewal"
+    },
+    {
+      "file": "QUES",
+      "id": 825315672,
+      "text": "The Valley of the Serpents"
+    },
+    {
+      "file": "QUES",
+      "id": 842092888,
+      "text": "Vigil for a Fallen Hero"
+    },
+    {
+      "file": "QUES",
+      "id": 826560856,
+      "text": "Balance of Twilight"
+    },
+    {
+      "file": "QUES",
+      "id": 843338072,
+      "text": "Bonus Quest 2"
+    },
+    {
+      "file": "QUES",
+      "id": 860115288,
+      "text": "Bonus Quest 3"
+    }
+  ],
+  "Quest Items": [
+    {
+      "file": "QITM",
+      "id": 16,
+      "text": "empty"
+    },
+    {
+      "file": "QITM",
+      "id": 17,
+      "text": "empty"
+    },
+    {
+      "file": "QITM",
+      "id": 18,
+      "text": "empty"
+    },
+    {
+      "file": "QITM",
+      "id": 19,
+      "text": "empty"
+    },
+    {
+      "file": "QITM",
+      "id": 20,
+      "text": "Speed Tonic\n\u0001FFDDAA(Temporary Speed Boost)"
+    },
+    {
+      "file": "QITM",
+      "id": 21,
+      "text": "Fire Balm\n\u0001FFDDAA(Temporarily Ignites Weapons)"
+    },
+    {
+      "file": "QITM",
+      "id": 22,
+      "text": "Strength Potion\n\u0001FFDDAA(Temporary Strength Boost)"
+    },
+    {
+      "file": "QITM",
+      "id": 23,
+      "text": "Regeneration Elixer\n\u0001FFDDAA(Temporary Healing Boost)"
+    },
+    {
+      "file": "QITM",
+      "id": 24,
+      "text": "Invisibility Brew\n\u0001FFDDAA(Temporary Invisibility)"
+    },
+    {
+      "file": "QITM",
+      "id": 25,
+      "text": "Shapeshift Potion\n\u0001FFDDAA(Temporary Transformation)"
+    },
+    {
+      "file": "QITM",
+      "id": 26,
+      "text": "Bracers of Immolation\n\u0001FFDDAA(Damage Shield)"
+    },
+    {
+      "file": "QITM",
+      "id": 27,
+      "text": "Belt of Reflection\n\u0001FFDDAA(Magic Shield)"
+    },
+    {
+      "file": "QITM",
+      "id": 28,
+      "text": "The Teevus Wand\n\u0001FFDDAA(Attack Spell)"
+    },
+    {
+      "file": "QITM",
+      "id": 29,
+      "text": "Rune of Healing\n\u0001FFDDAA(Healing Spell)"
+    },
+    {
+      "file": "QITM",
+      "id": 30,
+      "text": "Helm of Displacement\n\u0001FFDDAA(Attack Spell)"
+    },
+    {
+      "file": "QITM",
+      "id": 31,
+      "text": "Stoneback's Shield\n\u0001FFDDAA(Protection Spell)"
+    }
+  ]
+}

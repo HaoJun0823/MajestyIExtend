@@ -1,0 +1,21 @@
+<Majesty>
+	<Quest id="{38305551-0000-0000-0000-000000000000}">
+		<Name>SLAY_DRAGON</Name>
+		<Description lang="en_US">
+			<Short>你唯一拥有的公会是一座赫利亚神殿。[newline][newline]你无法建造任何公会或神殿，因此必须找到并组织当地人以保卫你的据点。使用索拉莉来召集乡间的公会！[newline][newline]找到隐藏之剑的地点并摧毁之，以获得能使凡德拉尔变为凡躯的魔法之剑。[newline][newline]用魔法之剑斩杀凡德拉尔。[newline][newline]（本任务中不可建造任何公会或神殿。）</Short>
+			<Long>"恕我冒昧，陛下，但您必须醒来！先知朱莱克预言的那一天已经到来。强大的巨龙凡德拉尔已从厄运山脉的千年沉睡中苏醒，正在攻击王国！[newline]时间不多了。您必须招募部队去寻找能帮助消灭这一威胁的武器，否则王国将化为焦土。派英雄去寻找屠龙者拜兰之剑。只有这种利刃能劈开凡德拉尔的龙皮。"</Long>
+		</Description>
+		<DataConfiguration>
+			<Dataset base="Majesty">
+				<Load>
+					<Template>Slay_Dragon.q</Template>
+				</Load>
+				<Unload>
+					<CAM />
+					<GPL />
+					<Constants />
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

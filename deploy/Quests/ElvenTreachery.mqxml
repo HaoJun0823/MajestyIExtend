@@ -1,0 +1,21 @@
+<Majesty>
+	<Quest id="{30315551-0000-0000-0000-000000000000}">
+		<Name>ELVEN_TREACHERY</Name>
+		<Description lang="en_US">
+			<Short>在30天内赚取50,000金币支付赎金，[newline][newline]或[newline][newline]在此之前击败精灵及所有敌方英雄和建筑。[newline][newline]（本任务中无精灵加入你的城市。）</Short>
+			<Long>"陛下？很遗憾由我来转达如此令人难以忍受的消息。一个精灵无赖刚离开了城堡。他来传达消息说，他那帮不靠谱的同族绑架了您的儿子！显然他们只看到了您金库的规模，而非您高超领导力的深度。[newline]这些卑劣的机会主义者要求您支付赎金，否则——他们说——您将再也见不到活着的儿子。我们该如何应对这些精灵的傲慢无礼，殿下？"</Long>
+		</Description>
+		<DataConfiguration>
+			<Dataset base="Majesty">
+				<Load>
+					<Template>Elven_Treachery.q</Template>
+				</Load>
+				<Unload>
+					<CAM />
+					<GPL />
+					<Constants />
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

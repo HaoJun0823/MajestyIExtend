@@ -1,0 +1,21 @@
+<Majesty>
+	<Quest id="{34305551-0000-0000-0000-000000000000}">
+		<Name>QUEST_FOR_CROWN</Name>
+		<Description lang="en_US">
+			<Short>找到并摧毁藏有王冠的巢穴。</Short>
+			<Long>"令人振奋的发现，殿下！西德里安之冠——您家族失传已久的权力象征——已被找到。它被藏在前线的一座邪恶堡垒中。[newline]最近一波又一波的怪物袭击已让您的子民心灰意冷。收回此物无疑将提升子民们的信心并恢复对您家族的支持。我极力建议您抓住这个意外之机。"</Long>
+		</Description>
+		<DataConfiguration>
+			<Dataset base="Majesty">
+				<Load>
+					<Template>QuestforCrown.q</Template>
+				</Load>
+				<Unload>
+					<CAM />
+					<GPL />
+					<Constants />
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

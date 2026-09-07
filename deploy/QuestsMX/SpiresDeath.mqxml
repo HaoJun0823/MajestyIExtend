@@ -1,0 +1,21 @@
+<Majesty>
+	<Quest id="{38305158-0000-0000-0000-000000000000}">
+		<Name>SPIRES_DEATH</Name>
+		<Description lang="en_US">
+			<Short>找到并摧毁五座尖塔中的每一座。[newline][newline]当心！每摧毁一座，其余的便会愈发强大……</Short>
+			<Long>"北境最富饶的土地就在我们眼前，触手可及。然而，通往那些土地的道路被几座巨大的尖塔所阻挡，它们向任何靠近者投掷魔法闪电并召唤凶猛的怪物。[newline]一位当地游牧民解释说，很久以前，一支北方民族极大地激怒了他们的神，以至于被驱逐出家园，被禁止回归。神随后竖立了五座受诅咒的尖塔来阻止他们。[newline]虽然这位神的名字早已被遗忘，但她的尖塔依然矗立。如果您能清除这些障碍，我们便可进入那片充满希望的土地。"</Long>
+		</Description>
+		<DataConfiguration>
+			<Dataset base="MajestyExpansion">
+				<Load>
+					<Template>Spires_Death.q</Template>
+				</Load>
+				<Unload>
+					<CAM />
+					<GPL />
+					<Constants />
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

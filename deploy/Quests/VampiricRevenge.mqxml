@@ -1,0 +1,23 @@
+<Majesty>
+	<Quest id="{504D4156-0000-0000-0000-000000000000}">
+		<Name>VAMPIRIC_REVENGE</Name>
+		<DisplayName lang="en_US">Vampiric Revenge</DisplayName>
+		<Description lang="en_US">
+			<Short>- 建立一个小型王国并招募英雄，以在此地区站稳脚跟。[newline]- 摧毁黑暗城堡，消灭其中邪恶的居民……</Short>
+			<Long>"陛下！[newline]关于一个吸干生命的威胁的传言正在乡间如野火般蔓延。您必须领导一场英雄的远征，将这股邪恶势力从我们美丽的土地上驱逐出去！"</Long>
+		</Description>
+		<DataConfiguration>
+			<Dataset base="Majesty">
+				<Load>
+					<Template>Vampiric_Revenge.q</Template>
+					<Strings>VampiricRevenge_Text.xml</Strings>
+				</Load>
+				<Unload>
+					<CAM />
+					<GPL />
+					<Constants />
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

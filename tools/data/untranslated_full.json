@@ -1,0 +1,596 @@
+[
+  {
+    "file": "HPTX",
+    "id": 808465000,
+    "text": "- The Avatar of Krolm is a massive figure embodying the power and fury of the god Krolm within the frame of one of his worthiest mortal followers.\n\n- While it can be said that such a figure is indeed mortal, it nonetheless holds within it some fraction of the power of a god. Krolm's Avatar may be the deadliest possible foe in all of Ardania if angered.",
+    "source_cam": "gpltext"
+  },
+  {
+    "file": "HPTX",
+    "id": 825242216,
+    "text": "- The Altars of Krolm are holy places consecrated solely to his worship. To despoil such a place would surely bring His wrath upon you, as it would weaken His hold on this region of Ardania significantly.",
+    "source_cam": "gpltext"
+  },
+  {
+    "file": "LOSX",
+    "id": 825246797,
+    "text": "Krolm's power has proven to be too great for you & his will remains supreme in these lands - for now.",
+    "source_cam": "gpltext"
+  },
+  {
+    "file": "QEND",
+    "id": 825246797,
+    "text": "Well done, Your Majesty. With the defeat of Krolm's Avatar, his influence over these lands has been broken.\n\nMost of Krolm's followers have scattered back into the wilderness and these routes into the north are now once again safe for civilized trade.",
+    "source_cam": "gpltext"
+  },
+  {
+    "file": "MX02",
+    "id": 3,
+    "text": "Goto this building's Visitors Window.",
+    "source_cam": "mx_textdata"
+  },
+  {
+    "file": "MX05",
+    "id": 5,
+    "text": "Zoom the Main Map to selected hero.",
+    "source_cam": "mx_textdata"
+  },
+  {
+    "file": "MX05",
+    "id": 9,
+    "text": "1500",
+    "source_cam": "mx_textdata"
+  },
+  {
+    "file": "MX09",
+    "id": 3,
+    "text": "Goto this building's Visitors Window.",
+    "source_cam": "mx_textdata"
+  },
+  {
+    "file": "MX17",
+    "id": 33,
+    "text": "999",
+    "source_cam": "mx_textdata"
+  },
+  {
+    "file": "MX19",
+    "id": 14,
+    "text": "Player1 Name",
+    "source_cam": "mx_textdata"
+  },
+  {
+    "file": "MX19",
+    "id": 31,
+    "text": "Press ENTER to send chat",
+    "source_cam": "mx_textdata"
+  },
+  {
+    "file": "GMTX",
+    "id": 420,
+    "text": "\u0001FFFFFF%s,\n%d Slain",
+    "source_cam": "mx_textdata"
+  },
+  {
+    "file": "GMTX",
+    "id": 441,
+    "text": "What up, Phatness?\r",
+    "source_cam": "mx_textdata"
+  },
+  {
+    "file": "AITX",
+    "id": 274,
+    "text": "Unfortunate news, Your Majesty. It seems the goblins have re-built a number of camps along the borders of our kingdom... Will their raids upon our peaceful kingdom never cease?",
+    "source_cam": "mx_gpltext"
+  },
+  {
+    "file": "AITX",
+    "id": 275,
+    "text": "It seems that the land itself resents our intrusion, Your Majesty. A number of Daemonwood groves have been spotted out in the nearby forests.",
+    "source_cam": "mx_gpltext"
+  },
+  {
+    "file": "AITX",
+    "id": 276,
+    "text": "Your Majesty! Nests of rust spitters have been found upon the roads leading into our kingdom - it is imperative that we clear away these horrid creatures as quickly as possible.",
+    "source_cam": "mx_gpltext"
+  },
+  {
+    "file": "EDTX",
+    "id": 858805829,
+    "text": "At random intervals, dangerous natural (or unnatural) disasters may strike your kingdom.",
+    "source_cam": "mx_gpltext"
+  },
+  {
+    "file": "EDTX",
+    "id": 909137477,
+    "text": "Each kingdom starts with a Mausoleum that contains several high-level dead heroes.",
+    "source_cam": "mx_gpltext"
+  },
+  {
+    "file": "EDTX",
+    "id": 959469125,
+    "text": "The monster lairs dump out more than their usual number of evil creatures, in a periodic fashion.",
+    "source_cam": "mx_gpltext"
+  },
+  {
+    "file": "EDTX",
+    "id": 858871365,
+    "text": "Rrongol and Url Shekk lay asleep in random lairs. Woe be to the heroes that wake them...",
+    "source_cam": "mx_gpltext"
+  },
+  {
+    "file": "HPTX",
+    "id": 943010152,
+    "text": "- Lets you place a timed bounty on all members of any previously defeated monster type\n\n- Keeps a list of vanquished foe types\n\n- Visiting heroes gain a temporary boost to their maximum hit points and their healing rate\n\n\n\u0001BCBCFFFrom the windows of its high gables, keen-eyed spotters in the Hall of Champions can sight any monster the Sovereign deems a danger and alert the heroes to its presence. The Hall's interior is filled with trophies from the settlement's monster kills.",
+    "source_cam": "mx_gpltext"
+  },
+  {
+    "file": "HPTX",
+    "id": 959787368,
+    "text": "Can research and sell magic potions\n\n- Tonic of Speed\n\n- Fire Balm\n\n\u0001DDBB44Upgrading the Bazaar adds\n+ Research Potion of Dirgo Strength\n+ Research Elixir of Regeneration\n+ Increased building hit points\n\n\n\u0001BCBCFFThe Magic Bazaar serves as both a collection of small shops and a magical distillery. A huge brewing vessel forms the core of the building. All the elixirs offered by the Bazaar are drawn from this urn.",
+    "source_cam": "mx_gpltext"
+  },
+  {
+    "file": "HPTX",
+    "id": 808857960,
+    "text": "Can research and sell magic potions\n\n- Potion of Dirgo Strength\n\n- Elixir of Regeneration\n\n\u0001DDBB44Upgrading yields\n+ Research Invisibility Brew\n+ Research Shapeshift Tincture\n+ Increased building hit points\n\n\n\u0001BCBCFFAs this building develops, its brewhouse is enclosed allowing the concoction of more advanced and delicate magical elixirs. Storage facilities are also added, allowing the Bazaar to keep more stock on hand.",
+    "source_cam": "mx_gpltext"
+  },
+  {
+    "file": "HPTX",
+    "id": 825635176,
+    "text": "Can research and sell magic potions\n\n- Invisibility Brew\n\n- Shapeshift Tincture\n\n\n\u0001BCBCFFOnly a fully developed Magic Bazaar flies the banner of Ardania�s Wizards. It features extensive storage space for both raw materials and finished goods. The odd smells resulting from the making of the Bazaar�s most sophisticated potions is at the same time alluring and repulsive to passersby.",
+    "source_cam": "mx_gpltext"
+  },
+  {
+    "file": "HPTX",
+    "id": 842412392,
+    "text": "- Stores dead heroes for resurrection\n\n- Releases Undead if destroyed\n\n\n\u0001BCBCFFThe Mausoleum is an alternate graveyard for your heroes. While the benefit of this building is obvious to all, many feel a certain unease when a Mausoleum is built in their community. Carefully applying some of Ardania�s darker magics, this building walks a dangerous line between being a blessing and a curse. Heroes who follow Agrela or Dauros refuse to be interned here.",
+    "source_cam": "mx_gpltext"
+  },
+  {
+    "file": "HPTX",
+    "id": 859189608,
+    "text": "- Grants Sovereign spells Change of Heart and Frost Field\n\n- Magically constructed, they do not require Peasants to erect or upgrade them\n\n\u0001DDBB44Upgrading adds\n+ Grants Sovereign spells Earthquake and Chain Lightning\n+ Increased building hit points\n\n\n\u0001BCBCFFDistinctly different from Wizard�s, Ardania�s Sorcerers are a rare breed skilled in the unique magics of the Eastern Provinces. A developed Palace and Magic Bazaar will attract a Sorcerer to your town. Their dwelling is designed to create a magical nexus at its center.",
+    "source_cam": "mx_gpltext"
+  },
+  {
+    "file": "HPTX",
+    "id": 875966824,
+    "text": "- Grants Sovereign spells Earthquake and Chain Lightning\n\n\u0001DDBB44Upgrading adds\n+ Grants Sovereign spells Gate and Dismiss\n+ Increased building hit points\n\n\n\u0001BCBCFFThe advanced Sorcerer�s Abode is festooned with enchanted lanterns to keep Ardania�s dark forces constantly at bay. The building reaches further skyward, improving the strength of its magical focus. Regardless of the weather, the air around this structure is always perfectly calm and strangely moist. ",
+    "source_cam": "mx_gpltext"
+  },
+  {
+    "file": "HPTX",
+    "id": 892744040,
+    "text": "- Grants Sovereign spells Dismiss and Gate\n\n\n\u0001BCBCFFPassersby can occasionally glimpse the Sorcerer through this lofty tower�s windows as he dances and gestures around the magical vortex. It seems as if the occupant never rests as he tames and shapes the energies under his power. It�s no wonder that there are so few old Sorcerers in the land.",
+    "source_cam": "mx_gpltext"
+  },
+  {
+    "file": "HPTX",
+    "id": 909521256,
+    "text": "- Serves as a refuge if your Palace is destroyed\n\n- Supports 2 Peasants, 1 Tax Collector, and 2 Palace Guards\n\n- Supports up to 6 guild-less heroes\n\n- Serves as a gold drop off point for Tax Collectors\n\n- Allows construction of additional Outposts, Blacksmiths, Embassies, Guard Houses, Hall of Champions, Inns, Marketplaces, Magic Bazaars, Mausoleums, Rangers Guilds, Rogues Guilds, Temples to Agrela, Temples to Dauros, Temples to Fervus, Temples to Krolm, Temples to Krypta, and Warriors Guilds\n- Provided their other prerequisites are met, lets you build Sorcerers Abode and Trading Posts\n\n\n\u0001BCBCFFWhile smaller than a first level Palace, the Outpost's thick stone walls provide the same level of protection. The practice of using Outposts dates back to earlier times when Palaces were abandoned rather than upgraded. In times of crisis, Sovereigns fled to their older, deserted Palaces.",
+    "source_cam": "mx_gpltext"
+  },
+  {
+    "file": "HPTX",
+    "id": 926298472,
+    "text": "- Periodically recruits random heroes\n\nCan support up to 2 heroes\n\nIn multiplayer provides shared vision with other Embassy-hosting players\n\n\n\u0001BCBCFFThe idea of Embassies is relatively new to Ardania. It came about in the aftermath of Andrevus� defeat in KA 1415. The Sydrians and Valmorgens recognized the need for more unity and mutual defense. The idea quickly caught on and Embassies are now common in most of Ardania.",
+    "source_cam": "mx_gpltext"
+  },
+  {
+    "file": "HPTX",
+    "id": 943075688,
+    "text": "- Uses the spells Terrify, Mind Warp, and Horrify\n\n\n\u0001BCBCFFThis creature had only existed as scattered, unreliable rumors until your expedition to the Northern Reaches. Its origin is uncertain, but some believe it to be the final, and fatal, creation of the vile mage Pyrog the Shadowed. The Abomination is remarkably stealthy for its size. Its magical wake often stuns any nearby small animals, birds, or insects, leaving them littering the ground behind it.",
+    "source_cam": "mx_gpltext"
+  },
+  {
+    "file": "HPTX",
+    "id": 959852904,
+    "text": "- Employs spell Summon Rats\n\n\n\u0001BCBCFFRecently ascending to power among the Rat underworld, Rhoden has galvanized Ratkind under his grand vision of surface conquest. His position was achieved through physical prowess, as well as ideology. Rhoden is among the strongest of his kind, and also shows an ability to wield magic - a skill usually only seen with Ratman Shamen.",
+    "source_cam": "mx_gpltext"
+  },
+  {
+    "file": "HPTX",
+    "id": 808923496,
+    "text": "- Can cast Strengthen Shadow Beasts\n\n -Will resurrect unless Stones is also killed\n\n -Her resurrection will release Chain Lightning that damages any foes nearby\n\n- Can cast Recall for aid from Stones\n\n\n\u0001BCBCFFStyx is the female half of the legendary evil wights, Styx and Stones. In her mortal incarnation, Styx was a brutal warrior queen of the now exterminated Tundra Giants. Many who faced her in battle chose to take their own lives instead of submitting to her inhumane interrogation.",
+    "source_cam": "mx_gpltext"
+  },
+  {
+    "file": "HPTX",
+    "id": 825700712,
+    "text": "- Can summon Shadow Beasts\n\n- Will resurrect unless Styx is also killed\n\n- His resurrection will release Chain Lightning that damages any foes nearby\n\n- Can cast Recall for aid from Styx\n\n\n\u0001BCBCFFStones served as Styx�s coldly efficient General in their mortal days. Severely outnumbered, he and Styx died together in battle on the Zhizhik Flats. The Witch King recognized their potential as a terrifying force. He brought the two into the world of the unliving in order to serve him. After the Witch King�s death, the pair of wights remained in the desolate north, away from the Ardanian heartlands.",
+    "source_cam": "mx_gpltext"
+  },
+  {
+    "file": "HPTX",
+    "id": 842477928,
+    "text": "- High combat stats, for a Goblin\n\n- Highly intelligent, for a Goblin\n\n- Protects Goblin lairs\n\n- Aids in concentrated attacks\n\n\n\u0001BCBCFFIn the Goblin military hierarchy, Overlords sit at the peak. Unlike Goblin Champions whose position is based solely on strength, Overlords must also show unusually high cunning. Most Overlords start their career as Champions, with only a few who demonstrate the required ingenuity rising to the next rank.",
+    "source_cam": "mx_gpltext"
+  },
+  {
+    "file": "HPTX",
+    "id": 859255144,
+    "text": "- Casts spell Petrify\n\n- Casts spell Summon Medusa\n\n- Casts spell Medusa Enchantment\n\n\n\u0001BCBCFFDuring the Serpent Queen�s attempted Ardanian conquest, the Greater Gorgon�s served as the lieutenants of her forces. Ultimately, this led to the destruction from within of the Serpent Queen's army when the Medusae refused to be subordinate to the Gorgons. A few Gorgons escaped the resulting bloodshed, fleeing to the Northern Reaches where they honed their magics to better bring the Medusae under their control.",
+    "source_cam": "mx_gpltext"
+  },
+  {
+    "file": "HPTX",
+    "id": 876032360,
+    "text": "- Impressive armor\n\n- Often leads raiding parties\n\n\n\u0001BCBCFFThese massive beasts are the elite soldiers of the Rat King. They lead the pack in every way. They�re the best fighters, the biggest eaters, and the most thorough groomers. Most other Ratmen couldn�t even walk under the Champions heavy field gear, let alone swing a blade with the same deadly efficiency.",
+    "source_cam": "mx_gpltext"
+  },
+  {
+    "file": "HPTX",
+    "id": 892809576,
+    "text": "- Wields spell Damage Shield\n\n- Can cast Plague\n\n\n\u0001BCBCFFOnly the most wily and skilled she-rats can rise to the Shamaness position. Ratman Shamanesses employ their magical abilities to enhance their compatriots during an attack. The ornately dressed Shamanesses are among the most revered of Ratkind, due to their uncommon skills.",
+    "source_cam": "mx_gpltext"
+  },
+  {
+    "file": "HPTX",
+    "id": 909586792,
+    "text": "- Does heavy damage by hurling an explosive round\n\n\n\u0001BCBCFFThe Ratmen have built rickety siege engines down in the sewers and wheel them to the surface to aid in their conquest. The Ratapult is controlled by a small driver and launches Balefire, an explosive, magical projectile. Rhoden himself invented the device.",
+    "source_cam": "mx_gpltext"
+  },
+  {
+    "file": "HPTX",
+    "id": 926364008,
+    "text": "- Unusually fast\n\n- Powerful attacks\n\n\n\u0001BCBCFFHard to detect, these undead beasts can swiftly pounce on their prey with little warning. Their teeth and claws are unusually dense, allowing them to rip through armor plate. While their vicious nature would seem to put taming them out of the question, some have reported seeing Shadow Beasts as minions of various supernatural evils.",
+    "source_cam": "mx_gpltext"
+  },
+  {
+    "file": "HPTX",
+    "id": 943141224,
+    "text": "- Incredibly strong\n\n- Fast and intelligent\n\n\n\u0001BCBCFFOne of the deadliest creatures of the Northlands, the massive Yeti is a formidable match for even a small group of competent heroes. Their icy fists can crush plate armor like paper. Their pungent smell is a hero's best defense. When you smell a Yeti, prepare yourself for a tough fight - or run!",
+    "source_cam": "mx_gpltext"
+  },
+  {
+    "file": "HPTX",
+    "id": 959918440,
+    "text": "- Breathes freezing ice blast\n\n\n\u0001BCBCFFDwelling in glacial caves, Ice Dragons are just as rare - and as deadly - as their southern cousins.\n In the time of the Dragon King, it�s said the ancient Dragon, Shallevex, turned an entire army to ice within minutes. The icy devastation of that day led the locals to name a nearby, rock-studded area �Shallevex�s Conquest�.",
+    "source_cam": "mx_gpltext"
+  },
+  {
+    "file": "HPTX",
+    "id": 808989032,
+    "text": "- Spawns undead\n\n- Located in the wilderness\n\n- Can be destroyed\n\n\n\u0001BCBCFFWith a long and often hazy history, Ardania�s landscape is peppered with graveyards from times forgotten. Some are peaceful groves, reflections of diminishing echoes of past turmoil. But some others are alive, in an undead way. Fortunately these troublesome locales can be neutralized with the proper application of heroic force.",
+    "source_cam": "mx_gpltext"
+  },
+  {
+    "file": "HPTX",
+    "id": 825766248,
+    "text": "- Allows vermin and siege engines to enter your settlement\n\n- Automatically appears after enough peasants die\n\n- Can be destroyed\n\n\n\u0001BCBCFFThe aggressive Ratmen are always seeking to create great avenues to the surface so that they can send forth more troops and their newly created Ratapults. A Broken Sewer Main presents them with the perfect opportunity to send an overwhelming force to the surface. Ratmen are constantly patrolling Ardania�s sewers looking for such a breach.",
+    "source_cam": "mx_gpltext"
+  },
+  {
+    "file": "HPTX",
+    "id": 842543464,
+    "text": "- Spawns monsters, including Yeti and Ice Dragon\n\n\n\u0001BCBCFFThese intolerably cold crevices are the preferred home of Yeti and Ice Dragons. The interior of most caves of this type is littered with bones and/ or treasure.",
+    "source_cam": "mx_gpltext"
+  },
+  {
+    "file": "HPTX",
+    "id": 859320680,
+    "text": "- Spawns Goblins\n\n- More HPs than Goblin Encampment\n\n- Auto-repairs over time\n\n\n\u0001BCBCFFThese are larger and better defended than Goblin Encampments. Four large watchtowers mark the perimeter and a stockade keeps all but concentrated attacks at bay. A Goblin war room usually dominates the center of the structure.",
+    "source_cam": "mx_gpltext"
+  },
+  {
+    "file": "HPTX",
+    "id": 876097896,
+    "text": "- Shoots arrows at the Goblin's enemies\n\n- Spawns Goblin Archer if destroyed\n\n\n\u0001BCBCFFOne of the Goblin�s heavy fortifications, the Watchtower is manned by a Goblin crew who can spot Goblin enemies and hit them with a ranged arrow attack. Goblin�s who man these towers are sometimes stuck in remote locations. Goblin Watchtower crews are known to amuse themselves with raucous games of knucklecrush and chiselsnot.",
+    "source_cam": "mx_gpltext"
+  },
+  {
+    "file": "HPTX",
+    "id": 892875112,
+    "text": "- Spawns all types of Rats/Ratmen\n\n- Auto-spawns more Rat Nests over time\n\n- Can be destroyed\n\n\n\u0001BCBCFFThis wilderness lair is home to all forms of Rats. It�s formed around a natural tunnel leading to the surface. The entrances are usually strewn with all kinds of underworld debris.",
+    "source_cam": "mx_gpltext"
+  },
+  {
+    "file": "HPTX",
+    "id": 909652328,
+    "text": "- Spawns monsters\n\n- Fires bolts of magical energy\n\n- May respawn\n\n\n\u0001BCBCFFLegend has it that long ago, a race of northlanders angered their god so greatly that she hurled them out of their homeland, forbidding them ever to return. She then raised five cursed spires to turn them back. Each tower features a formation of embedded gems, whose purpose is not yet understood.",
+    "source_cam": "mx_gpltext"
+  },
+  {
+    "file": "HPTX",
+    "id": 926429544,
+    "text": "- Releases hordes of monsters\n\n- Unpredictably teleports between locations\n\n\n\u0001BCBCFFThe mad arch mage, Ixmil, controls an imposing mystic fortress that moves under its own power, appearing and disappearing from place to place. This teleportation is made possible by a collection of �magical folds� of various sizes. Magical folds are usually highly unstable mechanisms for storing and amplifying manna. Each time the fortress appears it disgorges a great host of hostile creatures.",
+    "source_cam": "mx_gpltext"
+  },
+  {
+    "file": "HPTX",
+    "id": 943206760,
+    "text": "- Can spawn powerful creatures of evil\n\n\n\u0001BCBCFFTombs such as this are occasionally found in Ardania�s hinterlands. The stout walls are designed as much to keep things inside as out. Structural horns are often seen as part of these archaic structures. Some say their purpose is to frighten supernatural forces from toying with the souls within. Others say the horns are just designed to keep all away from dangers that lurk within.",
+    "source_cam": "mx_gpltext"
+  },
+  {
+    "file": "HPTX",
+    "id": 959983976,
+    "text": "- Spawns Greater Gorgons and Medusae\n\n\n\u0001BCBCFFThese lairs serve as a place of worship for Medusae and Greater Gorgons. The latter are believed to have built the structures in order to focus the Medusae to their cause and beliefs. The name of the Serpent Queen is often invoked here in attempt to resurrect the glory of her ancient conquest.",
+    "source_cam": "mx_gpltext"
+  },
+  {
+    "file": "HPTX",
+    "id": 809054568,
+    "text": "- Can hold magical artifacts\n\n- Can hold dire adversaries\n\n\n\u0001BCBCFFThese ancient burial sites sometimes hold the promise of great wealth. But they can disgorge a wave of death with equal probability. ",
+    "source_cam": "mx_gpltext"
+  },
+  {
+    "file": "HPTX",
+    "id": 825831784,
+    "text": "- Supports 6 Peasants, 2 Palace Guards, and 3 Tax Collectors\n\n- Stronghold of your opponent\n\n- Similar to level 3 Palace\n\n\n\u0001BCBCFFWith its spiked ramparts and robust walls, this formidable structure is well suited to weather all but the strongest siege. The twisted towers at the Palace�s core are a sign that barely contained dark magics have been used within its cold walls.",
+    "source_cam": "mx_gpltext"
+  },
+  {
+    "file": "HPTX",
+    "id": 842609000,
+    "text": "- Can teleport over short distances\n\n- Very quick reflexes\n\n- Incredibly strong\n\n\n\u0001BCBCFFLittle is known of this rare northern creature for few have ever been seen.  It is conjectured by some sages that they are relatives of the larger Yeti, as their appearance and habitat are similar, however, the Wendigo's odd blinking ability lends to some theories of the creature having been created magically.  The only thing certain regarding the beast is that it can be lethal to get too close to it!  ",
+    "source_cam": "mx_gpltext"
+  },
+  {
+    "file": "HPTX",
+    "id": 859386216,
+    "text": "\u0001BCBCFFThe Shrine of Light is thought to have been built in the years just after Krolm's battle with the Dragon King. Many scholars have studied the structure, but it's white marble walls and pools of radiant water have mystified them all. One theory is that the shrine was built as a monument to celebrate the birth of Krolm's daughter, Helia. Some sages believe that the shrine may have been built by the unknown mother of Krolm's children.  ",
+    "source_cam": "mx_gpltext"
+  },
+  {
+    "file": "HPTX",
+    "id": 876163432,
+    "text": "\u0001BCBCFFThe Shrine of Darkness is nearly identical to the Shrine of Light, the only difference being that it's pools are filled with mystic flames. The heat from the flames, and the reports of haunting cries that emanate from within it's walls, have kept most sages from studying the building closely. It is thought that the shrine is likely a monument to Krolm's son Lunord but, at some point in history, was claimed and corrupted by dark forces. ",
+    "source_cam": "mx_gpltext"
+  },
+  {
+    "file": "LOSX",
+    "id": 959467864,
+    "text": "The neighboring kingdoms refuse to continue trade with you, as you have failed to protect enough of their caravans!",
+    "source_cam": "mx_gpltext"
+  },
+  {
+    "file": "LOSX",
+    "id": 825315672,
+    "text": "You failed to protect the Elves! The Serpents are victorious, and the serpent empire has been resurrected!",
+    "source_cam": "mx_gpltext"
+  },
+  {
+    "file": "QEND",
+    "id": 825250136,
+    "text": "At last our streets are peaceful again... albeit drenched in Goblin spittle and littered with Rat dander. Hopefully these two factions have thoroughly spent their pointless aggressions. Now if you'll excuse me your Majesty, I need a good bath...",
+    "source_cam": "mx_gpltext"
+  },
+  {
+    "file": "QEND",
+    "id": 842027352,
+    "text": "At last, Styx AND Stones are dead. With the destruction of this disruptive presence, our fallen heroes - and our surviving ones - will rest easily.",
+    "source_cam": "mx_gpltext"
+  },
+  {
+    "file": "QEND",
+    "id": 858804568,
+    "text": "Ixmil's fortress has been destroyed, and  the Wizard defeated! This victory is due to the efforts of hero and henchman alike. The township fought bravely to put an end to this disruptive nemesis.",
+    "source_cam": "mx_gpltext"
+  },
+  {
+    "file": "QEND",
+    "id": 875581784,
+    "text": "Your heroes have recovered many amazing artifacts, including Stoneback's Shield of Might! The energies of this powerful shield have thrust the corrupt spirits of The Anvil back into the ether. Already word is spreading from village to village of this great feat!",
+    "source_cam": "mx_gpltext"
+  },
+  {
+    "file": "QEND",
+    "id": 892359000,
+    "text": "The death of the Ratman leader, Rhoden, sent those vermin scurrying back to the safety of their sewers. It should be a long time before they again mount an assault on the surface... at least I hope that's the case.",
+    "source_cam": "mx_gpltext"
+  },
+  {
+    "file": "QEND",
+    "id": 909136216,
+    "text": "It's a new day for the northlands, as our victorious heroes assume the mantle of the Scions of Chaos. Your association with the new Scions will doubtlessly prove an asset in dealing with the natives of this remote region. This is a significant political victory for us, Highness.",
+    "source_cam": "mx_gpltext"
+  },
+  {
+    "file": "QEND",
+    "id": 925913432,
+    "text": "We've done it! Borjin's resistance has crumbled and his influence is no longer an obstacle. The spoils of this victory have pleased everyone ...even the Peasants!\n\n{Peasant}\nOh - a crate of new hammers and saws... plus some new lanterns. All for me. And to think I was considering a spot of sleep and rest? Now I can build day and night. There is no greater joy.\n\nYou see? Everyone's overjoyed with this success!",
+    "source_cam": "mx_gpltext"
+  },
+  {
+    "file": "QEND",
+    "id": 942690648,
+    "text": "With the destruction of the last spire, the way to the fertile reaches is open to us! All are eager to take in the beauty of this long-forbidden paradise.",
+    "source_cam": "mx_gpltext"
+  },
+  {
+    "file": "QEND",
+    "id": 959467864,
+    "text": "Your heroes have once again proven their worth, Majesty. Thanks to the fine job they�ve done protecting the neighboring kingdoms� Caravans, we�ve been offered a trade agreement - quite lucrative, I might add!  Soon the Ardanian heartlands will sample such fine delicacies as Yeti bladder oil and Arctic Fungeweed.",
+    "source_cam": "mx_gpltext"
+  },
+  {
+    "file": "QEND",
+    "id": 808538456,
+    "text": "Good job, Highness! We are now free of such Elven threats as gambling, relaxation, music, ... and culture... Ah, who am I fooling...\n\nHey, Highness. You've managed to deprive this town of all crime, amusement, and entertainment. It's become a wholesome, safe, and dreadfully dull place to live, if you ask me. Outstanding work.",
+    "source_cam": "mx_gpltext"
+  },
+  {
+    "file": "QEND",
+    "id": 825315672,
+    "text": "Fine work, Majesty! You've ended the Greater Gorgons' treacherous plan to resurrect the Serpent Kingdom. The surviving Elves are grateful to safely return to their enclave. More importantly, you've put an end to a threat which could have engulfed all Ardania in a shroud of evil.",
+    "source_cam": "mx_gpltext"
+  },
+  {
+    "file": "QEND",
+    "id": 842092888,
+    "text": "We've atoned for Glohrea's loss.. but at what cost? While the Abomination has been dispatched, the surviving heroes are forever changed. Even the most stoic of these veterans have been plagued by shockingly vivid nightmares. Others have reported hearing its eerie call, while those around them hear only the normal bustle of life. All in attendance saw this indescribable evil die, but none feel its touch is truly gone from this world.",
+    "source_cam": "mx_gpltext"
+  },
+  {
+    "file": "QEND",
+    "id": 826560856,
+    "text": "You have resanctified the despoiled Shrine of Light and driven away the Phantoms forevermore, Your Majesty!",
+    "source_cam": "mx_gpltext"
+  },
+  {
+    "file": "HN54",
+    "id": 28,
+    "text": "of the New Temple",
+    "source_cam": "mx_gpltext"
+  },
+  {
+    "file": "FDTX",
+    "id": 1315267442,
+    "text": "A council of Vampires have establish a collective presence in this region. They have enslaved a pack of Rust spitters as both guardians and scouts for their lairs.",
+    "source_cam": "mx_rgstext"
+  },
+  {
+    "file": "FDTX",
+    "id": 1383032693,
+    "text": "Settlement starts with a level one Palace, a level two Rogues Guild, a Magic Bazaar and a Gambling Hall.",
+    "source_cam": "mx_rgstext"
+  },
+  {
+    "file": "FDTX",
+    "id": 1383036263,
+    "text": "Each settlement starts with a level one Palace, a level two Rogues Guild, a Magic Bazaar and a Gambling Hall.",
+    "source_cam": "mx_rgstext"
+  },
+  {
+    "file": "FDTX",
+    "id": 1466526820,
+    "text": "Wendigo, Werewolves, Vargs and Hellbears dominate this huge expanse of wilderness\n(Many average to strong monsters present)\n(Use of this force pattern requires 128 meg RAM min)",
+    "source_cam": "mx_rgstext"
+  },
+  {
+    "file": "FDTX",
+    "id": 1466530401,
+    "text": "Each settlement starts with a level one Palace, a level one Wizards Guild, a Library and two Wizards Towers.",
+    "source_cam": "mx_rgstext"
+  },
+  {
+    "file": "FDTX",
+    "id": 1634168658,
+    "text": "Each settlement starts with a level one Palace, a level two Rogues Guild, a Magic Bazaar and a Gambling Hall.",
+    "source_cam": "mx_rgstext"
+  },
+  {
+    "file": "FDTX",
+    "id": 1634627395,
+    "text": "Shamans from a warren of Ratmen and a tribe of Goblins have begun meeting in a secret castle in this region.\n(Many weak to strong monsters present) ",
+    "source_cam": "mx_rgstext"
+  },
+  {
+    "file": "FDTX",
+    "id": 1634628948,
+    "text": "Yetis and Ice Dragons inhabit the frozen Ice Caves of this region.  A pair of ruined keeps are home to some Minotaurs.\n(Many strong to very strong monsters) ",
+    "source_cam": "mx_rgstext"
+  },
+  {
+    "file": "FDTX",
+    "id": 1650684481,
+    "text": "Each settlement starts with a level two Palace, a Sorcerers Abode, and a Magic Bazaar.",
+    "source_cam": "mx_rgstext"
+  },
+  {
+    "file": "FDTX",
+    "id": 1650945874,
+    "text": "Each settlement starts with a level one Palace, a level two Rogues Guild, a Magic Bazaar and a Gambling Hall.",
+    "source_cam": "mx_rgstext"
+  },
+  {
+    "file": "FDTX",
+    "id": 1651664211,
+    "text": "A sizeable force of aggressive serpents have established several lairs in this region.\n(Many strong to very strong monsters present)",
+    "source_cam": "mx_rgstext"
+  },
+  {
+    "file": "FDTX",
+    "id": 1667395399,
+    "text": "Goblins have fortified this region with a single Goblin Fortress and several watch towers.\n(A few weak to average monsters present)",
+    "source_cam": "mx_rgstext"
+  },
+  {
+    "file": "FDTX",
+    "id": 1668837198,
+    "text": "There are no monster lairs in this region.\n(This pattern is included for Last Palace Standing games)",
+    "source_cam": "mx_rgstext"
+  },
+  {
+    "file": "FDTX",
+    "id": 1684105299,
+    "text": "Numerous Ancient Graveyards and undead lairs litter the landscape in this expansive region.\n(Many weak to strong monsters present)\n(Use of this pattern requires 128 meg RAM min) ",
+    "source_cam": "mx_rgstext"
+  },
+  {
+    "file": "FDTX",
+    "id": 1684172615,
+    "text": "War parties of various goblin tribes will make periodic assaults on your settlement.",
+    "source_cam": "mx_rgstext"
+  },
+  {
+    "file": "FDTX",
+    "id": 1685614414,
+    "text": "There are no monster lairs in this region.\n(This pattern is included for Last Palace Standing games)\n(Use of this force pattern requires 128 meg RAM min)",
+    "source_cam": "mx_rgstext"
+  },
+  {
+    "file": "FDTX",
+    "id": 1700949831,
+    "text": "Some Goblin castaways have set up a small tribe of their own in some local caves. There is evidence that they are trying to breed Giant Spiders. \n(Many weak monsters)",
+    "source_cam": "mx_rgstext"
+  },
+  {
+    "file": "FDTX",
+    "id": 1701080661,
+    "text": "The restless dead in this region have been making open assaults on Kingdom settlements. \n(Many weak to strong monsters)",
+    "source_cam": "mx_rgstext"
+  },
+  {
+    "file": "FDTX",
+    "id": 1717727047,
+    "text": "Goblins have heavily fortified their camps in this region.\n(Many weak to strong monsters)",
+    "source_cam": "mx_rgstext"
+  },
+  {
+    "file": "FDTX",
+    "id": 1734504263,
+    "text": "A single Fortified Goblin Camp is protected by several Goblin Watchtowers.\n(A few weak monsters are present)",
+    "source_cam": "mx_rgstext"
+  },
+  {
+    "file": "FDTX",
+    "id": 1735552839,
+    "text": "Greater Gorgons patrol this region. There is evidence that they are guarding at least a pair of spawning grounds.\n(A few strong monsters are present)",
+    "source_cam": "mx_rgstext"
+  },
+  {
+    "file": "FDTX",
+    "id": 1918990148,
+    "text": "Settlement starts with a level two Palace, a level three Blacksmith, a Dwarven Settlement and a Ballista Tower.",
+    "source_cam": "mx_rgstext"
+  },
+  {
+    "file": "FDTX",
+    "id": 1953066581,
+    "text": "Settlement starts with a level one Palace,  a Temple to Agrela, a Temple to Dauros, a Temple to Fervus and a temple to Krypta. ",
+    "source_cam": "mx_rgstext"
+  },
+  {
+    "file": "FDTX",
+    "id": 1953719634,
+    "text": "Undead in this region will rise up to assault your town.\n(Many weak to strong monsters present)",
+    "source_cam": "mx_rgstext"
+  },
+  {
+    "file": "FDTX",
+    "id": 2020893010,
+    "text": "A scouting force of Ratmen has occupied several caves in this region.\n(A few weak to average monsters present)",
+    "source_cam": "mx_rgstext"
+  },
+  {
+    "file": "FDTX",
+    "id": 2037149512,
+    "text": "Each settlement starts with a level two Palace, a Temple to Dauros and a Warriors Guild.",
+    "source_cam": "mx_rgstext"
+  }
+]

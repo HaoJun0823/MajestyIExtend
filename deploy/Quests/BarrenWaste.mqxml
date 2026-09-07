@@ -1,0 +1,21 @@
+<Majesty>
+	<Quest id="{31305551-0000-0000-0000-000000000000}">
+		<Name>BARREN_WASTE</Name>
+		<Description lang="en_US">
+			<Short>建造一座竞技场即可完成任务。[newline][newline]（无人族以外的种族或法师可用。）</Short>
+			<Long>"不必灰心，陛下。尽管这片沼泽地区尚未改造成舒适的居所，但我相信我们能实现您母亲的梦想。我建议我们从小处着手，想办法更有效地利用这片沼泽地。也许在这片荒凉的泥沼中央建造一座热闹的竞技场，就足以证明您的成就与能力。"</Long>
+		</Description>
+		<DataConfiguration>
+			<Dataset base="Majesty">
+				<Load>
+					<Template>barren_waste.q</Template>
+				</Load>
+				<Unload>
+					<CAM />
+					<GPL />
+					<Constants />
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

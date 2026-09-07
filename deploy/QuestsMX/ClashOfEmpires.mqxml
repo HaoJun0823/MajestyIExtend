@@ -1,0 +1,21 @@
+<Majesty>
+	<Quest id="{31305158-0000-0000-0000-000000000000}">
+		<Name>CLASH_EMPIRES</Name>
+		<Description lang="en_US">
+			<Short>消灭所有鼠人和哥布林巢穴。</Short>
+			<Long>"殿下，我很高兴地向您报告，我们最新的北方定居点繁荣昌盛。第一季的收成已入仓，集市蓬勃发展！[newline]啊……不过有一个小问题。似乎某些哥布林和鼠人派系一心想要消灭对方。虽然这通常值得庆祝，但他们选择的战场恰好正对着我们的新村庄。[newline]我担心，在他们急于消灭对方的冲动下，我们的定居点会被淹没。您的子民恳请您在他们被这些卑劣虫群的洪流冲走之前采取行动。"</Long>
+		</Description>
+		<DataConfiguration>
+			<Dataset base="MajestyExpansion">
+				<Load>
+					<Template>Clash_Empires.q</Template>
+				</Load>
+				<Unload>
+					<CAM />
+					<GPL />
+					<Constants />
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

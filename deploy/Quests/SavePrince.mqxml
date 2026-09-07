@@ -1,0 +1,21 @@
+<Majesty>
+	<Quest id="{35315551-0000-0000-0000-000000000000}">
+		<Name>SAVE_PRINCE</Name>
+		<Description lang="en_US">
+			<Short>摧毁囚禁王子的塔楼监狱即可完成此史诗任务。利用法师公会的魔法援助你。[newline][newline]（无神殿、非人族种族或游侠公会可用。）</Short>
+			<Long>"今天早上，在清理皇家信鸽巢时，一名仆人注意到一只陌生的鸟。它的腿上绑着一条消息。内容如下：[newline]"我被困在一座邪恶法师的塔楼中！请、请、请救救我。我的母亲，瓦尔莫根的女王，会给你丰厚的报酬。"[newline]斥候确认瓦尔莫根的年轻王子近日在狩猎途中失踪。此次救援的报酬和善意将对我们的王国大有裨益。"</Long>
+		</Description>
+		<DataConfiguration>
+			<Dataset base="Majesty">
+				<Load>
+					<Template>saveprince.q</Template>
+				</Load>
+				<Unload>
+					<CAM />
+					<GPL />
+					<Constants />
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

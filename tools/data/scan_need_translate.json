@@ -1,0 +1,1353 @@
+[
+  {
+    "file": "AP01",
+    "id": 7,
+    "en": "15 of 72",
+    "deployed": "15 / 72",
+    "source": "textdata"
+  },
+  {
+    "file": "AP02",
+    "id": 16,
+    "en": "15 of 72",
+    "deployed": "15 / 72",
+    "source": "textdata"
+  },
+  {
+    "file": "AP05",
+    "id": 5,
+    "en": "15 of 72",
+    "deployed": "15 / 72",
+    "source": "textdata"
+  },
+  {
+    "file": "AP06",
+    "id": 5,
+    "en": "15 of 72",
+    "deployed": "15 / 72",
+    "source": "textdata"
+  },
+  {
+    "file": "AP07",
+    "id": 5,
+    "en": "15 of 72",
+    "deployed": "15 / 72",
+    "source": "textdata"
+  },
+  {
+    "file": "AP08",
+    "id": 20,
+    "en": "15 of 72",
+    "deployed": "15 / 72",
+    "source": "textdata"
+  },
+  {
+    "file": "AP10",
+    "id": 5,
+    "en": "15 of 72",
+    "deployed": "15 / 72",
+    "source": "textdata"
+  },
+  {
+    "file": "AP14",
+    "id": 4,
+    "en": "15 of 72",
+    "deployed": "15 / 72",
+    "source": "textdata"
+  },
+  {
+    "file": "AP17",
+    "id": 11,
+    "en": "15 of 72",
+    "deployed": "15 / 72",
+    "source": "textdata"
+  },
+  {
+    "file": "AP19",
+    "id": 12,
+    "en": "15 of 72",
+    "deployed": "15 / 72",
+    "source": "textdata"
+  },
+  {
+    "file": "AP20",
+    "id": 11,
+    "en": "15 OF 356",
+    "deployed": "15 / 356",
+    "source": "textdata"
+  },
+  {
+    "file": "AP21",
+    "id": 0,
+    "en": "STR",
+    "deployed": "STR",
+    "source": "textdata"
+  },
+  {
+    "file": "AP21",
+    "id": 2,
+    "en": "INT",
+    "deployed": "INT",
+    "source": "textdata"
+  },
+  {
+    "file": "AP21",
+    "id": 4,
+    "en": "ART",
+    "deployed": "ART",
+    "source": "textdata"
+  },
+  {
+    "file": "AP21",
+    "id": 6,
+    "en": "VIT",
+    "deployed": "VIT",
+    "source": "textdata"
+  },
+  {
+    "file": "AP21",
+    "id": 8,
+    "en": "WIL",
+    "deployed": "WIL",
+    "source": "textdata"
+  },
+  {
+    "file": "AP21",
+    "id": 10,
+    "en": "HTH",
+    "deployed": "HTH",
+    "source": "textdata"
+  },
+  {
+    "file": "AP21",
+    "id": 43,
+    "en": "15 OF 356",
+    "deployed": "15 / 356",
+    "source": "textdata"
+  },
+  {
+    "file": "AP23",
+    "id": 13,
+    "en": "15 of 72",
+    "deployed": "15 / 72",
+    "source": "textdata"
+  },
+  {
+    "file": "AP24",
+    "id": 15,
+    "en": "15 of 72",
+    "deployed": "15 / 72",
+    "source": "textdata"
+  },
+  {
+    "file": "AP25",
+    "id": 12,
+    "en": "15 of 72",
+    "deployed": "15 / 72",
+    "source": "textdata"
+  },
+  {
+    "file": "AP26",
+    "id": 13,
+    "en": "15 of 72",
+    "deployed": "15 / 72",
+    "source": "textdata"
+  },
+  {
+    "file": "AP28",
+    "id": 12,
+    "en": "15 of 72",
+    "deployed": "15 / 72",
+    "source": "textdata"
+  },
+  {
+    "file": "AP31",
+    "id": 15,
+    "en": "15 of 72",
+    "deployed": "15 / 72",
+    "source": "textdata"
+  },
+  {
+    "file": "AP39",
+    "id": 21,
+    "en": "15 of 72",
+    "deployed": "15 / 72",
+    "source": "textdata"
+  },
+  {
+    "file": "AP47",
+    "id": 7,
+    "en": "15 of 72",
+    "deployed": "15 / 72",
+    "source": "textdata"
+  },
+  {
+    "file": "AP48",
+    "id": 7,
+    "en": "15 of 72",
+    "deployed": "15 / 72",
+    "source": "textdata"
+  },
+  {
+    "file": "AP51",
+    "id": 15,
+    "en": "15 of 72",
+    "deployed": "15 / 72",
+    "source": "textdata"
+  },
+  {
+    "file": "AP52",
+    "id": 24,
+    "en": "15 of 72",
+    "deployed": "15 / 72",
+    "source": "textdata"
+  },
+  {
+    "file": "AP53",
+    "id": 15,
+    "en": "15 of 72",
+    "deployed": "15 / 72",
+    "source": "textdata"
+  },
+  {
+    "file": "AP54",
+    "id": 12,
+    "en": "15 of 72",
+    "deployed": "15 / 72",
+    "source": "textdata"
+  },
+  {
+    "file": "AP74",
+    "id": 5,
+    "en": "15 of 72",
+    "deployed": "15 / 72",
+    "source": "textdata"
+  },
+  {
+    "file": "AP76",
+    "id": 10,
+    "en": "15 of 72",
+    "deployed": "15 / 72",
+    "source": "textdata"
+  },
+  {
+    "file": "AP90",
+    "id": 1,
+    "en": "15 of 72",
+    "deployed": "15 / 72",
+    "source": "textdata"
+  },
+  {
+    "file": "AP96",
+    "id": 12,
+    "en": "15 of 72",
+    "deployed": "15 / 72",
+    "source": "textdata"
+  },
+  {
+    "file": "AP97",
+    "id": 1,
+    "en": "15 of 72",
+    "deployed": "15 / 72",
+    "source": "textdata"
+  },
+  {
+    "file": "AP98",
+    "id": 1,
+    "en": "15 of 72",
+    "deployed": "15 / 72",
+    "source": "textdata"
+  },
+  {
+    "file": "APa5",
+    "id": 5,
+    "en": "15 of 72",
+    "deployed": "15 / 72",
+    "source": "textdata"
+  },
+  {
+    "file": "APb2",
+    "id": 10,
+    "en": "15 of 72",
+    "deployed": "15 / 72",
+    "source": "textdata"
+  },
+  {
+    "file": "APb3",
+    "id": 10,
+    "en": "15 of 72",
+    "deployed": "15 / 72",
+    "source": "textdata"
+  },
+  {
+    "file": "APb4",
+    "id": 8,
+    "en": "15 of 72",
+    "deployed": "15 / 72",
+    "source": "textdata"
+  },
+  {
+    "file": "APb5",
+    "id": 1,
+    "en": "15 of 72",
+    "deployed": "15 / 72",
+    "source": "textdata"
+  },
+  {
+    "file": "APb7",
+    "id": 2,
+    "en": "15 of 72",
+    "deployed": "15 / 72",
+    "source": "textdata"
+  },
+  {
+    "file": "APb8",
+    "id": 2,
+    "en": "15 of 72",
+    "deployed": "15 / 72",
+    "source": "textdata"
+  },
+  {
+    "file": "APc3",
+    "id": 10,
+    "en": "15 of 72",
+    "deployed": "15 / 72",
+    "source": "textdata"
+  },
+  {
+    "file": "APc4",
+    "id": 1,
+    "en": "ROYAL GARDENS",
+    "deployed": "R",
+    "source": "textdata"
+  },
+  {
+    "file": "APc4",
+    "id": 3,
+    "en": "Toggle this building on or off the repair route.",
+    "deployed": "r",
+    "source": "textdata"
+  },
+  {
+    "file": "APc4",
+    "id": 9,
+    "en": "Zoom the Main Map to this building.",
+    "deployed": "15 of 72",
+    "source": "textdata"
+  },
+  {
+    "file": "APc4",
+    "id": 15,
+    "en": "Coffers hold 2000 gold",
+    "deployed": "T",
+    "source": "textdata"
+  },
+  {
+    "file": "APc5",
+    "id": 1,
+    "en": "15 of 72",
+    "deployed": "15 / 72",
+    "source": "textdata"
+  },
+  {
+    "file": "APd4",
+    "id": 5,
+    "en": "15 of 72",
+    "deployed": "15 / 72",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB1",
+    "id": 1,
+    "en": "Step Over",
+    "deployed": "Step Over",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB1",
+    "id": 2,
+    "en": "Step Out",
+    "deployed": "Step Out",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB1",
+    "id": 3,
+    "en": "Show Next",
+    "deployed": "Show Next",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB1",
+    "id": 4,
+    "en": "Step Into",
+    "deployed": "Step Into",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB1",
+    "id": 5,
+    "en": "Exit Game",
+    "deployed": "Exit Game",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB1",
+    "id": 6,
+    "en": "Locals",
+    "deployed": "Locals",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB1",
+    "id": 7,
+    "en": "Calling Agent",
+    "deployed": "Calling Agent",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB1",
+    "id": 8,
+    "en": "Micro Step",
+    "deployed": "Micro Step",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB1",
+    "id": 9,
+    "en": "Clear All",
+    "deployed": "Clear All",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB1",
+    "id": 10,
+    "en": "Jump To",
+    "deployed": "Jump To",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB1",
+    "id": 11,
+    "en": "Breakpoints",
+    "deployed": "Breakpoints",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB1",
+    "id": 12,
+    "en": "opEqual",
+    "deployed": "opEqual",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB1",
+    "id": 13,
+    "en": "Call Stack",
+    "deployed": "Call Stack",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB1",
+    "id": 14,
+    "en": "Clear",
+    "deployed": "Clear",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB1",
+    "id": 15,
+    "en": "Toggle",
+    "deployed": "Toggle",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB1",
+    "id": 17,
+    "en": "ScriptName",
+    "deployed": "ScriptName",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB1",
+    "id": 19,
+    "en": "Undead_Warrior",
+    "deployed": "Undead_Warrior",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB1",
+    "id": 20,
+    "en": "Break point",
+    "deployed": "Break point",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB1",
+    "id": 23,
+    "en": "Tracking",
+    "deployed": "Tracking",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB1",
+    "id": 24,
+    "en": "Map Objs",
+    "deployed": "Map Objs",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB1",
+    "id": 25,
+    "en": "Local Variables",
+    "deployed": "Local Variables",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB1",
+    "id": 26,
+    "en": "Function Body",
+    "deployed": "Function Body",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB1",
+    "id": 27,
+    "en": "Xml",
+    "deployed": "Xml",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB1",
+    "id": 28,
+    "en": "Output",
+    "deployed": "Output",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB1",
+    "id": 29,
+    "en": "Resume Play",
+    "deployed": "Resume Play",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB1",
+    "id": 31,
+    "en": "Output",
+    "deployed": "Output",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB2",
+    "id": 0,
+    "en": "Function Body",
+    "deployed": "Function Body",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB2",
+    "id": 4,
+    "en": "Output",
+    "deployed": "Output",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB2",
+    "id": 5,
+    "en": "Tracking",
+    "deployed": "Tracking",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB2",
+    "id": 6,
+    "en": "Hierarchical",
+    "deployed": "Hierarchical",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB2",
+    "id": 7,
+    "en": "Xml",
+    "deployed": "Xml",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB2",
+    "id": 8,
+    "en": "Sort Order: ",
+    "deployed": "Sort Order: ",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB2",
+    "id": 9,
+    "en": "Resume Play",
+    "deployed": "Resume Play",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB2",
+    "id": 10,
+    "en": "Self-time",
+    "deployed": "Self-time",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB2",
+    "id": 11,
+    "en": "Critical Chain",
+    "deployed": "Critical Chain",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB2",
+    "id": 12,
+    "en": "Profiling Off",
+    "deployed": "Profiling Off",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB2",
+    "id": 13,
+    "en": "Reset",
+    "deployed": "Reset",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB2",
+    "id": 14,
+    "en": "Hierarchical",
+    "deployed": "Hierarchical",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB2",
+    "id": 15,
+    "en": "Total Profile Time :",
+    "deployed": "Total Profile Time :",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB3",
+    "id": 0,
+    "en": "Function Body",
+    "deployed": "Function Body",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB3",
+    "id": 3,
+    "en": "Tracking",
+    "deployed": "Tracking",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB3",
+    "id": 4,
+    "en": "Output",
+    "deployed": "Output",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB3",
+    "id": 6,
+    "en": "Xml",
+    "deployed": "Xml",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB3",
+    "id": 7,
+    "en": "Resume Play",
+    "deployed": "Resume Play",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB4",
+    "id": 0,
+    "en": "Function Body",
+    "deployed": "Function Body",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB4",
+    "id": 3,
+    "en": "Set Value",
+    "deployed": "Set Value",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB4",
+    "id": 6,
+    "en": "Script Files",
+    "deployed": "Script Files",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB4",
+    "id": 7,
+    "en": "Identifiers",
+    "deployed": "Identifiers",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB4",
+    "id": 8,
+    "en": "Order Stacks",
+    "deployed": "Order Stacks",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB4",
+    "id": 9,
+    "en": "Object Types",
+    "deployed": "Object Types",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB4",
+    "id": 10,
+    "en": "Attrib. Sets",
+    "deployed": "Attrib. Sets",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB4",
+    "id": 11,
+    "en": "Scripts",
+    "deployed": "Scripts",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB4",
+    "id": 12,
+    "en": "Constants",
+    "deployed": "Constants",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB4",
+    "id": 13,
+    "en": "Gpl-Attribs.",
+    "deployed": "Gpl-Attribs.",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB4",
+    "id": 14,
+    "en": "Goal Value",
+    "deployed": "Goal Value",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB4",
+    "id": 15,
+    "en": "Attribute",
+    "deployed": "Attribute",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB4",
+    "id": 16,
+    "en": "Value",
+    "deployed": "Value",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB4",
+    "id": 17,
+    "en": "Goal Value",
+    "deployed": "Goal Value",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB4",
+    "id": 18,
+    "en": "(Press TAB  to auto-complete from list)",
+    "deployed": "(Press TAB  to auto-complete from list)",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB4",
+    "id": 19,
+    "en": "Units Players Spells Groups...",
+    "deployed": "Units Players Spells Groups...",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB4",
+    "id": 20,
+    "en": "User defined constants",
+    "deployed": "User defined constants",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB4",
+    "id": 21,
+    "en": "Gpl coded scripts",
+    "deployed": "Gpl coded scripts",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB4",
+    "id": 22,
+    "en": "Add",
+    "deployed": "Add",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB4",
+    "id": 23,
+    "en": "Select the last item (ADD New) to add",
+    "deployed": "Select the last item (ADD New) to add",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB4",
+    "id": 24,
+    "en": "Constant",
+    "deployed": "Constant",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB4",
+    "id": 25,
+    "en": "Auto and user defined sets",
+    "deployed": "Auto and user defined sets",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB4",
+    "id": 26,
+    "en": "Tracking",
+    "deployed": "Tracking",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB4",
+    "id": 27,
+    "en": "Output",
+    "deployed": "Output",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB5",
+    "id": 0,
+    "en": "Function Body",
+    "deployed": "Function Body",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB5",
+    "id": 3,
+    "en": "All Agents:",
+    "deployed": "All Agents:",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB5",
+    "id": 4,
+    "en": "Currently Tracking:",
+    "deployed": "Currently Tracking:",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB5",
+    "id": 5,
+    "en": "Add                   >>",
+    "deployed": "Add                   >>",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB5",
+    "id": 6,
+    "en": "Add All                 >>",
+    "deployed": "Add All                 >>",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB5",
+    "id": 7,
+    "en": "Remove                    <<",
+    "deployed": "Remove                    <<",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB5",
+    "id": 8,
+    "en": "Remove All                 <<",
+    "deployed": "Remove All                 <<",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB5",
+    "id": 9,
+    "en": "Script Callbacks",
+    "deployed": "Script Callbacks",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB5",
+    "id": 10,
+    "en": "Object Attributes",
+    "deployed": "Object Attributes",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB5",
+    "id": 11,
+    "en": "DebugOut Tracking",
+    "deployed": "DebugOut Tracking",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB5",
+    "id": 12,
+    "en": "Script Callbacks:",
+    "deployed": "Script Callbacks:",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB5",
+    "id": 13,
+    "en": "Object Attributes:",
+    "deployed": "Object Attributes:",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB5",
+    "id": 14,
+    "en": "Output",
+    "deployed": "Output",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB5",
+    "id": 15,
+    "en": "Crash",
+    "deployed": "Crash",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB5",
+    "id": 16,
+    "en": "This will crash the program  (no joke!) ^",
+    "deployed": "This will crash the program  (no joke!) ^",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB5",
+    "id": 17,
+    "en": "Tracking",
+    "deployed": "Tracking",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB5",
+    "id": 18,
+    "en": "Resume Play",
+    "deployed": "Resume Play",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB5",
+    "id": 19,
+    "en": "Xml",
+    "deployed": "Xml",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB6",
+    "id": 0,
+    "en": "Function Body",
+    "deployed": "Function Body",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB6",
+    "id": 3,
+    "en": "Script Files",
+    "deployed": "Script Files",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB6",
+    "id": 4,
+    "en": "Page 4",
+    "deployed": "Page 4",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB6",
+    "id": 5,
+    "en": "Page 5",
+    "deployed": "Page 5",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB6",
+    "id": 6,
+    "en": "Gpl Script Files (Tree View Control)",
+    "deployed": "Gpl Script Files (Tree View Control)",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB7",
+    "id": 0,
+    "en": "Function Body",
+    "deployed": "Function Body",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB7",
+    "id": 3,
+    "en": "Script Files",
+    "deployed": "Script Files",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB7",
+    "id": 4,
+    "en": "Page 4",
+    "deployed": "Page 4",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB7",
+    "id": 5,
+    "en": "Page 5",
+    "deployed": "Page 5",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB7",
+    "id": 6,
+    "en": "Gpl Script Files (Tree View Control)",
+    "deployed": "Gpl Script Files (Tree View Control)",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB8",
+    "id": 0,
+    "en": "Function Body",
+    "deployed": "Function Body",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB8",
+    "id": 3,
+    "en": "Script Files",
+    "deployed": "Script Files",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB8",
+    "id": 4,
+    "en": "Page 4",
+    "deployed": "Page 4",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB8",
+    "id": 5,
+    "en": "Page 5",
+    "deployed": "Page 5",
+    "source": "textdata"
+  },
+  {
+    "file": "GDB8",
+    "id": 6,
+    "en": "Gpl Script Files (Tree View Control)",
+    "deployed": "Gpl Script Files (Tree View Control)",
+    "source": "textdata"
+  },
+  {
+    "file": "GMTX",
+    "id": 9,
+    "en": "(%d of %d)",
+    "deployed": "（%d / %d）",
+    "source": "textdata"
+  },
+  {
+    "file": "GMTX",
+    "id": 220,
+    "en": "\u0001FFFFFF%s \u0001FFFF00is %s\n\u0001A550AA(%d of %d hp)",
+    "deployed": "\u0001FFFFFF%s \u0001FFFF00%s\n\u0001A550AA(%d of %d hp)",
+    "source": "textdata"
+  },
+  {
+    "file": "GMTX",
+    "id": 298,
+    "en": "%s quit the game.",
+    "deployed": "%s",
+    "source": "textdata"
+  },
+  {
+    "file": "GMTX",
+    "id": 324,
+    "en": "\u0001E6E1FD%s  ",
+    "deployed": "\u0001E6E1FD%s  ",
+    "source": "textdata"
+  },
+  {
+    "file": "GMTX",
+    "id": 351,
+    "en": "CD-ROM",
+    "deployed": "CD-ROM",
+    "source": "textdata"
+  },
+  {
+    "file": "HKTX",
+    "id": 32768,
+    "en": "Center",
+    "deployed": "Center",
+    "source": "textdata"
+  },
+  {
+    "file": "HKTX",
+    "id": 32769,
+    "en": "Page Up",
+    "deployed": "Page Up",
+    "source": "textdata"
+  },
+  {
+    "file": "HKTX",
+    "id": 32771,
+    "en": "Page Down",
+    "deployed": "Page Down",
+    "source": "textdata"
+  },
+  {
+    "file": "HKTX",
+    "id": 32772,
+    "en": "Down",
+    "deployed": "Down",
+    "source": "textdata"
+  },
+  {
+    "file": "HKTX",
+    "id": 32777,
+    "en": "Keypad 0",
+    "deployed": "Keypad 0",
+    "source": "textdata"
+  },
+  {
+    "file": "MNTH",
+    "id": 0,
+    "en": "January",
+    "deployed": "1\u0001",
+    "source": "textdata"
+  },
+  {
+    "file": "MNTH",
+    "id": 3,
+    "en": "April",
+    "deployed": "4\u0004",
+    "source": "textdata"
+  },
+  {
+    "file": "MNTH",
+    "id": 4,
+    "en": "May",
+    "deployed": "5\u0005",
+    "source": "textdata"
+  },
+  {
+    "file": "MNTH",
+    "id": 5,
+    "en": "June",
+    "deployed": "6\u0006",
+    "source": "textdata"
+  },
+  {
+    "file": "MNTH",
+    "id": 6,
+    "en": "July",
+    "deployed": "7\u0007",
+    "source": "textdata"
+  },
+  {
+    "file": "MNTH",
+    "id": 7,
+    "en": "August",
+    "deployed": "8\b",
+    "source": "textdata"
+  },
+  {
+    "file": "MNTH",
+    "id": 8,
+    "en": "September",
+    "deployed": "9\t",
+    "source": "textdata"
+  },
+  {
+    "file": "MNTH",
+    "id": 9,
+    "en": "October",
+    "deployed": "〱਀",
+    "source": "textdata"
+  },
+  {
+    "file": "HN46",
+    "id": 14,
+    "en": " Trailblazer",
+    "deployed": " ",
+    "source": "gpltext"
+  },
+  {
+    "file": "QEND",
+    "id": 942691665,
+    "en": "At last, Vendral is dead. Juleck's prophecy is complete: Ardania's wisest mind shall unite its strongest bodies and, with magic-forged steel, forever rid our skies of the Winged Death. ",
+    "deployed": "    ",
+    "source": "gpltext"
+  },
+  {
+    "file": "QEND",
+    "id": 875648337,
+    "en": "A costly battle, your Highness! But a battle well-fought. None knew the true power of the Liche Queen until we'd forced her from her lair. Given that, this has been an outstanding day! There'd be more",
+    "deployed": "    ",
+    "source": "gpltext"
+  },
+  {
+    "file": "AP50",
+    "id": 4,
+    "en": "snow logo cover",
+    "deployed": "seugue cover",
+    "source": "mx_textdata"
+  },
+  {
+    "file": "APMK",
+    "id": 31,
+    "en": "SPELLS",
+    "deployed": "45",
+    "source": "mx_textdata"
+  },
+  {
+    "file": "GMTX",
+    "id": 9,
+    "en": "(%d of %d)",
+    "deployed": "（%d / %d）",
+    "source": "mx_textdata"
+  },
+  {
+    "file": "GMTX",
+    "id": 220,
+    "en": "\u0001FFFFFF%s \u0001FFFF00is %s\n\u0001A550AA(%d of %d hp)",
+    "deployed": "\u0001FFFFFF%s \u0001FFFF00%s\n\u0001A550AA(%d of %d hp)",
+    "source": "mx_textdata"
+  },
+  {
+    "file": "GMTX",
+    "id": 298,
+    "en": "%s quit the game.",
+    "deployed": "%s",
+    "source": "mx_textdata"
+  },
+  {
+    "file": "GMTX",
+    "id": 324,
+    "en": "\u0001E6E1FD%s  ",
+    "deployed": "\u0001E6E1FD%s  ",
+    "source": "mx_textdata"
+  },
+  {
+    "file": "GMTX",
+    "id": 351,
+    "en": "CD-ROM",
+    "deployed": "CD-ROM",
+    "source": "mx_textdata"
+  },
+  {
+    "file": "MX00",
+    "id": 10,
+    "en": "15 of 72",
+    "deployed": "15 / 72",
+    "source": "mx_textdata"
+  },
+  {
+    "file": "MX02",
+    "id": 17,
+    "en": "15 of 72",
+    "deployed": "15 / 72",
+    "source": "mx_textdata"
+  },
+  {
+    "file": "MX04",
+    "id": 7,
+    "en": "15 of 72",
+    "deployed": "15 / 72",
+    "source": "mx_textdata"
+  },
+  {
+    "file": "MX06",
+    "id": 10,
+    "en": "15 of 72",
+    "deployed": "15 / 72",
+    "source": "mx_textdata"
+  },
+  {
+    "file": "MX08",
+    "id": 21,
+    "en": "15 of 72",
+    "deployed": "15 / 72",
+    "source": "mx_textdata"
+  },
+  {
+    "file": "MX09",
+    "id": 17,
+    "en": "15 of 72",
+    "deployed": "15 / 72",
+    "source": "mx_textdata"
+  },
+  {
+    "file": "MX14",
+    "id": 4,
+    "en": "15 of 72",
+    "deployed": "15 / 72",
+    "source": "mx_textdata"
+  },
+  {
+    "file": "MX15",
+    "id": 5,
+    "en": "15 of 72",
+    "deployed": "15 / 72",
+    "source": "mx_textdata"
+  },
+  {
+    "file": "MX16",
+    "id": 5,
+    "en": "15 of 72",
+    "deployed": "15 / 72",
+    "source": "mx_textdata"
+  },
+  {
+    "file": "MX22",
+    "id": 20,
+    "en": "15 of 72",
+    "deployed": "15 / 72",
+    "source": "mx_textdata"
+  },
+  {
+    "file": "HN46",
+    "id": 14,
+    "en": " Trailblazer",
+    "deployed": " ",
+    "source": "mx_gpltext"
+  },
+  {
+    "file": "QEND",
+    "id": 942691665,
+    "en": "At last, Vendral is dead. Juleck's prophecy is complete: Ardania's wisest mind shall unite its strongest bodies and, with magic-forged steel, forever rid our skies of the Winged Death.",
+    "deployed": "    ",
+    "source": "mx_gpltext"
+  },
+  {
+    "file": "QEND",
+    "id": 875648337,
+    "en": "A costly battle, your Highness! But a battle well-fought. None knew the true power of the Liche Queen until we'd forced her from her lair. Given that, this has been an outstanding day! There'd be more",
+    "deployed": "    ",
+    "source": "mx_gpltext"
+  }
+]

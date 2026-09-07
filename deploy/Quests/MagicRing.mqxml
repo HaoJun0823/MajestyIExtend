@@ -1,0 +1,21 @@
+<Majesty>
+	<Quest id="{36315551-0000-0000-0000-000000000000}">
+		<Name>MAGIC_RING</Name>
+		<Description lang="en_US">
+			<Short>寻回治愈之戒。</Short>
+			<Long>"陛下？我感到视线变得越来越暗了。笼罩这片土地的黑暗瘟疫并不理会这些城堡墙壁的边界。[newline]这场流行病席卷我们的土地，榨取着皇家子民的生命。我们最好的医生似乎也无法减缓这可怕疾病的步伐。[newline]在陷入昏迷之前，强大的法师雷岑瑟尔坚持说只有一种方法可以阻止这场灾祸。您必须找回治愈之戒，传说中它就藏在阿达尼亚的某处。[newline]陛下，请以最快的速度行动……"</Long>
+		</Description>
+		<DataConfiguration>
+			<Dataset base="Majesty">
+				<Load>
+					<Template>Magic_ring.q</Template>
+				</Load>
+				<Unload>
+					<CAM />
+					<GPL />
+					<Constants />
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

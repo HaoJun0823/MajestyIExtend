@@ -1,0 +1,6 @@
+<Majesty>
+	<Language id="en_US">
+		<Text id="IDTXT_QUEST_WIN_MESSAGE">你击败了吸血鬼！</Text>
+		<Text id="IDTXT_QUEST_LOSS_MESSAGE">你被吸血鬼击败了！</Text>
+	</Language>
+</Majesty>

@@ -1,0 +1,21 @@
+<Majesty>
+	<Quest id="{35305551-0000-0000-0000-000000000000}">
+		<Name>DARK_FOREST</Name>
+		<Description lang="en_US">
+			<Short>治愈冒险者们的疾病。[newline][newline]击败盘踞在塔中的巫王。</Short>
+			<Long>"一股诅咒降临了这片土地，陛下，在消耗您忠诚子民的力量。几乎没有人有力气离开家门。[newline]当地公会仅剩一名战士尚能行动。他主动提出帮忙寻找治疗此疫的方法。[newline]我……我建议您接受他的好意。失陪了，我真的得躺下了。"</Long>
+		</Description>
+		<DataConfiguration>
+			<Dataset base="Majesty">
+				<Load>
+					<Template>DF.q</Template>
+				</Load>
+				<Unload>
+					<CAM />
+					<GPL />
+					<Constants />
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

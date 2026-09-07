@@ -1,0 +1,21 @@
+<Majesty>
+	<Quest id="{33305551-0000-0000-0000-000000000000}">
+		<Name>HOLY_CHALICE</Name>
+		<Description lang="en_US">
+			<Short>在三十天内寻回圣杯，否则疾病将吞噬你。[newline][newline]有传言称乡下某处有一群强大的圣骑士。若能找到他们，或许能助你一臂之力……[newline][newline]当心！此地的巢穴不会消亡——只会暂时沉寂。[newline][newline]（本任务中不可建造集市。）</Short>
+			<Long>"陛下最近的病情已让百姓备受煎熬。他们对您受苦的哀痛只增不减，更有噩耗传来——您的病情并未好转。如今应已清楚，是黑暗法术在推动这阴险的疾病。[newline]若非有一些令人振奋的消息，我不会打扰您休养。可信的老法师雷岑瑟尔告诉我有一件圣物——一只圣杯——蕴含着不可思议的治愈之力。它就藏在此地的某处。我恳求您派出英雄搜寻这片土地以找到这只圣杯。这可能是终结您疾病的唯一方法。"</Long>
+		</Description>
+		<DataConfiguration>
+			<Dataset base="Majesty">
+				<Load>
+					<Template>Holy_Chalice.q</Template>
+				</Load>
+				<Unload>
+					<CAM />
+					<GPL />
+					<Constants />
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

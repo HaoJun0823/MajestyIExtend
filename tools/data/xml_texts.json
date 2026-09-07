@@ -1,0 +1,290 @@
+[
+  {
+    "dir": "Quests",
+    "file": "BarrenWaste.mqxml",
+    "quest_id": "{31305551-0000-0000-0000-000000000000}",
+    "name": "BARREN_WASTE",
+    "short": "Build a Fairgrounds to win this quest.[newline][newline](No non-Human races or Wizards available.)",
+    "long": "\"Do not despair, Your Majesty. Though this swampy region has yet to be transformed into a comfortable abode, I'm sure we can fulfill your mother's dream. I suggest we start small and figure out a way to productively use more of this swampy ground. Perhaps building a festive Fairground in the middle of this desolate quagmire will be sufficient proof of your achievement and ability.\""
+  },
+  {
+    "dir": "Quests",
+    "file": "BellBookCandle.mqxml",
+    "quest_id": "{32305551-0000-0000-0000-000000000000}",
+    "name": "BELL_BOOK_CANDLE",
+    "short": "Recover the three items which have been stolen from your Palace and hidden in lairs throughout this realm.[newline][newline](No Warriors or Wizards available in this quest.)",
+    "long": "\"Forgive the intrusion, Highness, but we've been robbed! Someone has stolen the Magic Bell, the Holy Book, and the Eternal Candle! Right from under our noses, they were whisked away from the royal treasury by some scoundrel. We must do something to recover them! They are treasures beyond value.\""
+  },
+  {
+    "dir": "Quests",
+    "file": "Brashnard.mqxml",
+    "quest_id": "{38315551-0000-0000-0000-000000000000}",
+    "name": "BRASHNARD",
+    "short": "Recover the seven shards that make up Brashnard's Ultimate Sphere.",
+    "long": "\"Do I understand that your highness seeks Brashnard's Ultimate Sphere of Power? Possession of that legendary artifact would certainly lend authority to your rule. [newline]As you surely recall, the sphere was broken into seven sections which were scattered to the far reaches of the land. A great number of heroes must be summoned in order to scour the realm for these lost shards. By your authority, let this bold undertaking commence.[newline]Majesty? It is not this humble servant's place to question your wise directives, but this undertaking is... well, \"ambitious\". Can we truly succeed where countless others have failed?\""
+  },
+  {
+    "dir": "Quests",
+    "file": "DarkForest.mqxml",
+    "quest_id": "{35305551-0000-0000-0000-000000000000}",
+    "name": "DARK_FOREST",
+    "short": "Cure the adventurers of the sickness.[newline][newline]Defeat the Witch King who dwells in the tower.",
+    "long": "\"A curse afflicts the land, your Majesty, sapping your loyal subjects of their strength. Few have even the strength to leave their houses. [newline]A single Warrior from the local guild remains mobile. He offers his services in finding a cure to this debilitating bane.[newline]I... I recommend you take him up on the offer. Now if you'll excuse me, I really must lie down.\""
+  },
+  {
+    "dir": "Quests",
+    "file": "DayOfReckoning.mqxml",
+    "quest_id": "{36305551-0000-0000-0000-000000000000}",
+    "name": "DAY_OF_RECKONING",
+    "short": "Survive the onslaught of all the most evil creatures in the realm.[newline][newline](No temples of any kind, or any non-Human dwelling may be built.)",
+    "long": "\"Corruption blossoms from the earth! Hordes of the Underworld are springing up to ravage the land. Surely this plague of evil is a sign of sickness in the heavens - the gods are at war and we are all in danger![newline]The realm must be defended from this sweeping chaos! Though mortal strength seems a fragile deterrent, you must call forth all possible might to reckon with these ultimate manifestations of all things foul and pestilent.\""
+  },
+  {
+    "dir": "Quests",
+    "file": "DealDemon.mqxml",
+    "quest_id": "{37305551-0000-0000-0000-000000000000}",
+    "name": "DEAL_DEMON",
+    "short": "Make 100,000 gold within 40 days, or lose this quest.",
+    "long": "\"Mighty Leader, forgive this intrusion, but a terrible presence has visited our castle! A Demon! He claims he's here to collect on a debt owed to him by your mother. Can this be true?[newline]Since we were unable to immediately deliver the requested bounty, he said he'd return later for TRIPLE the amount of gold, or he'd curse the entire village. He then vanished in a cloud of foul smelling, green smoke.[newline]Your Majesty? I hope you have a plan. Something MUST be done before he returns!\""
+  },
+  {
+    "dir": "Quests",
+    "file": "ElvenTreachery.mqxml",
+    "quest_id": "{30315551-0000-0000-0000-000000000000}",
+    "name": "ELVEN_TREACHERY",
+    "short": "Make 50,000 gold in 30 days to pay the ransom,[newline][newline]OR[newline][newline]Defeat the Elves, all enemy heroes and buildings, before that time.[newline][newline](No Elves will join your city in this quest.)",
+    "long": "\"Majesty? It grieves me to be the bearer of such intolerable news. An Elvish miscreant has just left the castle. He came to deliver the message that his disreputable brethren have taken your son hostage! Apparently they see only the size of your treasury, not the depth of your skilled leadership.[newline]These foul opportunists demand you pay a ransom or, they say, you'll never again see your son alive. How shall we deal with this Elvish impudence, my Liege?\""
+  },
+  {
+    "dir": "Quests",
+    "file": "FertilePlain.mqxml",
+    "quest_id": "{31315551-0000-0000-0000-000000000000}",
+    "name": "FERTILE_PLAIN",
+    "short": "Survive seven waves of raiders who attempt to destroy you.[newline][newline]Destroy all raiders![newline][newline](No non-Human races available in this quest.)",
+    "long": "\"It honors me to counsel one so wise. Your forebears would be truly proud of the prosperity you've fostered in this land. This region has become rich and pleasant to dwell in thanks to your recent land acquisition. It is wonderful that the former Baron traded it for only a hundred and fifty head of cattle.[newline]However, such prosperity does not go without notice. Rumors have reached the castle walls that there are many who seek to claim this idyllic setting for themselves. You must be on guard against any such marauders.\""
+  },
+  {
+    "dir": "Quests",
+    "file": "ForsakenLands.mqxml",
+    "quest_id": "{32315551-0000-0000-0000-000000000000}",
+    "name": "FORSAKEN_LANDS",
+    "short": "Destroy the Evil Castle to win this epic quest.[newline][newline](No Wizards Guild, non-Human races, Palace level 3, or any temples available.)",
+    "long": "\"My liege, while this land holds great promise I should point out that there is much that requires your immediate attention. Our town is still beset by the marauding monsters who lurk in this forsaken land.[newline]We will only know true prosperity when these interlopers are kept at bay. It's in your best interest to employ the services of a variety of heroes. With their skills, and the blessings of the gods, we may be able to safeguard this community.\""
+  },
+  {
+    "dir": "Quests",
+    "file": "FreeSlaves.mqxml",
+    "quest_id": "{37315551-0000-0000-0000-000000000000}",
+    "name": "SLAVE_PITS",
+    "short": "Destroy four Slave Pits, releasing all slaves.[newline][newline]Kill Url-Shekk, the three-headed beast.",
+    "long": "\"Disturbing rumors have reached my ears, Majesty. There are many reports of villagers gone missing near the edge of town. Fearful whispers speak of some foul creature who has been harvesting the unwitting as slaves for its diabolic schemes.[newline]Panic is beginning to well within the village. Something must be done, your highness, or we face a grave crisis. I suggest you initiate efforts to recover these people and to rid the land of this frightful menace.\""
+  },
+  {
+    "dir": "Quests",
+    "file": "Freestyle.mqxml",
+    "quest_id": "{30455246-0000-0000-0000-000000000000}",
+    "name": "FREESTYLE",
+    "short": "Majesty Free Style game parameters",
+    "long": ""
+  },
+  {
+    "dir": "Quests",
+    "file": "GoblinHordes.mqxml",
+    "quest_id": "{33315551-0000-0000-0000-000000000000}",
+    "name": "GOBLIN_HORDES",
+    "short": "Destroy all Goblin Settlements.[newline][newline](Rangers Guilds cannot be constructed.)",
+    "long": "\"Dreadful news! Scouts from the frontier report that Goblins have been seen heading this way, in massive numbers. We must stem this dark tide before they overrun and utterly destroy the kingdom. I suggest you put out a call for heroes - as many as we can muster - to protect our village and keep this vile swarm at bay. [newline]I implore you to act quickly! The most recent sightings were not far from the village and we are ill-prepared for such an invasion.\""
+  },
+  {
+    "dir": "Quests",
+    "file": "HolyChalice.mqxml",
+    "quest_id": "{33305551-0000-0000-0000-000000000000}",
+    "name": "HOLY_CHALICE",
+    "short": "Recover the Holy Chalice within thirty days, or your illness will consume you.[newline][newline]There are rumors that a guild of mighty Paladins resides somewhere in the countryside. If you find it, they may aid you...[newline][newline]Beware! Lairs in this land never die - they just go dormant for awhile.[newline][newline](Can't build Marketplaces in this quest.)",
+    "long": "\"Your Majesty's recent illness has taken its toll on the people. Their grief for your suffering only increases with sad news that your condition does not improve. It should now be clear to all that dark magics fuel this insidious ailment.[newline]I would not disturb your rest were it not for some hopeful news. The trusted old Wizard, Rezzenthell,  told me of a relic - a chalice - containing incredible healing power. It is hidden somewhere in the realm. I implore you to send your heroes scouring the land in search of this Holy Chalice. It may be the only thing which can put an end to your illness.\""
+  },
+  {
+    "dir": "Quests",
+    "file": "LicheQueen.mqxml",
+    "quest_id": "{34315551-0000-0000-0000-000000000000}",
+    "name": "LICHE_QUEEN",
+    "short": "Drive the Liche Queen from her rocky lair, and then defeat her.[newline][newline](No Temples to Krypta available. No Blacksmiths, Inns, Dwarven Settlements, or Rogues Guilds may be built, but there may be hidden remnants of an earlier settlement left...)",
+    "long": "\"Majesty. I'm here with the latest report from the Chief Tax Collector. He reports that the fiscal quarter will soon be ending and the treasury reports a deficit of...\"[newline][newline]{Voice of the Liche Queen} [newline]\"You dare interfere with the plans of the Liche Queen?  Your meddling presence has been like a thorn in my side. I will soon remove you and your sorry heroes, permanently.\"[newline][newline] \"...though such outlays could damage income potential if not properly balanced against spending in other areas.[newline][newline]Uh, Your Highness? Did you hear what I was saying?\""
+  },
+  {
+    "dir": "Quests",
+    "file": "MagicRing.mqxml",
+    "quest_id": "{36315551-0000-0000-0000-000000000000}",
+    "name": "MAGIC_RING",
+    "short": "Recover the Ring of Healing.",
+    "long": "\"Majesty? I fear my vision grows alarmingly dim. The dark plague which grips our land does not respect the boundaries of these castle walls.[newline]This epidemic sweeps through our land, leeching away the very life from your royal subjects. Our best doctors seem unable to slow the pace of this dread disease. [newline]Before slipping into unconsciousness, the mighty Wizard Rezzenthell insisted that there was only one way to halt this affliction. You must recover the Ring of Healing, which the legends say is located somewhere in Ardania.[newline]Please, your Majesty, act with greatest haste....\""
+  },
+  {
+    "dir": "Quests",
+    "file": "QuestForCrown.mqxml",
+    "quest_id": "{34305551-0000-0000-0000-000000000000}",
+    "name": "QUEST_FOR_CROWN",
+    "short": "Find and destroy the lair that the Crown rests in.",
+    "long": "\"An enlightening discovery, your highness! The Crown of Sydrian - the long lost symbol of your family's power - has been located. It is being held in an evil fortress on the frontier.[newline]The recent waves of monster attacks have left your people dispirited. Reclaiming this item would doubtlessly boost your subjects' faith and renew the support of your family's house. I greatly urge you to take advantage of this unexpected opportunity.\""
+  },
+  {
+    "dir": "Quests",
+    "file": "SavePrince.mqxml",
+    "quest_id": "{35315551-0000-0000-0000-000000000000}",
+    "name": "SAVE_PRINCE",
+    "short": "Destroy the Tower Prison in which the Prince is imprisoned to win this epic quest. Use the magic spells of your Wizards Guild to help you.[newline][newline](No temples, non-Human races, or Rangers Guild are available.)",
+    "long": "\"This morning, while cleaning out the royal courier pigeon roost, a servant noticed an unfamiliar bird. Attached to its leg was a message. It reads:[newline]'I am trapped in the tower of an evil Wizard! Please, please, please rescue me. My mother, the Queen of Valmorgen, will richly reward you.'[newline]Scouts confirm that the young Prince of Valmorgen recently vanished while on a hunting trip. The reward and goodwill generated by this rescue would do our kingdom well.\""
+  },
+  {
+    "dir": "Quests",
+    "file": "SlayDragon.mqxml",
+    "quest_id": "{38305551-0000-0000-0000-000000000000}",
+    "name": "SLAY_DRAGON",
+    "short": "The only guild you have is a Temple to Helia. [newline][newline]You do not have the means to build any Guilds or Temples, so you'll have to find and organize the locals in order to defend your establishment. Use Solarii to rally the guilds lying in the countryside![newline][newline]Find the Hidden Sword Site and destroy it in order to obtain the Magic Sword, which will make Vendral mortal.[newline][newline]Use the Magic Sword to slay Vendral.[newline][newline](You can't build any guilds or temples in this quest.)",
+    "long": "\"Forgive the intrusion, your Majesty, but you must awaken! The day that Juleck the Prophet spoke of is upon us. The mighty dragon, Vendral, has awakened from his thousand-year slumber in the Mountains of Doom, and is attacking the realm![newline]There is little time. You must recruit forces to find the weapons that will help destroy this threat before the kingdom becomes a scorched, barren waste. Send heroes to find the sword of Byran the Dragonsmiter. This manner of blade is the only known weapon that may cleave Vendral's hide.\""
+  },
+  {
+    "dir": "Quests",
+    "file": "TombDragon.mqxml",
+    "quest_id": "{39305551-0000-0000-0000-000000000000}",
+    "name": "TOMB_DRAGON",
+    "short": "Destroy the three monster lairs to reveal the location of the Tomb.[newline][newline]Destroy the Tomb of the Dragon King.[newline][newline](No Guards are willing to venture out in this hostile land, so you can't construct any Guardhouses.)",
+    "long": "\"Your Majesty, I bear news of great import. Using his crystals and ethereal energies, the old Wizard, Tarsival, has divined the destiny of your kingdom. His vision in such matters is usually quite clear, so I urge you to respect his forecast.[newline]The Wizard claimed to see an ancient tomb, forgotten by all. It is rediscovered and visited by many heroes. One eventually recovered a magic sword that rests within. Tarsival insists that for the good of the land, this event must come to pass.\""
+  },
+  {
+    "dir": "Quests",
+    "file": "VampiricRevenge.mqxml",
+    "quest_id": "{504D4156-0000-0000-0000-000000000000}",
+    "name": "VAMPIRIC_REVENGE",
+    "short": "-Construct a small kingdom and recruit Heroes in order to establish a foothold in this region.[newline]-Destroy the Dark Castle, and dispose of its vile inhabitants...",
+    "long": "\"Your Majesty![newline]Rumors of a life draining menace are spreading through the countryside like wildfire. You must lead a heroic crusade to drive this evil presence from our fair land!\""
+  },
+  {
+    "dir": "Quests",
+    "file": "WizardsCurse.mqxml",
+    "quest_id": "{39315551-0000-0000-0000-000000000000}",
+    "name": "WIZARDS_CURSE",
+    "short": "There are two different ways to rid the curse:[newline][newline]Method One: Arrest the Hooligan who stole the book of spells, return it to the Wizard, and then perform whatever the Wizard deems \"sufficient good deeds\".[newline][newline]Method Two: Destroy the angry Wizard.[newline][newline]Your heroes are cursed, so they won't act like their regular selves...[newline][newline](Wizards Guilds and Temples to Fervus, Krypta, Agrela, Krolm or Dauros, aren't available in this quest.)",
+    "long": " \"I humbly beg for your forgiveness for this rude intrusion, but there's an angry Wizard who...\"[newline][newline]{Angry Wizard}[newline]\"Move aside, you sniveling toad! [newline]Sovereign! I will have words with you. Under your lawless rule, one of your foolish subjects has stolen my book of spells. The value of that great tome is beyond measure! You and your realm must now pay a price for its loss! [newline]Until such a time as sufficient good deeds have been performed, I curse all the dwellers of this land to be as stupid as the dead.\""
+  },
+  {
+    "dir": "Quests",
+    "file": "WrathOfKrolm.mqxml",
+    "quest_id": "{3130444D-0000-0000-0000-000000000000}",
+    "name": "MD01",
+    "short": "Destroy all Altars to Krolm, or defeat his Avatar in order to wrest Krolm's grip from the land.[newline]The wild creatures of this place have been strengthened by the spirit of Krolm.[newline]You may only build Guilds, Temples, Towers and Blacksmiths. [newline]You may not build Temples of Krolm.",
+    "long": "\"The followers of Krolm have challenged your fitness to rule over the wild northlands,Your Majesty. Before us lies a valley consecrated to the worship of Krolm. It is said that in this place, the spirit of Krolm himself manifests to destroy any who would intrude on their holy ground.\" [newline]\"The other gods contest Krolm's claim to the entirety of the northlands, and their priests have charged us with the duty of weakening his presence in this place. But be warned, Your Majesty - There is no doubting Krolm's power in this place. The very air throbs with his presense and the warcries of his followers echo through these hills unceasingly.\""
+  },
+  {
+    "dir": "QuestsMX",
+    "file": "Balance_Of_Twilight.mqxml",
+    "quest_id": "{31445158-0000-0000-0000-000000000000}",
+    "name": "XQD1",
+    "short": "Defend your kingdom from the Black Phantoms.[newline]Find the resting place of the ancient sage and restore him to life.[newline]Resanctify the Shrine of Light.[newline]Destroy the Black Phantoms.",
+    "long": "\"Somehow, the Shrine of Light has been despoiled, causing its opposing shrine to grow greatly in power. The dreaded Black Phantoms have been drawn to the power of the Shrine of Darkness, and so long as they are permitted to feed upon it, they cannot be destroyed.[newline]It is said that an ancient sage was entombed in this place long ago - if we can find his tomb and restore him to life, perhaps he will know how to restore the Shrine of Light.[newline]Once the balance between the two shrines has been restored, it should be possible to destroy the Black Phantoms and eliminate their presence here for good.\""
+  },
+  {
+    "dir": "QuestsMX",
+    "file": "ClashOfEmpires.mqxml",
+    "quest_id": "{31305158-0000-0000-0000-000000000000}",
+    "name": "CLASH_EMPIRES",
+    "short": "Destroy all Ratmen and Goblin Lairs.",
+    "long": "\"My Liege, I'm pleased to report that our newest northern settlement has been most prosperous. The first season's harvest is in and our Marketplaces are thriving![newline]Ahh... there is one small problem, however. It seems that certain Goblin and Ratmen factions are bent on exterminating each other. While this might normally be cause for celebration, their chosen field of battle seems to be centered rather squarely upon our new village.[newline]I fear that, in their rush to destroy each other, our settlement will be over-run. Your subjects urge you to take action before they are swept away by torrents of these foul vermin.\""
+  },
+  {
+    "dir": "QuestsMX",
+    "file": "DarknessFalls.mqxml",
+    "quest_id": "{32305158-0000-0000-0000-000000000000}",
+    "name": "DARKNESS_FALLS",
+    "short": "Destroy the evil Wights.[newline][newline](The Dwarves will not move into this area, as they regard it with fear.)",
+    "long": "\"Majesty, do you recall the legend of the evil wights, Styx and Stones, who terrorized the Northern Reaches? Well, the locals inform us that the crypts of these shades are nearby. Indeed, their evil influence can be felt seeping into the land, causing the dead to rest uneasily.[newline]As long as Styx and Stones dwell in this region, our expansion is threatened. You must find these ancient horrors, wrest them from their slumber, and dispatch them, once and for all. Unfortunately, the two are as inextricably linked in death as they were in life. It is said that while one lives, the other cannot truly die.\""
+  },
+  {
+    "dir": "QuestsMX",
+    "file": "FortressIxmil.mqxml",
+    "quest_id": "{33305158-0000-0000-0000-000000000000}",
+    "name": "FORTRESS_IXMIL",
+    "short": "Seek out and destroy Ixmil's Fortress.",
+    "long": "\"My Liege, a most disturbing development. It seems that Ixmil, a mad arch-mage, has cast a blanket of fear over the Northern Reaches. Ixmil controls an imposing, mystic fortress that moves under its own power, appearing and disappearing from place to place. Each time the fortress appears, it disgorges a great host of hostile creatures.[newline]Ixmil has now turned his eye upon your newly acquired holdings. We must find some way to halt his reign of terror before your subjects become demoralized by his elusive raids. Otherwise we may be forced to retreat from these hard-fought lands.\""
+  },
+  {
+    "dir": "QuestsMX",
+    "file": "LegendaryHeroes.mqxml",
+    "quest_id": "{34305158-0000-0000-0000-000000000000}",
+    "name": "LEGENDARY_HEROES",
+    "short": "Destroy all of the Ancient Barrows within thirty days, or the unstable energies in this realm will reduce your kingdom to rubble.[newline][newline]Buildings can only support one hero at a time.[newline][newline]Heroes start out very experienced.[newline][newline]It takes fewer heroes to upgrade the Palace to levels two and three.[newline][newline]Some lairs in this realm respawn after a duration.",
+    "long": "\"Majesty, your populace is ill at ease. We rest on the edge of Krolm's Anvil, an ancient battlefield. Since before recorded time this place has lain desolate. It is said to be haunted by the spirits of those who died here, and many fell creatures lurk in its shadowed barrows and hills. Rangers consider it one of the most dangerous regions in all of Ardania.[newline]It is said that many ancient and powerful artifacts lay scattered where great heroes perished. Regardless of the danger, the recovery of these items would demonstrate your resourcefulness to the inhabitants of these cold Northern Reaches.\""
+  },
+  {
+    "dir": "QuestsMX",
+    "file": "RiseRatmen.mqxml",
+    "quest_id": "{35305158-0000-0000-0000-000000000000}",
+    "name": "RISE_RATMEN",
+    "short": "Destroy Rhoden, the Rat King, and all Broken Sewer Mains in the realm.",
+    "long": "\"Sovereign, the Ratmen grow bolder day by day. Their numbers appear to increase and strange new sounds can be heard issuing from our sewers. Rumors have reached our ears of a new ruler among Ratkind - a rodent with a taste for surface conquest.[newline]We must be vigilant against a potential Ratmen invasion. If they choose to strike, we must target their new leader. Without their ruler, the Ratmen will not be able to maintain such an onslaught.\""
+  },
+  {
+    "dir": "QuestsMX",
+    "file": "ScionsChaos.mqxml",
+    "quest_id": "{36305158-0000-0000-0000-000000000000}",
+    "name": "SCIONS_CHAOS",
+    "short": "Destroy the three scions of Chaos - the Priestess, the Cultist and the Warrior of Discord.[newline][newline](No Temples except those belonging to Krypta and Fervus may be built in this land. No Wizards Guilds, Marketplaces, Non-Human races, Outposts or Embassies may be built, either.)",
+    "long": "\"An interesting turn of events, my Liege. Three legendary heroes called 'The Scions of Chaos' have issued a challenge to the champions of our settlement. They call on our heroes to meet them on the field of battle. All three Scions must be defeated before we can truly claim to have bested them.\""
+  },
+  {
+    "dir": "QuestsMX",
+    "file": "Siege.mqxml",
+    "quest_id": "{37305158-0000-0000-0000-000000000000}",
+    "name": "SIEGE",
+    "short": "Destroy Borjin's Palace or cut off the caravan routes supplying him with gold. If they run out of resources they will surely be forced to surrender to our forces.[newline][newline](No Wizards Guilds may be built.)",
+    "long": "\"Majesty, our battle with the hostile and barbaric kingdom of Borjin the Conqueror has brought us to a siege of his stronghold. We must either force his surrender by blockading his supply Caravans, or storm his fortress and take it by force. Our challenge is complicated by our local Wizards Guild, which has chosen to side with Borjin's forces. Still, I feel we can prevail if you act decisively.\""
+  },
+  {
+    "dir": "QuestsMX",
+    "file": "SpiresDeath.mqxml",
+    "quest_id": "{38305158-0000-0000-0000-000000000000}",
+    "name": "SPIRES_DEATH",
+    "short": "Seek out and destroy each of the five spires.[newline][newline]Beware! They grow more powerful with each one that falls...",
+    "long": "\"The richest lands of the Northern Reaches sit tantalizingly close to us. However, our way to these tracts is blocked by huge spires that hurl magical bolts and summon ferocious monsters against anyone approaching.[newline]A local nomad explained that, long ago, a race of northlanders angered their god so greatly that she hurled them out of their homeland, forbidding them ever to return. She then raised five cursed spires to turn them back.[newline]While the name of this god is long forgotten, her spires still stand. If you can clear away those obstacles, we can enter the promising lands beyond.\""
+  },
+  {
+    "dir": "QuestsMX",
+    "file": "TradeRoutes.mqxml",
+    "quest_id": "{39305158-0000-0000-0000-000000000000}",
+    "name": "TRADE_ROUTES",
+    "short": "Clear routes and protect the caravans entering our kingdom over the next month.  At least half of them must reach our markets intact. If our marketplace is destroyed we will have failed regardless.[newline][newline](No Marketplaces or Trading Posts may be built.)",
+    "long": "\"Majesty, I have just returned from several of the northern kingdoms. They are open to the idea of trade and offer all manner of exotic goods. However, their trust must be earned.[newline]Over the next several weeks, a stream of Caravans, opening new trade routes, will be heading to our settlement. If we assure their safe passage, this will seal our end of the bargain and we'll receive a continued stream of goods and riches from the northlands.\""
+  },
+  {
+    "dir": "QuestsMX",
+    "file": "UrbanRenewal.mqxml",
+    "quest_id": "{30315158-0000-0000-0000-000000000000}",
+    "name": "URBAN_RENEWAL",
+    "short": "Destroy all red Guilds, Elven Lounges and Gambling Halls.[newline][newline](No Rogues Guilds, or Elven Bungalows may be built.)",
+    "long": "\"(...sigh...) How can I possibly tell our Sovereign the news?...[newline]Um, Majesty, I have good news and bad. The good news is your uncle died...[newline][newline]No, that won't do...[newline][newline](ahem) My Leige, your late uncle has bequeathed you a town!...of sorts...[newline][newline]Hmm, maybe more positive...[newline][newline]It pleases me to inform you that you've been granted a tremendous opportunity! You can be the first Ardanian sovereign to give the word \"slum\" a good name!...[newline][newline]Oh, that won't work either. (...sigh...) it's no use...[newline][newline]Majesty, look out the window. Rogues, Elves, and debauchery as far as the eye can see. It's all yours, no thanks to your dead uncle. Think you can clean up that mess?\""
+  },
+  {
+    "dir": "QuestsMX",
+    "file": "ValeSerpents.mqxml",
+    "quest_id": "{31315158-0000-0000-0000-000000000000}",
+    "name": "VALE_SERPENTS",
+    "short": "Destroy the Snake Pits that are encroaching on your realm.[newline][newline]If you lose all Elven Bungalows, you lose this quest.[newline][newline]You are restricted from placing Elven Bungalows, as it is up to your Elven neighbors to decide when and where to place them...[newline][newline]Many citizens refuse to settle in this threated valley. Hence, much of your normal infrastructure such as General Housing, Sewers, and Broken Sewer Mains, and Graveyards will not appear.",
+    "long": "\"Your Highness, our newest settlement borders an Elven enclave. They offer their warmest greetings and have pledged an alliance with us, in hopes of improving trade and relations.[newline]On a less pleasant note, there has been talk among the merchants. They speak of skirmishes with a powerful adversary on the distant boundaries of the Elven lands. Perhaps we should make ready our defenses in case these turn out to be more than unfounded rumors.\""
+  },
+  {
+    "dir": "QuestsMX",
+    "file": "Vigil.mqxml",
+    "quest_id": "{32315158-0000-0000-0000-000000000000}",
+    "name": "VIGIL",
+    "short": "Destroy the Abomination that lives in the hills.[newline][newline](No Fairgrounds, Sorcerers Abodes, Magic Bazaars, Outposts, Guilds or Temples can be built.)",
+    "long": "\"My Liege, it pains me to inform you that our realm's most valiant and renowned Paladin, Glohrea Oathtaker, was slain while questing in the outlands. There is not one hero or peasant in this village who does not owe their lives to her selfless acts. Your subjects demand the head of whoever...or whatever murdered our brave Glohrea. Please move quickly and send a small contingent of battle-hardened heroes to the outlands. This deed can not go unpunished!\""
+  },
+  {
+    "dir": "QuestsMX",
+    "file": "mx_Freestyle.mqxml",
+    "quest_id": "{31455246-0000-0000-0000-000000000000}",
+    "name": "MX FREESTYLE",
+    "short": "Majesty:Expansion Free Style game parameters",
+    "long": ""
+  }
+]

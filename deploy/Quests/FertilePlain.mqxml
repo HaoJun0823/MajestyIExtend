@@ -1,0 +1,21 @@
+<Majesty>
+	<Quest id="{31315551-0000-0000-0000-000000000000}">
+		<Name>FERTILE_PLAIN</Name>
+		<Description lang="en_US">
+			<Short>在七波掠夺者的猛攻下存活下来。[newline][newline]消灭所有掠夺者！[newline][newline]（本任务中无人族以外的种族可用。）</Short>
+			<Long>"能辅佐如此英明的君主是我的荣幸。您的先祖定会为您在这片土地上培育的繁荣感到自豪。得益于您近期的土地 acquisitions，此地区已变得富饶而宜居。那位男爵居然只用一百五十头牛就把它换走了，真是太妙了。[newline]然而，如此繁荣不会无人注意。已传到城墙边的消息说，许多人觊觎这片田园诗般的所在。您必须防备任何此类掠夺者。"</Long>
+		</Description>
+		<DataConfiguration>
+			<Dataset base="Majesty">
+				<Load>
+					<Template>fertile_plain.q</Template>
+				</Load>
+				<Unload>
+					<CAM />
+					<GPL />
+					<Constants />
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

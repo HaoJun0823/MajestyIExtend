@@ -1,0 +1,21 @@
+<Majesty>
+	<Quest id="{37305551-0000-0000-0000-000000000000}">
+		<Name>DEAL_DEMON</Name>
+		<Description lang="en_US">
+			<Short>在40天内赚取100,000金币，否则任务失败。</Short>
+			<Long>"伟大的领袖，恕我冒昧，但有一个可怕的存在造访了我们的城堡！一个恶魔！他声称是来收取您母亲欠他的债务。这是真的吗？[newline]由于我们无法立即交付要求的赏金，他说稍后会来取三倍于此的金额，否则就诅咒整个村庄。说完他便在一团恶臭的绿色烟雾中消失了。[newline]陛下？希望您已有对策。在他回来之前必须做些什么！"</Long>
+		</Description>
+		<DataConfiguration>
+			<Dataset base="Majesty">
+				<Load>
+					<Template>Deal_demon.q</Template>
+				</Load>
+				<Unload>
+					<CAM />
+					<GPL />
+					<Constants />
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

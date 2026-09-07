@@ -1,0 +1,21 @@
+<Majesty>
+	<Quest id="{32315158-0000-0000-0000-000000000000}">
+		<Name>VIGIL</Name>
+		<Description lang="en_US">
+			<Short>消灭藏匿于山丘中的憎恶。[newline][newline]（不可建造竞技场、术士居所、魔法集市、前哨、公会或神殿。）</Short>
+			<Long>"殿下，痛心地告诉您，我们王国最英勇、最著名的圣骑士格洛蕾亚·誓约者在外出冒险时阵亡了。这个村子里没有一个英雄或农民不欠她无私行为的救命之恩。您的子民要求 whoever...or whatever 谋杀了我们勇敢的格洛蕾亚的项上人头。请迅速行动，派遣一支精锐英雄小队前往荒野。此仇不能不报！"</Long>
+		</Description>
+		<DataConfiguration>
+			<Dataset base="MajestyExpansion">
+				<Load>
+					<Template>Vigil.q</Template>
+				</Load>
+				<Unload>
+					<CAM />
+					<GPL />
+					<Constants />
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

@@ -1,0 +1,14 @@
+<Majesty>
+	<Language id="en_US">
+		<Text id="IDTXT_QUEST_DEFINITION_MISSING_TITLE">任务数据缺失</Text>
+		<Text id="IDTXT_QUEST_DEFINITION_MISSING_BODY">用于创建此存档的任务数据缺失。该任务可能需要重新下载并安装到您的用户文件夹中。</Text>
+		<Text id="IDTXT_MODDING_ACTIVATE_MODS">激活模组</Text>
+		<Text id="IDTXT_MODDING_DEACTIVATE_MODS">停用模组</Text>
+		<Text id="IDTXT_MODDING_MOD_WORKS_WITH_BASE">适用：原版任务</Text>
+		<Text id="IDTXT_MODDING_MOD_WORKS_WITH_EXPANSION">适用：北境扩展任务</Text>
+		<Text id="IDTXT_MODDING_MOD_WORKS_WITH_BOTH">适用：原版及北境扩展任务</Text>		
+		<Text id="IDTXT_MODDING_MOD_WORKS_WITH_UNKNOWN">适用：未知数据集</Text>		
+		<Text id="IDTXT_MOD_DEFINITION_MISSING_TITLE">模组缺失</Text>		
+		
+	</Language>
+</Majesty>

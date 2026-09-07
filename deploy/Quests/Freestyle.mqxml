@@ -1,0 +1,21 @@
+<Majesty>
+	<Quest id="{30455246-0000-0000-0000-000000000000}">
+		<Name>FREESTYLE</Name>
+		<Description lang="en_US">
+			<Short>自由模式游戏参数</Short>
+			<Long />
+		</Description>
+		<DataConfiguration>
+			<Dataset base="Majesty">
+				<Load>
+					<Template>Freestyle.q</Template>
+				</Load>
+				<Unload>
+					<CAM />
+					<GPL />
+					<Constants />
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

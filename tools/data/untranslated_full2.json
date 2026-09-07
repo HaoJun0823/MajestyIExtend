@@ -1,0 +1,548 @@
+[
+  {
+    "cam": "textdata.cam",
+    "file": "AP35",
+    "id": 0,
+    "text": ""
+  },
+  {
+    "cam": "textdata.cam",
+    "file": "AP40",
+    "id": 0,
+    "text": ""
+  },
+  {
+    "cam": "textdata.cam",
+    "file": "UNTN",
+    "id": 808471640,
+    "text": "-"
+  },
+  {
+    "cam": "textdata.cam",
+    "file": "UNTN",
+    "id": 808535875,
+    "text": "-"
+  },
+  {
+    "cam": "textdata.cam",
+    "file": "UNTN",
+    "id": 808535888,
+    "text": "-"
+  },
+  {
+    "cam": "textdata.cam",
+    "file": "UNTN",
+    "id": 808535895,
+    "text": "-"
+  },
+  {
+    "cam": "textdata.cam",
+    "file": "UNTN",
+    "id": 825247555,
+    "text": "-"
+  },
+  {
+    "cam": "textdata.cam",
+    "file": "UNTN",
+    "id": 825247558,
+    "text": "-"
+  },
+  {
+    "cam": "textdata.cam",
+    "file": "UNTN",
+    "id": 825247559,
+    "text": "-"
+  },
+  {
+    "cam": "textdata.cam",
+    "file": "UNTN",
+    "id": 825247564,
+    "text": "-"
+  },
+  {
+    "cam": "textdata.cam",
+    "file": "UNTN",
+    "id": 825247568,
+    "text": "-"
+  },
+  {
+    "cam": "textdata.cam",
+    "file": "UNTN",
+    "id": 825247570,
+    "text": "-"
+  },
+  {
+    "cam": "textdata.cam",
+    "file": "UNTN",
+    "id": 825247572,
+    "text": "-"
+  },
+  {
+    "cam": "textdata.cam",
+    "file": "UNTN",
+    "id": 825247573,
+    "text": "-"
+  },
+  {
+    "cam": "textdata.cam",
+    "file": "UNTN",
+    "id": 825247574,
+    "text": "-"
+  },
+  {
+    "cam": "textdata.cam",
+    "file": "UNTN",
+    "id": 825247575,
+    "text": "-"
+  },
+  {
+    "cam": "textdata.cam",
+    "file": "UNTN",
+    "id": 825247577,
+    "text": "-"
+  },
+  {
+    "cam": "textdata.cam",
+    "file": "UNTN",
+    "id": 825313104,
+    "text": "-"
+  },
+  {
+    "cam": "textdata.cam",
+    "file": "UNTN",
+    "id": 826364481,
+    "text": "-"
+  },
+  {
+    "cam": "textdata.cam",
+    "file": "UNTN",
+    "id": 826558274,
+    "text": "-"
+  },
+  {
+    "cam": "textdata.cam",
+    "file": "UNTN",
+    "id": 829249089,
+    "text": "-"
+  },
+  {
+    "cam": "textdata.cam",
+    "file": "UNTN",
+    "id": 829314625,
+    "text": "-"
+  },
+  {
+    "cam": "textdata.cam",
+    "file": "UNTN",
+    "id": 842024771,
+    "text": "-"
+  },
+  {
+    "cam": "textdata.cam",
+    "file": "UNTN",
+    "id": 842024775,
+    "text": "-"
+  },
+  {
+    "cam": "textdata.cam",
+    "file": "UNTN",
+    "id": 842024777,
+    "text": "-"
+  },
+  {
+    "cam": "textdata.cam",
+    "file": "UNTN",
+    "id": 842024780,
+    "text": "-"
+  },
+  {
+    "cam": "textdata.cam",
+    "file": "UNTN",
+    "id": 842024784,
+    "text": "-"
+  },
+  {
+    "cam": "textdata.cam",
+    "file": "UNTN",
+    "id": 842024786,
+    "text": "-"
+  },
+  {
+    "cam": "textdata.cam",
+    "file": "UNTN",
+    "id": 842024789,
+    "text": "-"
+  },
+  {
+    "cam": "textdata.cam",
+    "file": "UNTN",
+    "id": 842024790,
+    "text": "-"
+  },
+  {
+    "cam": "textdata.cam",
+    "file": "UNTN",
+    "id": 842024791,
+    "text": "-"
+  },
+  {
+    "cam": "textdata.cam",
+    "file": "UNTN",
+    "id": 842024793,
+    "text": "-"
+  },
+  {
+    "cam": "textdata.cam",
+    "file": "UNTN",
+    "id": 842090320,
+    "text": "-"
+  },
+  {
+    "cam": "textdata.cam",
+    "file": "UNTN",
+    "id": 842090322,
+    "text": "-"
+  },
+  {
+    "cam": "textdata.cam",
+    "file": "UNTN",
+    "id": 842090327,
+    "text": "-"
+  },
+  {
+    "cam": "textdata.cam",
+    "file": "UNTN",
+    "id": 843335490,
+    "text": "-"
+  },
+  {
+    "cam": "textdata.cam",
+    "file": "UNTN",
+    "id": 843794242,
+    "text": "-"
+  },
+  {
+    "cam": "textdata.cam",
+    "file": "UNTN",
+    "id": 843859778,
+    "text": "-"
+  },
+  {
+    "cam": "textdata.cam",
+    "file": "UNTN",
+    "id": 843925314,
+    "text": "-"
+  },
+  {
+    "cam": "textdata.cam",
+    "file": "UNTN",
+    "id": 846091841,
+    "text": "-"
+  },
+  {
+    "cam": "textdata.cam",
+    "file": "UNTN",
+    "id": 858801987,
+    "text": "-"
+  },
+  {
+    "cam": "textdata.cam",
+    "file": "UNTN",
+    "id": 858802000,
+    "text": "-"
+  },
+  {
+    "cam": "textdata.cam",
+    "file": "UNTN",
+    "id": 858802002,
+    "text": "-"
+  },
+  {
+    "cam": "textdata.cam",
+    "file": "UNTN",
+    "id": 858802004,
+    "text": "-"
+  },
+  {
+    "cam": "textdata.cam",
+    "file": "UNTN",
+    "id": 858802006,
+    "text": "-"
+  },
+  {
+    "cam": "textdata.cam",
+    "file": "UNTN",
+    "id": 858802009,
+    "text": "-"
+  },
+  {
+    "cam": "textdata.cam",
+    "file": "UNTN",
+    "id": 875579203,
+    "text": "-"
+  },
+  {
+    "cam": "textdata.cam",
+    "file": "UNTN",
+    "id": 875579216,
+    "text": "-"
+  },
+  {
+    "cam": "textdata.cam",
+    "file": "UNTN",
+    "id": 875579218,
+    "text": "-"
+  },
+  {
+    "cam": "textdata.cam",
+    "file": "UNTN",
+    "id": 878794317,
+    "text": "-"
+  },
+  {
+    "cam": "textdata.cam",
+    "file": "UNTN",
+    "id": 892356432,
+    "text": "-"
+  },
+  {
+    "cam": "textdata.cam",
+    "file": "UNTN",
+    "id": 925910851,
+    "text": "-"
+  },
+  {
+    "cam": "textdata.cam",
+    "file": "UNTN",
+    "id": 925910864,
+    "text": "-"
+  },
+  {
+    "cam": "textdata.cam",
+    "file": "UNTN",
+    "id": 925910866,
+    "text": "-"
+  },
+  {
+    "cam": "textdata.cam",
+    "file": "UNTN",
+    "id": 925910871,
+    "text": "-"
+  },
+  {
+    "cam": "textdata.cam",
+    "file": "UNTN",
+    "id": 942688067,
+    "text": "-"
+  },
+  {
+    "cam": "textdata.cam",
+    "file": "UNTN",
+    "id": 942688073,
+    "text": "-"
+  },
+  {
+    "cam": "textdata.cam",
+    "file": "UNTN",
+    "id": 942688080,
+    "text": "-"
+  },
+  {
+    "cam": "textdata.cam",
+    "file": "UNTN",
+    "id": 942688082,
+    "text": "-"
+  },
+  {
+    "cam": "textdata.cam",
+    "file": "UNTN",
+    "id": 942688087,
+    "text": "-"
+  },
+  {
+    "cam": "mx_textdata.cam",
+    "file": "MX00",
+    "id": 4,
+    "text": "r"
+  },
+  {
+    "cam": "mx_textdata.cam",
+    "file": "MX00",
+    "id": 6,
+    "text": "R"
+  },
+  {
+    "cam": "mx_textdata.cam",
+    "file": "MX02",
+    "id": 6,
+    "text": "r"
+  },
+  {
+    "cam": "mx_textdata.cam",
+    "file": "MX02",
+    "id": 8,
+    "text": "t"
+  },
+  {
+    "cam": "mx_textdata.cam",
+    "file": "MX02",
+    "id": 10,
+    "text": "R"
+  },
+  {
+    "cam": "mx_textdata.cam",
+    "file": "MX02",
+    "id": 12,
+    "text": "T"
+  },
+  {
+    "cam": "mx_textdata.cam",
+    "file": "MX02",
+    "id": 20,
+    "text": "1"
+  },
+  {
+    "cam": "mx_textdata.cam",
+    "file": "MX02",
+    "id": 24,
+    "text": "2"
+  },
+  {
+    "cam": "mx_textdata.cam",
+    "file": "MX04",
+    "id": 9,
+    "text": "r"
+  },
+  {
+    "cam": "mx_textdata.cam",
+    "file": "MX04",
+    "id": 11,
+    "text": "R"
+  },
+  {
+    "cam": "mx_textdata.cam",
+    "file": "MX05",
+    "id": 9,
+    "text": "1500"
+  },
+  {
+    "cam": "mx_textdata.cam",
+    "file": "MX06",
+    "id": 4,
+    "text": "r"
+  },
+  {
+    "cam": "mx_textdata.cam",
+    "file": "MX06",
+    "id": 6,
+    "text": "R"
+  },
+  {
+    "cam": "mx_textdata.cam",
+    "file": "MX06",
+    "id": 13,
+    "text": "1"
+  },
+  {
+    "cam": "mx_textdata.cam",
+    "file": "MX06",
+    "id": 17,
+    "text": "2"
+  },
+  {
+    "cam": "mx_textdata.cam",
+    "file": "MX08",
+    "id": 12,
+    "text": "2"
+  },
+  {
+    "cam": "mx_textdata.cam",
+    "file": "MX08",
+    "id": 14,
+    "text": "2"
+  },
+  {
+    "cam": "mx_textdata.cam",
+    "file": "MX08",
+    "id": 16,
+    "text": "5"
+  },
+  {
+    "cam": "mx_textdata.cam",
+    "file": "MX08",
+    "id": 25,
+    "text": "2"
+  },
+  {
+    "cam": "mx_textdata.cam",
+    "file": "MX09",
+    "id": 6,
+    "text": "r"
+  },
+  {
+    "cam": "mx_textdata.cam",
+    "file": "MX09",
+    "id": 8,
+    "text": "t"
+  },
+  {
+    "cam": "mx_textdata.cam",
+    "file": "MX09",
+    "id": 10,
+    "text": "R"
+  },
+  {
+    "cam": "mx_textdata.cam",
+    "file": "MX09",
+    "id": 12,
+    "text": "T"
+  },
+  {
+    "cam": "mx_textdata.cam",
+    "file": "MX09",
+    "id": 20,
+    "text": "1"
+  },
+  {
+    "cam": "mx_textdata.cam",
+    "file": "MX09",
+    "id": 24,
+    "text": "2"
+  },
+  {
+    "cam": "mx_textdata.cam",
+    "file": "MX17",
+    "id": 33,
+    "text": "999"
+  },
+  {
+    "cam": "mx_textdata.cam",
+    "file": "MX22",
+    "id": 10,
+    "text": "r"
+  },
+  {
+    "cam": "mx_textdata.cam",
+    "file": "MX22",
+    "id": 13,
+    "text": "R"
+  },
+  {
+    "cam": "mx_textdata.cam",
+    "file": "MX22",
+    "id": 15,
+    "text": "T"
+  },
+  {
+    "cam": "mx_textdata.cam",
+    "file": "MX22",
+    "id": 23,
+    "text": "1"
+  },
+  {
+    "cam": "mx_textdata.cam",
+    "file": "MX22",
+    "id": 24,
+    "text": "1"
+  }
+]
