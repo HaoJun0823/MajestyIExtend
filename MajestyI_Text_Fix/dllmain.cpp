@@ -92,6 +92,13 @@ static int g_dictCount = 0;
 static std::vector<std::pair<std::string, std::string>> g_rollback;
 static int g_rollbackCount = 0;
 
+// ===================== 小写转换辅助 =====================
+static std::string AsciiToLower(const std::string& s) {
+    std::string r = s;
+    for (auto& c : r) { if (c >= 'A' && c <= 'Z') c += 32; }
+    return r;
+}
+
 // ===================== 原始函数指针 =====================
 typedef int (__fastcall *OrigDraw_t)(int ecx_this, int edx_unused, int a2, int a3, int a4);
 static OrigDraw_t g_orig66E7B0 = nullptr;
@@ -485,17 +492,20 @@ static bool LoadRollbackJson(const char* path) {
 }
 
 // ===================== Rollback 词汇替换 =====================
-// 对 UTF-8 英文文本做子串替换，返回替换后的 UTF-8 文本
+// 对 UTF-8 英文文本做大小写不敏感的子串替换，返回替换后的 UTF-8 文本
 static bool RollbackReplace(const std::string& enText, std::string& outUtf8) {
     outUtf8 = enText;
     bool anyReplaced = false;
+    std::string lowerText = AsciiToLower(enText);
     for (const auto& kv : g_rollback) {
         const std::string& from = kv.first;
         const std::string& to = kv.second;
         if (from.empty()) continue;
+        std::string lowerFrom = AsciiToLower(from);
         size_t pos = 0;
-        while ((pos = outUtf8.find(from, pos)) != std::string::npos) {
+        while ((pos = lowerText.find(lowerFrom, pos)) != std::string::npos) {
             outUtf8.replace(pos, from.size(), to);
+            lowerText.replace(pos, lowerFrom.size(), std::string(to.size(), ' '));
             pos += to.size();
             anyReplaced = true;
         }
@@ -574,6 +584,26 @@ static bool LoadDictTxt(const char* path) {
         g_dictCount++;
     }
     return true;
+}
+
+// ===================== 文本归一化 =====================
+// 将游戏传入的实际控制字符归一化为 dict key 中的字面量格式
+// \n (0x0A) -> [newline]
+// \r (0x0D) -> 删除
+// 其他字符（含 \x01 颜色码、%s、%d 等）保持不变
+static std::string NormalizeText(const std::string& text) {
+    std::string out;
+    out.reserve(text.size() + 16);
+    for (size_t i = 0; i < text.size(); i++) {
+        if (text[i] == '\n') {
+            out += "[newline]";
+        } else if (text[i] == '\r') {
+            // 跳过 \r
+        } else {
+            out += text[i];
+        }
+    }
+    return out;
 }
 
 // ===================== 从 this 读取完整字符串 =====================
@@ -1175,19 +1205,21 @@ int __fastcall Hooked_66E7B0(int ecx_this, int edx_unused, int a2, int a3, int a
         return g_orig66E7B0(ecx_this, edx_unused, a2, a3, a4);
     }
 
-    auto it = g_dict.find(enText);
+    // 归一化: \n -> [newline] 以匹配 dict key
+    std::string normText = NormalizeText(enText);
+    auto it = g_dict.find(normText);
     if (it == g_dict.end()) {
         // ★ MISS: 尝试 rollback.json 词汇替换
         if (g_rollbackCount > 0) {
             std::string replacedUtf8;
-            if (RollbackReplace(enText, replacedUtf8)) {
+            if (RollbackReplace(normText, replacedUtf8)) {
                 // rollback 成功，渲染替换后的文本
                 int wlen = MultiByteToWideChar(CP_UTF8, 0, replacedUtf8.c_str(), (int)replacedUtf8.size(), nullptr, 0);
                 if (wlen > 0) {
                     std::vector<uint8_t> utf16buf((wlen + 1) * 2, 0);
                     MultiByteToWideChar(CP_UTF8, 0, replacedUtf8.c_str(), (int)replacedUtf8.size(),
                         (wchar_t*)utf16buf.data(), wlen);
-                    LogRollback(enText.c_str(), replacedUtf8.c_str(), wlen);
+                    LogRollback(normText.c_str(), replacedUtf8.c_str(), wlen);
                     const wchar_t* wstr = (const wchar_t*)utf16buf.data();
                     bool drawn = DirectBlitText(ecx_this, a2, a3, a4, wstr, wlen);
                     if (drawn) {
@@ -1195,13 +1227,13 @@ int __fastcall Hooked_66E7B0(int ecx_this, int edx_unused, int a2, int a3, int a
                         return wlen;
                     }
                     // 渲染失败，回退原版
-                    LogWrite("[Rollback] Blit FAILED for \"%s\"\n", enText.substr(0, 100).c_str());
+                    LogWrite("[Rollback] Blit FAILED for \"%s\"\n", normText.substr(0, 100).c_str());
                     return g_orig66E7B0(ecx_this, edx_unused, a2, a3, a4);
                 }
             }
         }
         // rollback 未命中或未加载，输出 miss.log
-        LogMiss(enText.c_str(), wide, chLen);
+        LogMiss(normText.c_str(), wide, chLen);
         return g_orig66E7B0(ecx_this, edx_unused, a2, a3, a4);
     }
 
@@ -1214,7 +1246,7 @@ int __fastcall Hooked_66E7B0(int ecx_this, int edx_unused, int a2, int a3, int a
         if (u8len > 0 && u8len < 1024) {
             WideCharToMultiByte(CP_UTF8, 0, (const wchar_t*)entry.cnUtf16LE.data(), entry.cnWcharCount, cnUtf8, u8len, nullptr, nullptr);
         }
-        LogHit(enText.c_str(), cnUtf8, entry.cnWcharCount);
+        LogHit(normText.c_str(), cnUtf8, entry.cnWcharCount);
     }
 
     const wchar_t* wstr = (const wchar_t*)entry.cnUtf16LE.data();
@@ -1222,7 +1254,7 @@ int __fastcall Hooked_66E7B0(int ecx_this, int edx_unused, int a2, int a3, int a
 
     bool drawn = DirectBlitText(ecx_this, a2, a3, a4, wstr, wlen);
     if (!drawn) {
-        LogWrite("[Blit] FAILED hit=%d text=\"%s\"\n", g_hitCount, enText.substr(0, 100).c_str());
+        LogWrite("[Blit] FAILED hit=%d text=\"%s\"\n", g_hitCount, normText.substr(0, 100).c_str());
         return g_orig66E7B0(ecx_this, edx_unused, a2, a3, a4);
     }
 
