@@ -389,12 +389,53 @@ static void InitGdiFonts() {
             LogWrite("[Font] %s %dpt: tmHeight=%d tmAscent=%d tmDescent=%d tmInternalLeading=%d\n",
                 g_cfg.fontName, g_cfg.fontSize, tm.tmHeight, tm.tmAscent, tm.tmDescent, tm.tmInternalLeading);
         }
-        SelectObject(tdc, oldF);
-        ReleaseDC(nullptr, tdc);
-        LogWrite("[Font] %s %dpt created (handle=0x%p) tmHeight=%d tmAscent=%d\n",
-            g_cfg.fontName, g_cfg.fontSize, g_cjkFont, g_tmHeight, g_tmAscent);
-    } else {
-        LogWrite("[Font] ERROR: CreateFontW failed (err=%d)\n", GetLastError());
+
+        // 验证 GetGlyphOutlineW 是否对该字体可用（可变字体可能不兼容）
+        GLYPHMETRICS testGm;
+        MAT2 testMat = {{0,1},{0,0},{0,0},{0,1}};
+        DWORD testRet = GetGlyphOutlineW(tdc, 0x4E2D /* 中 */, GGO_BITMAP, &testGm, 0, nullptr, &testMat);
+        bool ggoOk = (testRet != GDI_ERROR);
+        if (!ggoOk) {
+            LogWrite("[Font] WARNING: GetGlyphOutlineW failed for custom font (variable font?), falling back to SimSun\n");
+            SelectObject(tdc, oldF);
+            DeleteObject(g_cjkFont);
+            g_cjkFont = nullptr;
+        } else {
+            LogWrite("[Font] GetGlyphOutlineW test OK (glyphSize=%u for U+4E2D)\n", testRet);
+        }
+
+        if (g_cjkFont) {
+            SelectObject(tdc, oldF);
+            ReleaseDC(nullptr, tdc);
+            LogWrite("[Font] %s %dpt created (handle=0x%p) tmHeight=%d tmAscent=%d\n",
+                g_cfg.fontName, g_cfg.fontSize, g_cjkFont, g_tmHeight, g_tmAscent);
+        }
+    }
+
+    // 回退到 SimSun
+    if (!g_cjkFont) {
+        wchar_t simsun[] = L"SimSun";
+        g_cjkFont = CreateFontW(
+            -g_cfg.fontSize, 0, 0, 0, g_cfg.fontWeight,
+            FALSE, FALSE, FALSE, DEFAULT_CHARSET,
+            OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
+            NONANTIALIASED_QUALITY, DEFAULT_PITCH | FF_DONTCARE, simsun);
+        if (g_cjkFont) {
+            HDC tdc = GetDC(nullptr);
+            HFONT oldF = (HFONT)SelectObject(tdc, g_cjkFont);
+            TEXTMETRICW tm;
+            if (GetTextMetricsW(tdc, &tm)) {
+                g_tmHeight = tm.tmHeight;
+                g_tmAscent = tm.tmAscent;
+                g_tmDescent = tm.tmDescent;
+            }
+            SelectObject(tdc, oldF);
+            ReleaseDC(nullptr, tdc);
+            LogWrite("[Font] Fallback SimSun %dpt (handle=0x%p) tmHeight=%d tmAscent=%d\n",
+                g_cfg.fontSize, g_cjkFont, g_tmHeight, g_tmAscent);
+        } else {
+            LogWrite("[Font] ERROR: SimSun fallback also failed (err=%d)\n", GetLastError());
+        }
     }
 }
 
