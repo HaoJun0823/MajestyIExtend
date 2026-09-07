@@ -1,90 +1,82 @@
-﻿// dllmain.cpp : Majesty HD Runtime Localization v10.1 (GDI on DirectDraw Surface)
+﻿// dllmain.cpp : Majesty HD Runtime Localization v11.0 (Direct Pixel Buffer Rendering)
 //
-// === v10.1 DirectDraw Surface GetDC 方案 ===
-// v10.0 结果: GDI 画在窗口 DC 上被 DirectDraw Flip 覆盖 → 不可见
+// === v11.0 直接像素缓冲区渲染 ===
+// v10.1 结果: DirectDraw surface GetDC 方案失败 — dword_7CA9E8 是 CYOffportIMP
+//   而非 CYDDOffport, 没有 IDirectDrawSurface 指针
 //
-// v10.1 策略:
+// v11.0 核心发现:
+//   dword_7CA9E4 = CYOffportIMP 渲染设备对象 (sub_648C70 设置)
+//   CYOffportIMP 布局 (sub_6477B0 初始化):
+//     this[4]  (off 16) = 像素缓冲区基地址 (malloc 分配, 系统内存)
+//     this[5]  (off 20) = width
+//     this[6]  (off 24) = height
+//     this[7]  (off 28) = BPP (bits per pixel)
+//     this[8]  (off 32) = stride (bytes per row, DWORD 对齐)
+//     this[14] (off 56) = 颜色格式索引
+//     this[18] (off 72) = clip left
+//     this[19] (off 76) = clip top
+//     this[20] (off 80) = clip right
+//     this[21] (off 84) = clip bottom
+//   sub_6479F0 (vtable[46], offset 184): 返回像素指针 = this[4] + y*stride + (x*bpp)>>3
+//   游戏 sub_634140 直接写像素缓冲区, 不用 Lock/Unlock
+//
+// v11.0 策略:
 //   hook sub_66E7B0 (文本绘制函数), 命中中文时:
-//   1. 跳过原函数 (不调用 g_orig66E7B0)
-//   2. 从 this 对象读取布局信息 (位置/颜色/对齐)
-//   3. 从 dword_7CA9EC (back buffer CYDDOffport) 获取 IDirectDrawSurface
-//   4. 调用 IDirectDrawSurface::GetDC() 获取 DirectDraw surface 的 DC
-//   5. 用 GDI ExtTextOutW 在 DirectDraw surface DC 上绘制中文
-//   6. 调用 IDirectDrawSurface::ReleaseDC() 释放 DC
+//   1. 跳过原函数
+//   2. 从 dword_7CA9E4 或 a4 获取 CYOffportIMP 渲染设备
+//   3. 读取像素缓冲区信息 (base/bpp/stride/clip)
+//   4. 用 GetGlyphOutlineW 获取中文字形位图 (1bpp monochrome)
+//   5. 手动 blit 字形到像素缓冲区 (支持 8/16/32bpp)
+//   6. 处理对齐/裁剪/描边
 //   7. 非中文文本走原函数
 //
-// this 对象布局 (IDA 反编译确认):
-//   this[0]/[4]/[8]  - StrObj 字符串数据 (inline/indirect)
+// this 对象布局 (sub_66E7B0 的 this = UI 组件):
+//   this[0]/[4]/[8]  - StrObj 字符串数据
 //   this[2] (0x08)  - 字符串模式 (1=UTF-16, 其他=ANSI)
-//   this[3] (0x0C)  - X 偏移 (加到 a2)
-//   this[4] (0x10)  - Y 偏移 (加到 a3)
-//   this[5] (0x14)  - 右边界 X (加到 a2)
-//   this[6] (0x18)  - 底部 Y (加到 a3)
-//   this[7] (0x1C)  - 渲染标志位 (bit0=居中, bit1=右对齐, bit2=描边, bit3=垂直居中, bit4=裁剪, bit5=右对齐2, bit6=颜色覆盖)
-//   this[10](0x28)  - 字体对象 (CYFontImage)
-//   this[12](0x30) - 描边颜色索引
-//   this[13](0x34) - 前景颜色索引
-//   this[20](0x50) - 颜色覆盖列表大小
-//   this[21](0x54) - 颜色覆盖列表指针
-//   this[23](0x5C) - 文本最大宽度
-//   this[25](0x64) - 前景色 (调色板索引)
-//   this[26](0x68) - 描边色 (调色板索引)
-//   this+0x61      - 字体 ID
-//   this[97]       - (同上, 字节偏移)
-//
-// DirectDraw surface 获取:
-//   dword_7CA9E8 = primary surface CYDDOffport (this[33] = IDirectDrawSurface* offset 132)
-//   dword_7CA9EC = back buffer CYDDOffport
+//   this[3] (0x0C)  - X 偏移
+//   this[4] (0x10)  - Y 偏移
+//   this[5] (0x14)  - 右边界 X
+//   this[6] (0x18)  - 底部 Y
+//   this[7] (0x1C)  - 渲染标志 (bit0=居中, bit1=右对齐, bit2=描边, bit3=垂直居中)
+//   this[25](0x64)  - 前景色
+//   this[26](0x68)  - 描边色
 //
 // sub_66E7B0(this, a2, a3, a4) 签名:
 //   this = UI 组件对象
-//   a2 = X 偏移 (加到 this[3] 得到实际 X)
-//   a3 = Y 偏移 (加到 this[6] 得到实际 Y)  
+//   a2 = X 偏移, a3 = Y 偏移
 //   a4 = 渲染设备 (0=用默认 dword_7CA9E4)
 
 #include "pch.h"
 #include <psapi.h>
 #include <intrin.h>
-#include <ddraw.h>       // DirectDraw interfaces
 #include <unordered_map>
 #include <string>
 #include <vector>
 #include "MinHook.h"
 
 #pragma comment(lib, "psapi.lib")
-// 不链接 ddraw.lib: 只通过 vtable 指针调用 GetDC/ReleaseDC, 不需要导入符号
 #pragma intrinsic(_ReturnAddress)
 
 // ===================== 地址常量 =====================
 static constexpr uintptr_t ADDR_66E7B0  = 0x0066E7B0;
-static constexpr uintptr_t ADDR_7CA9E4   = 0x007CA9E4;  // dword_7CA9E4 (默认渲染设备)
-static constexpr uintptr_t ADDR_7CA9BC  = 0x007CA9BC;  // dword_7CA9BC (调色板数组)
-static constexpr uintptr_t ADDR_7CA9E8  = 0x007CA9E8;  // dword_7CA9E8 (primary surface CYDDOffport)
-static constexpr uintptr_t ADDR_7CA9EC  = 0x007CA9EC;  // dword_7CA9EC (back buffer CYDDOffport)
-static constexpr uintptr_t ADDR_7C89E8  = 0x007C89E8;  // dword_7C89E8 (primary IDirectDrawSurface*)
-static constexpr uintptr_t ADDR_7C89EC  = 0x007C89EC;  // dword_7C89EC (back buffer IDirectDrawSurface*)
-static constexpr uintptr_t ADDR_7C89D8  = 0x007C89D8;  // dword_7C89D8 (DirectDraw2 interface)
-static constexpr uintptr_t ADDR_7C89E0  = 0x007C89E0;  // dword_7C89E0 (DirectDraw4 interface)
-static constexpr uintptr_t ADDR_7C89DC  = 0x007C89DC;  // dword_7C89DC (DirectDraw7 interface)
+static constexpr uintptr_t ADDR_7CA9E4   = 0x007CA9E4;  // dword_7CA9E4 (默认渲染设备 CYOffportIMP)
+static constexpr uintptr_t EXPECTED_VT   = 0x00741CAC;  // CYOffportIMP vtable
 
-// ===================== DirectDraw 函数指针类型 =====================
-// IDirectDrawSurface vtable: GetDC=slot19, ReleaseDC=slot28
-// (QueryInterface=0, AddRef=1, Release=2, AddAttachedSurface=3,
-//  AddOverlayDirtyRect=4, Blt=5, BltBatch=6, BltFast=7,
-//  DeleteAttachedSurface=8, EnumAttachedZBuffers=9, Flip=10,
-//  GetAttachedSurface=11, GetBltStatus=12, GetCaps=13, GetClipper=14,
-//  GetColorKey=15, GetDC=16, GetFlipStatus=17, GetOverlayPosition=18,
-//  GetPalette=19, GetPixelFormat=20, GetSurfaceDesc=21, Initialize=22,
-//  IsLost=23, Lock=24, ReleaseDC=25, Restore=26, SetClipper=27,
-//  SetColorKey=28, SetOverlayPosition=29, SetPalette=30, Unlock=31,
-//  UpdateOverlay=32, UpdateOverlayDisplay=33, UpdateOverlayZBuffer=34)
-typedef HRESULT (__stdcall *DDSURFACE_GETDC)(void*, HDC*);
-typedef HRESULT (__stdcall *DDSURFACE_RELEASEDC)(void*, HDC);
+// CYOffportIMP 字段偏移
+static constexpr uint32_t OFF_PIXELBUF  = 16;   // this[4]  像素缓冲区
+static constexpr uint32_t OFF_WIDTH     = 20;   // this[5]  宽度
+static constexpr uint32_t OFF_HEIGHT    = 24;   // this[6]  高度
+static constexpr uint32_t OFF_BPP        = 28;   // this[7]  BPP
+static constexpr uint32_t OFF_STRIDE     = 32;   // this[8]  stride
+static constexpr uint32_t OFF_CLIP_LEFT  = 72;   // this[18] 裁剪左
+static constexpr uint32_t OFF_CLIP_TOP   = 76;   // this[19] 裁剪上
+static constexpr uint32_t OFF_CLIP_RIGHT = 80;   // this[20] 裁剪右
+static constexpr uint32_t OFF_CLIP_BOT   = 84;   // this[21] 裁剪下
 
 // ===================== 字符串对象 =====================
 struct StrObj {
     void*    data;   // [0]
-    uint32_t meta;   // [4] 低3字节=长度, bit24=wide标志
+    uint32_t meta;   // [4]
     uint32_t extra;  // [8]
 };
 
@@ -106,16 +98,11 @@ static int g_callCount = 0;
 static int g_replacedCount = 0;
 static int g_hitCount = 0;
 static int g_missCount = 0;
-static int g_gdiDrawCount = 0;
-static int g_gdiFailCount = 0;
-static int g_surfaceFailCount = 0;
+static int g_blitCount = 0;
+static int g_blitFailCount = 0;
+static int g_devDumpCount = 0;
 
-// ===================== surface 缓存 =====================
-static void* g_cachedBackSurface = nullptr;
-static int g_surfaceCacheMissCount = 0;
-static int g_vtableLogCount = 0;
-
-// ===================== IsBadReadPtr 替代: 安全读取 4 字节 =====================
+// ===================== IsBadReadPtr 替代 =====================
 static bool SafeRead32(uint32_t addr, uint32_t* out) {
     if (!addr) return false;
     __try {
@@ -136,16 +123,13 @@ static void LogWrite(const char* fmt, ...) {
 }
 
 // ===================== 字典加载 =====================
-
 static int RemoveZeroWidthChars(char* data, int len) {
-    int write = 0;
-    int read = 0;
+    int write = 0, read = 0;
     while (read < len) {
         unsigned char c = (unsigned char)data[read];
         if (read + 2 < len && c == 0xEF &&
             (unsigned char)data[read+1] == 0xBB && (unsigned char)data[read+2] == 0xBF) {
-            read += 3;
-            continue;
+            read += 3; continue;
         }
         if (read + 2 < len && c == 0xE2 &&
             (unsigned char)data[read+1] == 0x80) {
@@ -165,27 +149,21 @@ static int RemoveZeroWidthChars(char* data, int len) {
 static bool LoadDict(const char* path) {
     FILE* f = fopen(path, "rb");
     if (!f) return false;
-
     fseek(f, 0, SEEK_END);
     long fileSize = ftell(f);
     fseek(f, 0, SEEK_SET);
-
     if (fileSize <= 0) { fclose(f); return false; }
     if (fileSize > 4 * 1024 * 1024) {
         LogWrite("[Dict] File too large: %ld bytes, truncating to 4MB\n", fileSize);
         fileSize = 4 * 1024 * 1024;
     }
-
     std::vector<char> fileData(fileSize + 1, 0);
     fread(fileData.data(), 1, fileSize, f);
     fclose(f);
-
     int cleanLen = RemoveZeroWidthChars(fileData.data(), (int)fileSize);
     fileData[cleanLen] = '\0';
     LogWrite("[Dict] File size: %ld -> %d (after removing zero-width chars)\n", fileSize, cleanLen);
-
-    int pos = 0;
-    int lineNum = 0;
+    int pos = 0, lineNum = 0;
     while (pos < cleanLen) {
         lineNum++;
         int lineStart = pos;
@@ -195,62 +173,48 @@ static bool LoadDict(const char* path) {
         if (lineLen == 0) continue;
         if (lineLen == 1 && fileData[lineStart] == '\r') continue;
         if (lineLen >= 8192) continue;
-
         unsigned char lineBuf[8192];
         memcpy(lineBuf, fileData.data() + lineStart, lineLen);
         lineBuf[lineLen] = '\0';
         int actualLen = lineLen;
-        while (actualLen > 0 && (lineBuf[actualLen-1] == '\r' || lineBuf[actualLen-1] == '\n')) {
+        while (actualLen > 0 && (lineBuf[actualLen-1] == '\r' || lineBuf[actualLen-1] == '\n'))
             lineBuf[--actualLen] = '\0';
-        }
         if (actualLen == 0) continue;
-
         char* tab = (char*)memchr(lineBuf, '\t', actualLen);
         if (!tab) continue;
-
         int enLen = (int)(tab - (char*)lineBuf);
         if (enLen <= 0 || enLen >= 4096) continue;
-
         char enKey[4096];
         memcpy(enKey, lineBuf, enLen);
         enKey[enLen] = '\0';
-        while (enLen > 0 && (enKey[enLen-1] == '\r' || enKey[enLen-1] == '\n')) {
+        while (enLen > 0 && (enKey[enLen-1] == '\r' || enKey[enLen-1] == '\n'))
             enKey[--enLen] = '\0';
-        }
         if (enLen == 0) continue;
-
         char* cnStart = tab + 1;
         int cnLen = actualLen - enLen - 1;
         if (cnLen <= 0 || cnLen >= 4096) continue;
-        while (cnLen > 0 && (cnStart[cnLen-1] == '\r' || cnStart[cnLen-1] == '\n')) {
+        while (cnLen > 0 && (cnStart[cnLen-1] == '\r' || cnStart[cnLen-1] == '\n'))
             cnStart[--cnLen] = '\0';
-        }
         if (cnLen == 0) continue;
-
         std::string enStr(enKey, enLen);
         std::string cnStr(cnStart, cnLen);
-
         for (size_t i = 0; i + 1 < cnStr.size(); i++) {
             if (cnStr[i] == '\\' && cnStr[i+1] == 'n') {
                 cnStr[i] = '\n';
                 cnStr.erase(i+1, 1);
             }
         }
-
         int wlen = MultiByteToWideChar(CP_UTF8, 0, cnStr.c_str(), (int)cnStr.size(), nullptr, 0);
         if (wlen <= 0) continue;
-
         DictEntry entry;
         entry.cnWcharCount = wlen;
         entry.cnUtf16LE.resize((wlen + 1) * 2);
         MultiByteToWideChar(CP_UTF8, 0, cnStr.c_str(), (int)cnStr.size(),
             (wchar_t*)entry.cnUtf16LE.data(), wlen);
         *(wchar_t*)(entry.cnUtf16LE.data() + wlen * 2) = 0;
-
         g_dict[enStr] = std::move(entry);
         g_dictCount++;
     }
-
     return true;
 }
 
@@ -258,12 +222,10 @@ static bool LoadDict(const char* path) {
 static bool ReadFullString(int thisPtr, std::string& out, int* outCharLen = nullptr, bool* outWide = nullptr) {
     if (!thisPtr) return false;
     uint8_t* edi = (uint8_t*)thisPtr;
-
     void* obj = *(void**)edi;
     bool wide = false;
     int chLen = 0;
     uint8_t* data = nullptr;
-
     if (obj) {
         uint8_t* s = (uint8_t*)obj;
         wide = (s[7] & 1) != 0;
@@ -274,10 +236,8 @@ static bool ReadFullString(int thisPtr, std::string& out, int* outCharLen = null
         data = *(uint8_t**)(edi + 4);
         chLen = 0;
     }
-
     if (!data) return false;
     if (outWide) *outWide = wide;
-
     if (wide) {
         int n = chLen;
         if (n <= 0) {
@@ -305,376 +265,309 @@ static bool ReadFullString(int thisPtr, std::string& out, int* outCharLen = null
     }
 }
 
-// ===================== GDI 字体管理 =====================
+// ===================== GDI 字体 (用于 GetGlyphOutlineW) =====================
 static HFONT g_cjkFont = nullptr;
-static HFONT g_cjkFontBold = nullptr;
 static int g_fontSize = 14;
 
 static void InitGdiFonts() {
     if (g_cjkFont) return;
-    
     g_cjkFont = CreateFontW(
-        -g_fontSize,              // 高度 (负值=字符高度)
-        0,                        // 宽度 (0=自动)
-        0, 0,                     // 倾斜/方向
-        FW_NORMAL,                // 粗细
-        FALSE, FALSE, FALSE,      // 斜体/下划线/删除线
-        DEFAULT_CHARSET,          // 字符集
-        OUT_DEFAULT_PRECIS,
-        CLIP_DEFAULT_PRECIS,
-        ANTIALIASED_QUALITY,      // 抗锯齿
-        DEFAULT_PITCH | FF_DONTCARE,
-        L"SimSun"
-    );
-    
-    g_cjkFontBold = CreateFontW(
-        -g_fontSize,
-        0, 0, 0,
-        FW_BOLD,
+        -g_fontSize, 0, 0, 0, FW_NORMAL,
         FALSE, FALSE, FALSE,
         DEFAULT_CHARSET,
         OUT_DEFAULT_PRECIS,
         CLIP_DEFAULT_PRECIS,
-        ANTIALIASED_QUALITY,
+        NONANTIALIASED_QUALITY,  // 关闭抗锯齿, 使用 1bpp monochrome
         DEFAULT_PITCH | FF_DONTCARE,
         L"SimSun"
     );
-    
     if (g_cjkFont) {
-        LogWrite("[GDI] Font created: SimSun %dpt (handle=0x%p)\n", g_fontSize, g_cjkFont);
+        LogWrite("[Font] SimSun %dpt created (handle=0x%p)\n", g_fontSize, g_cjkFont);
     } else {
-        LogWrite("[GDI] ERROR: Failed to create font (err=%d)\n", GetLastError());
+        LogWrite("[Font] ERROR: CreateFontW failed (err=%d)\n", GetLastError());
     }
 }
 
-// ===================== 调色板索引 → RGB 颜色 =====================
-static COLORREF PalIndexToRgb(uint32_t palIndex) {
-    if (palIndex == 0) return RGB(0, 0, 0);
-    if (palIndex == 255) return RGB(255, 255, 255);
-    if (palIndex == 254) return RGB(255, 255, 255);
-    uint8_t gray = (uint8_t)(palIndex & 0xFF);
-    return RGB(gray, gray, gray);
-}
+// ===================== 渲染设备信息缓存 =====================
+struct RenderDevInfo {
+    uint32_t obj;       // CYOffportIMP 对象地址
+    uint32_t pixelBuf;  // this[4] 像素缓冲区
+    uint32_t width;     // this[5]
+    uint32_t height;    // this[6]
+    uint32_t bpp;       // this[7]
+    uint32_t stride;    // this[8]
+    uint32_t clipL;     // this[18]
+    uint32_t clipT;     // this[19]
+    uint32_t clipR;     // this[20]
+    uint32_t clipB;     // this[21]
+};
 
-// ===================== 获取 DirectDraw surface =====================
-// 策略: 优先从 a4 (渲染设备对象) 提取 surface, 其次从全局变量获取, 用 SEH 保护
-//
-// CYDDOffport 有三个构造函数, surface 指针在不同路径下存储在不同偏移:
-//   sub_67FEF0 (DD2 路径): this[33] = byte offset 132
-//   sub_680080 (DD4 路径): this[32] = byte offset 128
-//   sub_6801F0 (DD7 路径): this[31] = byte offset 124
-// 同时 dword_7C89E8/7C89EC 存储原始 IDirectDrawSurface* (但运行时可能为0)
-//
-// a4 参数 (sub_66E7B0 的第4个参数) = 渲染设备对象 (CYDDOffport*)
-// 当 a4=0 时, 游戏用 dword_7CA9E4 作为默认渲染设备
-static void* GetBackBufferSurface(int a4) {
-    // 优先使用缓存
-    if (g_cachedBackSurface) {
-        uint32_t vt_val = 0;
-        if (SafeRead32((uint32_t)g_cachedBackSurface, &vt_val) && vt_val) {
-            return g_cachedBackSurface;
-        }
-        g_cachedBackSurface = nullptr;
-    }
+static bool GetRenderDevInfo(int a4, RenderDevInfo& info) {
+    memset(&info, 0, sizeof(info));
 
-    uint32_t surface = 0;
-
-    // === 策略1: 从 a4 参数 (渲染设备对象) 提取 surface ===
-    // a4 是 CYDDOffport*, 尝试三个可能的偏移
+    // 1. 获取渲染设备对象地址
+    info.obj = 0;
     if (a4) {
-        // 三个构造函数的 surface 偏移: 124(DD7), 128(DD4), 132(DD2)
-        uint32_t offsets[] = { 124, 128, 132 };
-        for (int i = 0; i < 3 && !surface; i++) {
-            uint32_t val = 0;
-            if (SafeRead32((uint32_t)a4 + offsets[i], &val) && val) {
-                uint32_t vt_val = 0;
-                if (SafeRead32(val, &vt_val) && vt_val) {
-                    surface = val;
-                    if (g_vtableLogCount < 5) {
-                        LogWrite("[Surface] a4=0x%X off[%d]=%d -> surface=0x%X vtable=0x%X\n",
-                            a4, i, offsets[i], surface, vt_val);
-                        g_vtableLogCount++;
-                    }
-                }
-            }
-        }
-        // 如果 a4 的三个偏移都失败, dump 前 160 字节用于诊断
-        if (!surface && g_surfaceFailCount == 0) {
-            LogWrite("[Surface] a4=0x%X dump first 160 bytes:\n", a4);
-            for (int i = 0; i < 40; i++) {
-                uint32_t val = 0;
-                if (SafeRead32((uint32_t)a4 + i * 4, &val)) {
-                    LogWrite("  [%3d] (off %3d) = 0x%08X\n", i, i * 4, val);
-                } else {
-                    LogWrite("  [%3d] (off %3d) = UNREADABLE\n", i, i * 4);
-                    break;
-                }
-            }
+        info.obj = (uint32_t)a4;
+    } else {
+        if (!SafeRead32(ADDR_7CA9E4, &info.obj) || !info.obj) {
+            if (g_blitFailCount < 5)
+                LogWrite("[Render] dword_7CA9E4 = 0 (no render device)\n");
+            return false;
         }
     }
 
-    // === 策略2: 从全局变量获取原始 surface 指针 ===
-    if (!surface) {
-        uint32_t candidates[] = {
-            ADDR_7C89EC,   // 原始 back buffer surface
-            ADDR_7C89E8,   // 原始 primary surface
-        };
-        for (int i = 0; i < 2 && !surface; i++) {
-            uint32_t addr = candidates[i];
-            if (SafeRead32(addr, &surface) && surface) {
-                uint32_t vt_val = 0;
-                if (SafeRead32(surface, &vt_val) && vt_val) {
-                    if (g_vtableLogCount < 5) {
-                        LogWrite("[Surface] Global 0x%X -> surface=0x%X vtable=0x%X\n", addr, surface, vt_val);
-                        g_vtableLogCount++;
-                    }
-                } else {
-                    surface = 0;
-                }
-            }
+    // 2. 验证 vtable (可选, 用于诊断)
+    uint32_t vt = 0;
+    if (SafeRead32(info.obj, &vt)) {
+        if (g_devDumpCount < 3) {
+            LogWrite("[Render] obj=0x%X vtable=0x%X (expected=0x%X)\n",
+                info.obj, vt, EXPECTED_VT);
+            g_devDumpCount++;
         }
+    } else {
+        if (g_blitFailCount < 5)
+            LogWrite("[Render] obj=0x%X vtable unreadable\n", info.obj);
+        return false;
     }
 
-    // === 策略3: 从全局 CYDDOffport 对象提取 surface ===
-    if (!surface) {
-        uint32_t cyOff[] = { ADDR_7CA9EC, ADDR_7CA9E8 };
-        for (int i = 0; i < 2 && !surface; i++) {
-            uint32_t cyAddr = 0;
-            if (SafeRead32(cyOff[i], &cyAddr) && cyAddr) {
-                // 尝试三个可能的偏移: 124(DD7), 128(DD4), 132(DD2)
-                uint32_t offsets[] = { 132, 128, 124 };
-                for (int j = 0; j < 3 && !surface; j++) {
-                    uint32_t val = 0;
-                    if (SafeRead32(cyAddr + offsets[j], &val) && val) {
-                        uint32_t vt_val = 0;
-                        if (SafeRead32(val, &vt_val) && vt_val) {
-                            surface = val;
-                            if (g_vtableLogCount < 5) {
-                                LogWrite("[Surface] CYDDOffport[0x%X]+%d -> surface=0x%X vtable=0x%X\n",
-                                    cyAddr, offsets[j], surface, vt_val);
-                                g_vtableLogCount++;
-                            }
-                        }
-                    }
-                }
-                // 如果三个偏移都失败, dump 前 160 字节
-                if (!surface && g_surfaceFailCount == 0) {
-                    LogWrite("[Surface] CYDDOffport[0x%X] dump first 160 bytes:\n", cyAddr);
-                    for (int k = 0; k < 40; k++) {
-                        uint32_t val = 0;
-                        if (SafeRead32(cyAddr + k * 4, &val)) {
-                            LogWrite("  [%3d] (off %3d) = 0x%08X\n", k, k * 4, val);
-                        } else {
-                            LogWrite("  [%3d] (off %3d) = UNREADABLE\n", k, k * 4);
-                            break;
-                        }
-                    }
-                }
-            }
-        }
+    // 3. 读取像素缓冲区信息
+    if (!SafeRead32(info.obj + OFF_PIXELBUF, &info.pixelBuf) || !info.pixelBuf) {
+        if (g_blitFailCount < 5)
+            LogWrite("[Render] pixelBuf = 0 (obj=0x%X)\n", info.obj);
+        return false;
+    }
+    if (!SafeRead32(info.obj + OFF_WIDTH, &info.width) || !info.width) return false;
+    if (!SafeRead32(info.obj + OFF_HEIGHT, &info.height) || !info.height) return false;
+    if (!SafeRead32(info.obj + OFF_BPP, &info.bpp) || !info.bpp) return false;
+    if (!SafeRead32(info.obj + OFF_STRIDE, &info.stride) || !info.stride) return false;
+
+    // 4. 读取裁剪矩形
+    SafeRead32(info.obj + OFF_CLIP_LEFT, &info.clipL);
+    SafeRead32(info.obj + OFF_CLIP_TOP, &info.clipT);
+    SafeRead32(info.obj + OFF_CLIP_RIGHT, &info.clipR);
+    SafeRead32(info.obj + OFF_CLIP_BOT, &info.clipB);
+
+    // 使用 surface 尺寸作为默认裁剪
+    if (info.clipR == 0) info.clipR = info.width;
+    if (info.clipB == 0) info.clipB = info.height;
+
+    if (g_devDumpCount < 5) {
+        LogWrite("[Render] pixelBuf=0x%X %ux%u bpp=%u stride=%u clip=[%u,%u,%u,%u]\n",
+            info.pixelBuf, info.width, info.height, info.bpp, info.stride,
+            info.clipL, info.clipT, info.clipR, info.clipB);
+        g_devDumpCount++;
     }
 
-    if (!surface) {
-        if (g_surfaceFailCount < 10) {
-            uint32_t v1=0, v2=0, v3=0, v4=0;
-            SafeRead32(ADDR_7C89EC, &v1);
-            SafeRead32(ADDR_7CA9EC, &v2);
-            SafeRead32(ADDR_7C89E8, &v3);
-            SafeRead32(ADDR_7CA9E8, &v4);
-            LogWrite("[Surface] All sources failed (a4=0x%X 7C89EC=0x%X 7CA9EC=0x%X 7C89E8=0x%X 7CA9E8=0x%X)\n",
-                a4, v1, v2, v3, v4);
-        }
-        g_surfaceFailCount++;
-        return nullptr;
-    }
-
-    g_cachedBackSurface = (void*)surface;
-    return g_cachedBackSurface;
+    return true;
 }
 
-// ===================== GDI 文本绘制 (DirectDraw surface) =====================
-static bool GdiDrawText(int thisPtr, int a2, int a3, int a4, const wchar_t* wstr, int wlen) {
+// ===================== 直接像素缓冲区渲染 =====================
+static bool DirectBlitText(int thisPtr, int a2, int a3, int a4,
+                           const wchar_t* wstr, int wlen) {
     if (!wstr || wlen <= 0) return false;
 
-    // 获取 DirectDraw surface (传入 a4 渲染设备对象)
-    void* surface = GetBackBufferSurface(a4);
-    if (!surface) {
-        g_gdiFailCount++;
+    // 1. 获取渲染设备信息
+    RenderDevInfo rdi;
+    if (!GetRenderDevInfo(a4, rdi)) {
+        g_blitFailCount++;
         return false;
     }
 
-    // IDirectDrawSurface vtable: GetDC=slot16, ReleaseDC=slot25
-    // 用 SafeRead32 安全读取 vtable 指针和 slot
-    uint32_t vt_addr = 0;
-    if (!SafeRead32((uint32_t)surface, &vt_addr) || !vt_addr) {
-        if (g_gdiFailCount < 10) {
-            LogWrite("[GDI] Surface vtable unreadable (surface=0x%X)\n", (uint32_t)(uintptr_t)surface);
-        }
-        g_cachedBackSurface = nullptr;
-        g_gdiFailCount++;
-        return false;
-    }
-    
-    uint32_t getDC_addr = 0, releaseDC_addr = 0;
-    // vtable slot 16 = byte offset 64, slot 25 = byte offset 100
-    if (!SafeRead32(vt_addr + 64, &getDC_addr) || !getDC_addr) {
-        if (g_gdiFailCount < 10) {
-            LogWrite("[GDI] vtable[16] (GetDC) unreadable at 0x%X\n", vt_addr);
-        }
-        g_cachedBackSurface = nullptr;
-        g_gdiFailCount++;
-        return false;
-    }
-    if (!SafeRead32(vt_addr + 100, &releaseDC_addr) || !releaseDC_addr) {
-        if (g_gdiFailCount < 10) {
-            LogWrite("[GDI] vtable[25] (ReleaseDC) unreadable at 0x%X\n", vt_addr);
-        }
-        g_cachedBackSurface = nullptr;
-        g_gdiFailCount++;
-        return false;
-    }
-    
-    if (g_vtableLogCount <= 3) {
-        LogWrite("[GDI] vtable=0x%X GetDC=0x%X ReleaseDC=0x%X\n", vt_addr, getDC_addr, releaseDC_addr);
-    }
-    
-    DDSURFACE_GETDC pGetDC = (DDSURFACE_GETDC)getDC_addr;
-    DDSURFACE_RELEASEDC pReleaseDC = (DDSURFACE_RELEASEDC)releaseDC_addr;
-
-    // SEH 保护: DirectDraw surface 可能在调用时失效
-    HDC hdc = nullptr;
-    HRESULT hr = 0; // DD_OK
-    __try {
-        hr = pGetDC(surface, &hdc);
-    } __except (EXCEPTION_EXECUTE_HANDLER) {
-        if (g_gdiFailCount < 10) {
-            LogWrite("[GDI] GetDC SEH exception: 0x%08X\n", GetExceptionCode());
-        }
-        // 失效缓存, 下次重新获取
-        g_cachedBackSurface = nullptr;
-        g_gdiFailCount++;
-        return false;
-    }
-    if (FAILED(hr) || !hdc) {
-        if (g_gdiFailCount < 10) {
-            LogWrite("[GDI] Surface GetDC failed: hr=0x%08X\n", (unsigned)hr);
-        }
-        g_gdiFailCount++;
-        return false;
-    }
-
-    // 保存 DC 状态
-    int savedState = SaveDC(hdc);
-
-    // === 坐标系说明 ===
-    // DirectDraw surface DC 的坐标系是 surface 像素坐标 (0,0 = 左上角)
-    // 游戏的绘制坐标是客户区坐标, 应该与 surface 坐标一致 (全屏模式)
-    // 但如果窗口模式, surface 坐标可能需要偏移
-
-    // 从 this 对象读取位置信息
-    uint8_t* base = (uint8_t*)thisPtr;
-    uint32_t* dwordBase = (uint32_t*)base;
-
-    // sub_66E7B0 中的位置计算:
-    // v7 = this[3] + a2  -> 起始 X
-    // v8 = this[5] + a2  -> 结束 X  
-    // v10 = this[4] + a3 -> Y 上
-    // v65 = this[6] + a3 -> Y 下
+    // 2. 读取文本布局
+    uint32_t* dwordBase = (uint32_t*)thisPtr;
     int startX = (int)dwordBase[3] + a2;
     int endX   = (int)dwordBase[5] + a2;
     int startY = (int)dwordBase[4] + a3;
     int endY   = (int)dwordBase[6] + a3;
-
-    // 渲染标志
     uint8_t flags = (uint8_t)dwordBase[7];
-    bool centered  = (flags & 0x01) != 0;
+    uint32_t fgColor = dwordBase[25];  // 前景色
+    uint32_t bgColor = dwordBase[26];  // 描边色
+
+    bool centered   = (flags & 0x01) != 0;
     bool rightAlign = (flags & 0x02) != 0;
-    bool outlined  = (flags & 0x04) != 0;
-    bool vCentered = (flags & 0x08) != 0;
+    bool outlined   = (flags & 0x04) != 0;
+    bool vCentered  = (flags & 0x08) != 0;
 
-    // 颜色
-    uint32_t fgColorIdx = dwordBase[25];  // 前景色 (调色板索引)
-    uint32_t bgColorIdx = dwordBase[26];  // 描边色 (调色板索引)
+    // 3. 计算每像素字节数
+    int bytesPerPixel = rdi.bpp / 8;
+    if (bytesPerPixel < 1 || bytesPerPixel > 4) {
+        if (g_blitFailCount < 5)
+            LogWrite("[Blit] Unsupported BPP=%u\n", rdi.bpp);
+        g_blitFailCount++;
+        return false;
+    }
 
-    COLORREF fgColor = PalIndexToRgb(fgColorIdx);
-    COLORREF bgColor = PalIndexToRgb(bgColorIdx);
+    // 4. 创建内存 DC (用于 GetGlyphOutlineW)
+    HDC mdc = CreateCompatibleDC(nullptr);
+    if (!mdc) {
+        g_blitFailCount++;
+        return false;
+    }
+    HFONT oldFont = (HFONT)SelectObject(mdc, g_cjkFont);
 
-    // 映射
-    SetMapMode(hdc, MM_TEXT);
-    SetWindowOrgEx(hdc, 0, 0, nullptr);
-    SetViewportOrgEx(hdc, 0, 0, nullptr);
+    // 5. 测量文本总宽度
+    int totalWidth = 0;
+    int textHeight = g_fontSize;
+    int maxLineWidth = 0;
+    int curLineWidth = 0;
+    for (int i = 0; i < wlen; i++) {
+        if (wstr[i] == L'\n') {
+            if (curLineWidth > maxLineWidth) maxLineWidth = curLineWidth;
+            curLineWidth = 0;
+            textHeight += g_fontSize;
+            continue;
+        }
+        GLYPHMETRICS gm;
+        MAT2 mat = {{0,1},{0,0},{0,0},{0,1}};
+        DWORD ret = GetGlyphOutlineW(mdc, wstr[i], GGO_METRICS, &gm, 0, nullptr, &mat);
+        if (ret != GDI_ERROR) {
+            curLineWidth += gm.gmCellIncX;
+        }
+    }
+    if (curLineWidth > maxLineWidth) maxLineWidth = curLineWidth;
+    totalWidth = maxLineWidth;
 
-    // 选择字体
-    HFONT oldFont = (HFONT)SelectObject(hdc, g_cjkFont);
-
-    // 透明背景
-    SetBkMode(hdc, TRANSPARENT);
-
-    // 计算文本尺寸
-    SIZE textSize = {0, 0};
-    GetTextExtentPoint32W(hdc, wstr, wlen, &textSize);
-
-    // 计算绘制位置
+    // 6. 计算绘制位置
     int drawX = startX;
     int drawY = startY;
-
-    // 水平对齐
     if (centered) {
-        drawX += (endX - startX - textSize.cx) / 2;
+        drawX = startX + (endX - startX - totalWidth) / 2;
     } else if (rightAlign) {
-        drawX = endX - textSize.cx;
+        drawX = endX - totalWidth;
     }
-
-    // 垂直对齐
     if (vCentered) {
-        drawY += (endY - startY - textSize.cy) / 2;
+        drawY = startY + (endY - startY - textHeight) / 2;
     }
 
-    // 矩形裁剪
-    RECT clipRect;
-    clipRect.left = startX;
-    clipRect.top = startY;
-    clipRect.right = endX;
-    clipRect.bottom = endY;
+    // 7. 裁剪: 文本裁剪 + surface 裁剪
+    int clipL = startX > (int)rdi.clipL ? startX : (int)rdi.clipL;
+    int clipT = startY > (int)rdi.clipT ? startY : (int)rdi.clipT;
+    int clipR = endX < (int)rdi.clipR ? endX : (int)rdi.clipR;
+    int clipB = endY < (int)rdi.clipB ? endY : (int)rdi.clipB;
+    if (clipR > (int)rdi.width) clipR = (int)rdi.width;
+    if (clipB > (int)rdi.height) clipB = (int)rdi.height;
 
-    // 如果描边, 先画黑色描边
-    if (outlined) {
-        SetTextColor(hdc, bgColor);
-        for (int dx = -1; dx <= 1; dx++) {
+    if (g_blitCount < 5) {
+        LogWrite("[Blit %d] pos=(%d,%d) clip=[%d,%d,%d,%d] surf=[%u,%u,%u,%u] flags=0x%02X fg=0x%X bg=0x%X bpp=%u\n",
+            g_blitCount, drawX, drawY, clipL, clipT, clipR, clipB,
+            rdi.clipL, rdi.clipT, rdi.clipR, rdi.clipB,
+            flags, fgColor, bgColor, rdi.bpp);
+    }
+
+    // 8. 逐字符 blit
+    int curX = drawX;
+    int curY = drawY;
+
+    for (int i = 0; i < wlen; i++) {
+        if (wstr[i] == L'\n') {
+            curX = drawX;
+            curY += g_fontSize;
+            continue;
+        }
+        if (wstr[i] == L'\t') {
+            curX += g_fontSize * 4;
+            continue;
+        }
+
+        // 获取字形位图
+        GLYPHMETRICS gm;
+        MAT2 mat = {{0,1},{0,0},{0,0},{0,1}};
+        DWORD glyphSize = GetGlyphOutlineW(mdc, wstr[i], GGO_BITMAP, &gm, 0, nullptr, &mat);
+        if (glyphSize == GDI_ERROR || glyphSize == 0) {
+            // 无法获取字形, 用默认宽度前进
+            GLYPHMETRICS gm2;
+            DWORD ret = GetGlyphOutlineW(mdc, wstr[i], GGO_METRICS, &gm2, 0, nullptr, &mat);
+            if (ret != GDI_ERROR) {
+                curX += gm2.gmCellIncX;
+            } else {
+                curX += g_fontSize;  // fallback
+            }
+            continue;
+        }
+
+        std::vector<uint8_t> glyphBuf(glyphSize, 0);
+        if (GetGlyphOutlineW(mdc, wstr[i], GGO_BITMAP, &gm, glyphSize, glyphBuf.data(), &mat) == GDI_ERROR) {
+            curX += gm.gmCellIncX;
+            continue;
+        }
+
+        int glyphW = gm.gmBlackBoxX;
+        int glyphH = gm.gmBlackBoxY;
+        int glyphStride = ((glyphW + 7) / 8 + 3) & ~3;  // DWORD 对齐
+        int originX = gm.gmptGlyphOrigin.x;
+        int originY = gm.gmptGlyphOrigin.y;
+
+        // blit lambda: 把字形位图 blit 到像素缓冲区, 带偏移和颜色
+        auto blitGlyph = [&](int offX, int offY, uint32_t color) {
+            for (int py = 0; py < glyphH; py++) {
+                int dstY = curY + originY + py + offY;
+                if (dstY < clipT || dstY >= clipB) continue;
+                if (dstY < 0 || dstY >= (int)rdi.height) continue;
+
+                uint8_t* dstRow = (uint8_t*)rdi.pixelBuf + dstY * rdi.stride;
+                uint8_t* srcRow = glyphBuf.data() + py * glyphStride;
+
+                for (int px = 0; px < glyphW; px++) {
+                    // 检查位图位
+                    if (!(srcRow[px >> 3] & (0x80 >> (px & 7)))) continue;
+
+                    int dstX = curX + originX + px + offX;
+                    if (dstX < clipL || dstX >= clipR) continue;
+                    if (dstX < 0 || dstX >= (int)rdi.width) continue;
+
+                    // SEH 保护写入
+                    __try {
+                        switch (bytesPerPixel) {
+                            case 1:
+                                dstRow[dstX] = (uint8_t)color;
+                                break;
+                            case 2:
+                                *(uint16_t*)(dstRow + dstX * 2) = (uint16_t)color;
+                                break;
+                            case 3:
+                                dstRow[dstX * 3]     = (uint8_t)(color);
+                                dstRow[dstX * 3 + 1] = (uint8_t)(color >> 8);
+                                dstRow[dstX * 3 + 2] = (uint8_t)(color >> 16);
+                                break;
+                            case 4:
+                                *(uint32_t*)(dstRow + dstX * 4) = color;
+                                break;
+                        }
+                    } __except (EXCEPTION_EXECUTE_HANDLER) {
+                        // 写入失败, 跳过这个像素
+                    }
+                }
+            }
+        };
+
+        // 描边 (先画, 被前景色覆盖)
+        if (outlined) {
             for (int dy = -1; dy <= 1; dy++) {
-                if (dx == 0 && dy == 0) continue;
-                ExtTextOutW(hdc, drawX + dx, drawY + dy, ETO_CLIPPED, &clipRect, wstr, wlen, nullptr);
+                for (int dx = -1; dx <= 1; dx++) {
+                    if (dx == 0 && dy == 0) continue;
+                    blitGlyph(dx, dy, bgColor);
+                }
             }
         }
+
+        // 前景色
+        blitGlyph(0, 0, fgColor);
+
+        // 前进
+        curX += gm.gmCellIncX;
     }
 
-    // 前景色绘制
-    SetTextColor(hdc, fgColor);
-    ExtTextOutW(hdc, drawX, drawY, ETO_CLIPPED, &clipRect, wstr, wlen, nullptr);
+    // 清理
+    SelectObject(mdc, oldFont);
+    DeleteDC(mdc);
 
-    // 恢复 DC 状态
-    SelectObject(hdc, oldFont);
-    RestoreDC(hdc, savedState);
-
-    // 释放 DC (加 SEH 保护)
-    __try {
-        pReleaseDC(surface, hdc);
-    } __except (EXCEPTION_EXECUTE_HANDLER) {
-        if (g_gdiFailCount < 10) {
-            LogWrite("[GDI] ReleaseDC SEH exception: 0x%08X\n", GetExceptionCode());
-        }
-        g_cachedBackSurface = nullptr;
+    g_blitCount++;
+    if (g_blitCount <= 20) {
+        LogWrite("[Blit %d] done: text='%.*ls' pos=(%d,%d) chars=%d\n",
+            g_blitCount, (wlen < 40 ? wlen : 40), wstr, drawX, drawY, wlen);
     }
 
-    g_gdiDrawCount++;
-    if (g_gdiDrawCount <= 20) {
-        LogWrite("[GDI Draw %d] pos=(%d,%d) clip=[%d,%d,%d,%d] flags=0x%02X fg=%d bg=%d text='%.*ls'\n",
-            g_gdiDrawCount, drawX, drawY,
-            clipRect.left, clipRect.top, clipRect.right, clipRect.bottom,
-            flags, fgColorIdx, bgColorIdx,
-            (wlen < 30 ? wlen : 30), wstr);
-    }
-    
     return true;
 }
 
@@ -712,44 +605,37 @@ int __fastcall Hooked_66E7B0(int ecx_this, int edx_unused, int a2, int a3, int a
             g_hitCount, enText.substr(0, 60).c_str(), entry.cnWcharCount);
     }
 
-    // 用 GDI 在 DirectDraw surface 上绘制中文, 跳过原函数
+    // 直接像素缓冲区渲染, 跳过原函数
     const wchar_t* wstr = (const wchar_t*)entry.cnUtf16LE.data();
     int wlen = entry.cnWcharCount;
-    
-    bool drawn = GdiDrawText(ecx_this, a2, a3, a4, wstr, wlen);
+
+    bool drawn = DirectBlitText(ecx_this, a2, a3, a4, wstr, wlen);
     if (!drawn) {
-        // GDI 绘制失败, 回退到原函数 (会显示空白, 但不会崩溃)
-        if (g_gdiFailCount <= 5) {
-            LogWrite("[GDI] Draw failed, falling back to original (will be blank)\n");
+        if (g_blitFailCount <= 5) {
+            LogWrite("[Blit] Failed, falling back to original (will be blank)\n");
         }
         return g_orig66E7B0(ecx_this, edx_unused, a2, a3, a4);
     }
 
     g_replacedCount++;
-    
-    // 返回字符数 (原函数返回 v15 = 字符索引)
     return wlen;
 }
 
 // ===================== Hook 安装 =====================
 static bool InstallHooks() {
     uint8_t* p66E7B0 = (uint8_t*)ADDR_66E7B0;
-
     LogWrite("[Verify] sub_66E7B0 bytes: %02X %02X %02X %02X %02X %02X %02X\n",
         p66E7B0[0], p66E7B0[1], p66E7B0[2], p66E7B0[3], p66E7B0[4], p66E7B0[5], p66E7B0[6]);
-
     if (p66E7B0[0] != 0x6A || p66E7B0[1] != 0xFF) {
         LogWrite("[ERROR] sub_66E7B0 byte mismatch: expected 6A FF, got %02X %02X\n",
             p66E7B0[0], p66E7B0[1]);
         return false;
     }
-
     MH_STATUS status = MH_Initialize();
     if (status != MH_OK && status != MH_ERROR_ALREADY_INITIALIZED) {
         LogWrite("[Hook] MH_Initialize failed: %s\n", MH_StatusToString(status));
         return false;
     }
-
     status = MH_CreateHook((LPVOID)ADDR_66E7B0, (LPVOID)&Hooked_66E7B0, (LPVOID*)&g_orig66E7B0);
     if (status != MH_OK) {
         LogWrite("[Hook] MH_CreateHook(66E7B0) failed: %s\n", MH_StatusToString(status));
@@ -761,7 +647,6 @@ static bool InstallHooks() {
         return false;
     }
     LogWrite("[Hook] sub_66E7B0 hooked, trampoline=%p\n", g_orig66E7B0);
-
     return true;
 }
 
@@ -769,72 +654,54 @@ static bool InstallHooks() {
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
     if (dwReason == DLL_PROCESS_ATTACH) {
         DisableThreadLibraryCalls(hModule);
-
         HMODULE hExe = GetModuleHandleA(nullptr);
         if (!hExe) return TRUE;
-
         char path[MAX_PATH];
         GetModuleFileNameA(hExe, path, MAX_PATH);
         if (!strstr(path, "MajestyHD.exe") && !strstr(path, "majestyhd.exe")) {
             return TRUE;
         }
-
         char logPath[MAX_PATH];
         GetModuleFileNameA(hModule, logPath, MAX_PATH);
         char* p = strrchr(logPath, '\\');
-        if (p) {
-            strcpy(p + 1, "MajestyI_TextFix.log");
-        } else {
-            strcpy(logPath, "MajestyI_TextFix.log");
-        }
-
+        if (p) strcpy(p + 1, "MajestyI_TextFix.log");
+        else strcpy(logPath, "MajestyI_TextFix.log");
         g_logFile = fopen(logPath, "w");
         if (g_logFile) {
-            fprintf(g_logFile, "[MajestyHD Runtime Localization v10.1 DirectDraw Surface GetDC] DllMain ATTACH\n");
+            fprintf(g_logFile, "[MajestyHD Runtime Localization v11.0 Direct Pixel Buffer] DllMain ATTACH\n");
             fprintf(g_logFile, "  Exe path: %s\n", path);
             fprintf(g_logFile, "  Log path: %s\n", logPath);
-            fprintf(g_logFile, "  Strategy: hook sub_66E7B0 + IDirectDrawSurface::GetDC + GDI ExtTextOutW\n\n");
+            fprintf(g_logFile, "  Strategy: hook sub_66E7B0 + CYOffportIMP pixel buffer + GetGlyphOutlineW\n\n");
             fflush(g_logFile);
         }
-
         char dictPath[MAX_PATH];
         GetModuleFileNameA(hModule, dictPath, MAX_PATH);
         char* p2 = strrchr(dictPath, '\\');
-        if (p2) {
-            strcpy(p2 + 1, "dict.txt");
-        } else {
-            strcpy(dictPath, "dict.txt");
-        }
-
+        if (p2) strcpy(p2 + 1, "dict.txt");
+        else strcpy(dictPath, "dict.txt");
         if (LoadDict(dictPath)) {
             LogWrite("[Dict] Loaded %d entries from %s\n", g_dictCount, dictPath);
         } else {
             LogWrite("[ERROR] Failed to load dict from %s\n", dictPath);
         }
-
-        // 初始化 GDI 字体
         InitGdiFonts();
-
         if (InstallHooks()) {
             LogWrite("\n[Init] Hook installed successfully\n");
         } else {
             LogWrite("\n[ERROR] Hook installation failed\n");
         }
-
         fflush(g_logFile);
-
     } else if (dwReason == DLL_PROCESS_DETACH) {
         if (g_logFile) {
-            fprintf(g_logFile, "\n[DllMain] DETACH (v10.1)\n");
+            fprintf(g_logFile, "\n[DllMain] DETACH (v11.0)\n");
             fprintf(g_logFile, "  Calls=%d Replaced=%d Hits=%d Misses=%d\n",
                 g_callCount, g_replacedCount, g_hitCount, g_missCount);
-            fprintf(g_logFile, "  GDI Draws=%d GDI Fails=%d Surface Fails=%d\n",
-                g_gdiDrawCount, g_gdiFailCount, g_surfaceFailCount);
+            fprintf(g_logFile, "  Blits=%d BlitFails=%d\n",
+                g_blitCount, g_blitFailCount);
             fclose(g_logFile);
             g_logFile = nullptr;
         }
         if (g_cjkFont) { DeleteObject(g_cjkFont); g_cjkFont = nullptr; }
-        if (g_cjkFontBold) { DeleteObject(g_cjkFontBold); g_cjkFontBold = nullptr; }
     }
     return TRUE;
 }
