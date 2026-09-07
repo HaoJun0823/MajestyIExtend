@@ -1,14 +1,3 @@
----
-AIGC:
-  ContentProducer: '001191110102MAD55U9H0F10002'
-  ContentPropagator: '001191110102MAD55U9H0F10002'
-  Label: '1'
-  ProduceID: 'eb1bdc95-c8cc-4dfd-b847-dca687c731b3'
-  PropagateID: 'eb1bdc95-c8cc-4dfd-b847-dca687c731b3'
-  ReservedCode1: 'f1afabd0-d23e-4aa7-bff4-2e450375d267'
-  ReservedCode2: 'f1afabd0-d23e-4aa7-bff4-2e450375d267'
----
-
 # Majesty HD 汉化项目（MajestyIExtend）
 
 《Majesty HD》（王权1高清版）完整中文本地化方案。采用 **双层架构**：
