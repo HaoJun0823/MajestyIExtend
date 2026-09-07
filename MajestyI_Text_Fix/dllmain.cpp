@@ -112,9 +112,19 @@ static int g_surfaceFailCount = 0;
 
 // ===================== surface 缓存 =====================
 static void* g_cachedBackSurface = nullptr;
-static void* g_cachedPrimarySurface = nullptr;
 static int g_surfaceCacheMissCount = 0;
 static int g_vtableLogCount = 0;
+
+// ===================== IsBadReadPtr 替代: 安全读取 4 字节 =====================
+static bool SafeRead32(uint32_t addr, uint32_t* out) {
+    if (!addr) return false;
+    __try {
+        *out = *(uint32_t*)addr;
+        return true;
+    } __except (EXCEPTION_EXECUTE_HANDLER) {
+        return false;
+    }
+}
 
 static void LogWrite(const char* fmt, ...) {
     if (!g_logFile) return;
@@ -347,80 +357,76 @@ static COLORREF PalIndexToRgb(uint32_t palIndex) {
 }
 
 // ===================== 获取 DirectDraw surface =====================
-// 策略:
-//   1. 先尝试 dword_7C89EC (原始 IDirectDrawSurface* back buffer)
-//   2. 回退到 CYDDOffport[33] (字节偏移 132)
-//   3. 回退到 dword_7C89E8 (原始 primary surface)
+// 策略: 从多个全局变量获取 surface 指针, 用 SEH 保护
 static void* GetBackBufferSurface() {
     // 优先使用缓存
     if (g_cachedBackSurface) {
-        void* vt = *(void**)g_cachedBackSurface;
-        if (vt) return g_cachedBackSurface;
+        uint32_t vt_val = 0;
+        if (SafeRead32((uint32_t)g_cachedBackSurface, &vt_val) && vt_val) {
+            return g_cachedBackSurface;
+        }
         g_cachedBackSurface = nullptr;
     }
 
-    // 方案1: 直接从 dword_7C89EC 获取原始 back buffer surface 指针
-    uint32_t surface = *(uint32_t*)ADDR_7C89EC;
-    if (surface && g_vtableLogCount < 3) {
-        void* vt = *(void**)surface;
-        LogWrite("[Surface] dword_7C89EC = 0x%X, vtable=%p, vt[0]=%p, vt[16]=%p\n",
-            surface, vt, ((void**)vt)[0], ((void**)vt)[16]);
-        g_vtableLogCount++;
-    }
-    if (!surface) {
-        // 方案2: 从 CYDDOffport 获取
-        uint32_t cyDDOffport = *(uint32_t*)ADDR_7CA9EC;
-        if (cyDDOffport) {
-            surface = *(uint32_t*)(cyDDOffport + 132);
-            if (surface && g_vtableLogCount < 3) {
-                void* vt = *(void**)surface;
-                LogWrite("[Surface] CYDDOffport[33] = 0x%X, vtable=%p, vt[0]=%p, vt[16]=%p\n",
-                    surface, vt, ((void**)vt)[0], ((void**)vt)[16]);
-                g_vtableLogCount++;
+    // 按优先级尝试多个来源
+    uint32_t candidates[] = {
+        ADDR_7C89EC,   // 原始 back buffer surface
+        ADDR_7C89E8,   // 原始 primary surface
+    };
+
+    uint32_t surface = 0;
+    for (int i = 0; i < 2 && !surface; i++) {
+        uint32_t addr = candidates[i];
+        if (SafeRead32(addr, &surface) && surface) {
+            // 验证 surface 的 vtable 指针
+            uint32_t vt_val = 0;
+            if (SafeRead32(surface, &vt_val) && vt_val) {
+                if (g_vtableLogCount < 3) {
+                    LogWrite("[Surface] Source 0x%X -> surface=0x%X vtable=0x%X\n", addr, surface, vt_val);
+                    g_vtableLogCount++;
+                }
+            } else {
+                surface = 0; // vtable 无效, 继续尝试
             }
         }
     }
+
+    // 如果直接来源都失败, 尝试 CYDDOffport
     if (!surface) {
-        // 方案3: 从 dword_7C89E8 获取 primary surface
-        surface = *(uint32_t*)ADDR_7C89E8;
-        if (surface && g_vtableLogCount < 3) {
-            void* vt = *(void**)surface;
-            LogWrite("[Surface] dword_7C89E8 = 0x%X, vtable=%p, vt[0]=%p, vt[16]=%p\n",
-                surface, vt, ((void**)vt)[0], ((void**)vt)[16]);
-            g_vtableLogCount++;
-        }
-    }
-    if (!surface) {
-        // 方案4: 从 CYDDOffport primary 获取
-        uint32_t cyDDOffport = *(uint32_t*)ADDR_7CA9E8;
-        if (cyDDOffport) {
-            surface = *(uint32_t*)(cyDDOffport + 132);
+        uint32_t cyOff[] = { ADDR_7CA9EC, ADDR_7CA9E8 };
+        for (int i = 0; i < 2 && !surface; i++) {
+            uint32_t cyAddr = 0;
+            if (SafeRead32(cyOff[i], &cyAddr) && cyAddr) {
+                // CYDDOffport[33] (DWORD index 33 = byte offset 132)
+                if (SafeRead32(cyAddr + 132, &surface) && surface) {
+                    uint32_t vt_val = 0;
+                    if (SafeRead32(surface, &vt_val) && vt_val) {
+                        if (g_vtableLogCount < 3) {
+                            LogWrite("[Surface] CYDDOffport[0x%X]+132 -> surface=0x%X vtable=0x%X\n", cyAddr, surface, vt_val);
+                            g_vtableLogCount++;
+                        }
+                    } else {
+                        surface = 0;
+                    }
+                }
+            }
         }
     }
 
     if (!surface) {
         if (g_surfaceFailCount < 10) {
-            LogWrite("[Surface] All surface sources null (7C89EC=%d, 7CA9EC=%d, 7C89E8=%d, 7CA9E8=%d)\n",
-                *(uint32_t*)ADDR_7C89EC, *(uint32_t*)ADDR_7CA9EC,
-                *(uint32_t*)ADDR_7C89E8, *(uint32_t*)ADDR_7CA9E8);
+            uint32_t v1=0, v2=0, v3=0, v4=0;
+            SafeRead32(ADDR_7C89EC, &v1);
+            SafeRead32(ADDR_7CA9EC, &v2);
+            SafeRead32(ADDR_7C89E8, &v3);
+            SafeRead32(ADDR_7CA9E8, &v4);
+            LogWrite("[Surface] All sources failed (7C89EC=0x%X 7CA9EC=0x%X 7C89E8=0x%X 7CA9E8=0x%X)\n", v1, v2, v3, v4);
         }
         g_surfaceFailCount++;
         return nullptr;
     }
 
-    // 验证 surface: 检查 vtable 指针
-    void* vt = *(void**)surface;
-    if (!vt) {
-        if (g_surfaceFailCount < 10) {
-            LogWrite("[Surface] Surface vtable is null (surface=0x%X)\n", surface);
-        }
-        g_surfaceFailCount++;
-        return nullptr;
-    }
-
-    // 缓存
     g_cachedBackSurface = (void*)surface;
-    LogWrite("[Surface] Cached surface: 0x%X (vtable=%p)\n", surface, vt);
     return g_cachedBackSurface;
 }
 
@@ -436,17 +442,42 @@ static bool GdiDrawText(int thisPtr, int a2, int a3, const wchar_t* wstr, int wl
     }
 
     // IDirectDrawSurface vtable: GetDC=slot16, ReleaseDC=slot25
-    void** vtable = *(void***)surface;
-    DDSURFACE_GETDC pGetDC = (DDSURFACE_GETDC)vtable[16];
-    DDSURFACE_RELEASEDC pReleaseDC = (DDSURFACE_RELEASEDC)vtable[25];
-
-    if (!pGetDC || !pReleaseDC) {
+    // 用 SafeRead32 安全读取 vtable 指针和 slot
+    uint32_t vt_addr = 0;
+    if (!SafeRead32((uint32_t)surface, &vt_addr) || !vt_addr) {
         if (g_gdiFailCount < 10) {
-            LogWrite("[GDI] vtable slot null: GetDC=%p ReleaseDC=%p\n", pGetDC, pReleaseDC);
+            LogWrite("[GDI] Surface vtable unreadable (surface=0x%X)\n", (uint32_t)(uintptr_t)surface);
         }
+        g_cachedBackSurface = nullptr;
         g_gdiFailCount++;
         return false;
     }
+    
+    uint32_t getDC_addr = 0, releaseDC_addr = 0;
+    // vtable slot 16 = byte offset 64, slot 25 = byte offset 100
+    if (!SafeRead32(vt_addr + 64, &getDC_addr) || !getDC_addr) {
+        if (g_gdiFailCount < 10) {
+            LogWrite("[GDI] vtable[16] (GetDC) unreadable at 0x%X\n", vt_addr);
+        }
+        g_cachedBackSurface = nullptr;
+        g_gdiFailCount++;
+        return false;
+    }
+    if (!SafeRead32(vt_addr + 100, &releaseDC_addr) || !releaseDC_addr) {
+        if (g_gdiFailCount < 10) {
+            LogWrite("[GDI] vtable[25] (ReleaseDC) unreadable at 0x%X\n", vt_addr);
+        }
+        g_cachedBackSurface = nullptr;
+        g_gdiFailCount++;
+        return false;
+    }
+    
+    if (g_vtableLogCount <= 3) {
+        LogWrite("[GDI] vtable=0x%X GetDC=0x%X ReleaseDC=0x%X\n", vt_addr, getDC_addr, releaseDC_addr);
+    }
+    
+    DDSURFACE_GETDC pGetDC = (DDSURFACE_GETDC)getDC_addr;
+    DDSURFACE_RELEASEDC pReleaseDC = (DDSURFACE_RELEASEDC)releaseDC_addr;
 
     // SEH 保护: DirectDraw surface 可能在调用时失效
     HDC hdc = nullptr;
