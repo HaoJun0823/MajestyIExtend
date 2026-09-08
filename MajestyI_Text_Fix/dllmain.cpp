@@ -1,4 +1,4 @@
-﻿// dllmain.cpp : Majesty HD Runtime Localization v24.0 (BG-LRU v9: hit=endY / moved=clipB dual-erase)
+﻿// dllmain.cpp : Majesty HD Runtime Localization v25.0 (Engine vtable fill: use engine's own FillRect to cover old text)
 //
 // v16.0 motion.log 定案(推翻 v15 推论): DirectBlit 在单位移动/相机平移期间
 //   **每帧都被调用且位置连续变化** (农民#1: 462 次移动/249 位置, +6px/帧平滑走 200px)。
@@ -109,6 +109,16 @@
 //   moved(位置变): WriteBack擦到s.b(=clipB)→清旧字底部残影✓。旧位置无血条
 //     (旧血条在旧endY以下, 擦到clipB覆盖旧血条→但旧位置不再显示→无视觉影响)。
 //   Capture/V15BgDrifted 仍用s.b(=clipB, 全矩形)→不变。
+//
+// v25.0 (Engine vtable fill): 跳出 BG-LRU，回归引擎原生机制。
+//   原版 sub_66E7B0 画字前调用 vtable[0xF8](偏移248, 索引62) 填充半透明背景矩形,
+//   背景色默认 dwordBase[13] (0x80FFFFFF = 白色 alpha=0x80)。每帧重绘时半透明背景
+//   天然覆盖旧字 → 无残影。汉化 DirectBlit 跳过了此填充 → 旧字无人覆盖 → 残影。
+//   v25: 在 DirectBlitText 画字前同样调用 vtable[62] 填充背景, 并禁用 BG-LRU。
+//   - 半透明不完全遮挡背景 → 视觉可接受
+//   - 引擎自己的填充函数知道边界 → 不会花块
+//   - 完全不需要 BG-LRU 像素缓存/恢复 → 无血条伪影
+//   - BG-LRU 代码保留但不调用(V15EraseOldText 不再被调用), 便于回退
 
 #include "pch.h"
 #include <psapi.h>
@@ -1408,6 +1418,29 @@ int __cdecl Hooked_5D7720(int a1, void* a2, void* a3, int a4, int a5) {
     return g_orig5D7720(a1, a2, a3, a4, a5);
 }
 
+// ===================== V25: Engine vtable fill =====================
+// 调用引擎自己的 vtable[62](偏移 248) 填充半透明背景矩形, 与原版 sub_66E7B0 一致。
+// __thiscall: this=device(ECX), 其余参数压栈(left, top, right, bottom, color, 0)
+typedef void (__thiscall *EngineFillRect_t)(uint32_t device, int left, int top, int right, int bottom, int color, int zero);
+
+static int g_v25FillCount = 0;
+static int g_v25FillFail = 0;
+
+static void V25FillBackground(const RenderDevInfo& rdi, int left, int top, int right, int bottom, int color) {
+    if (!rdi.obj || left >= right || top >= bottom) return;
+    uint32_t vtable = 0;
+    if (!SafeRead32(rdi.obj, &vtable) || !vtable) { g_v25FillFail++; return; }
+    uint32_t funcPtr = 0;
+    if (!SafeRead32(vtable + 248, &funcPtr) || !funcPtr) { g_v25FillFail++; return; }
+    EngineFillRect_t fillRect = (EngineFillRect_t)funcPtr;
+    __try {
+        fillRect(rdi.obj, left, top, right, bottom, color, 0);
+        g_v25FillCount++;
+    } __except (EXCEPTION_EXECUTE_HANDLER) {
+        g_v25FillFail++;
+    }
+}
+
 // ===================== 直接像素缓冲区渲染 =====================
 static bool DirectBlitText(int thisPtr, int a2, int a3, int a4,
                            const wchar_t* wstr, int wlen) {
@@ -1623,29 +1656,20 @@ static bool DirectBlitText(int thisPtr, int a2, int a3, int a4,
         }
     }
 
-    // ★ v15.0/v17.0 方案 C: 画字前擦除旧字 + 缓存干净背景
-    //   顺序: V15EraseOldText(恢复同位置背景→擦旧字) 必须先于任何画像素
-    //   v17: 键 = (thisPtr, textHash)。同 this 同文本位置变化 = 移动 → 立即擦旧位
+    // ★ v25.0: 用引擎 vtable[62] 填充半透明背景, 替代 BG-LRU
+    //   原版 sub_66E7B0 在画字前用 vtable[0xF8] 填充整个文字区域,
+    //   背景色 dwordBase[13] (半透明, 默认 0x80FFFFFF)。
+    //   每帧重绘时半透明背景覆盖旧字 → 无残影, 无需像素缓存/恢复。
+    //   BG-LRU (V15EraseOldText) 不再调用, 代码保留便于回退。
     {
-        // 用文本实际落地区域(与画字裁剪一致), 外扩描边+反锯齿淡出余量。
-        // v23: 非对称pad — 左/右/上=ow+2(覆盖描边+反锯齿), 底部=0。
-        // v24: hit擦到endY(不碰血条), moved擦到clipB(清旧字底部)。
-        //   b=clipB(slot匹配用), hitEraseB=endY(hit擦除底边)。
-        //   hit(同位置): 新字直接覆盖旧字底部(endY~clipB), 擦到endY足够。
-        //   moved(位置变): 旧字底部残影在endY~clipB, 必须擦到clipB才清。
-        int eL = clipL, eT = clipT, eR = clipR;
-        int eB = clipB;  // slot 匹配矩形 b=clipB
-        int hitEraseB = endY < (int)rdi.clipB ? endY : (int)rdi.clipB;  // hit 擦除底边=endY
-        int ow = outlined ? (g_cfg.outlineWidth > 0 ? g_cfg.outlineWidth : 1) : 0;
-        int padSide = ow + 2;   // 左/右/上
-        if (eL - padSide > 0) eL -= padSide;
-        if (eT - padSide > 0) eT -= padSide;
-        if (eR + padSide < (int)rdi.width) eR += padSide;
-        // 底部不扩(eB=clipB不扩, hitEraseB=endY不扩)
-        // 注意: 这里不能包 __try(DirectBlitText 有 std::vector 需对象展开 → C2712)
-        //       V15EraseOldText 内部已有 __try 保护
-        uint32_t thash = V15TextHash(wstr, wlen);
-        V15EraseOldText((uint32_t)thisPtr, thash, eL, eT, eR, eB, hitEraseB, rdi);
+        int bgFillColor = (int)dwordBase[13];   // 引擎的填充背景色
+        if (bgFillColor == 0) bgFillColor = 0x80FFFFFF;  // 默认: 半透明白色
+        int fillBottom = effectiveEndY;  // CJK 字体可能比 endY 高
+        V25FillBackground(rdi, startX, startY, endX, fillBottom, bgFillColor);
+        if (g_blitCount < 20) {
+            LogWrite("[V25] fill bg=0x%X rect=(%d,%d,%d,%d) fillCalls=%d\n",
+                bgFillColor, startX, startY, endX, fillBottom, g_v25FillCount);
+        }
     }
 
     // ★ 渲染：使用换行位置逐行绘制
@@ -2017,7 +2041,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
         sprintf_s(motionLogPath, "%smotion.log", dllDir);
         g_motionFile = fopen(motionLogPath, "w");
         if (g_logFile) {
-            fprintf(g_logFile, "[MajestyHD Runtime Localization v19.0 BG-LRU v4 (no time-based expire)] DllMain ATTACH\n");
+            fprintf(g_logFile, "[MajestyHD Runtime Localization v25.0 Engine vtable fill] DllMain ATTACH\n");
             fprintf(g_logFile, "  Exe path: %s\n", path);
             fprintf(g_logFile, "  Log path: %s\n", logPath);
             fprintf(g_logFile, "  Motion log: %s\n", motionLogPath);
@@ -2081,7 +2105,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
         fflush(g_logFile);
     } else if (dwReason == DLL_PROCESS_DETACH) {
         if (g_logFile) {
-            fprintf(g_logFile, "\n[DllMain] DETACH (v23.1)\n");
+            fprintf(g_logFile, "\n[DllMain] DETACH (v25.0)\n");
             fprintf(g_logFile, "  Calls=%d Replaced=%d Hits=%d (unique=%d) Rollback=%d (unique=%d) Misses=%d (unique=%d)\n",
                 g_callCount, g_replacedCount, g_hitCount, (int)g_hitSeen.size(),
                 g_rollbackHitCount, (int)g_rollbackSeen.size(),
@@ -2094,8 +2118,10 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
             fprintf(g_logFile, "  SubmitDelta: ok=%d zero=%d weird=%d  DirtyMgr: nonNull=%d null=%d\n",
                 g_dirtyDeltaOK, g_dirtyDeltaZero, g_dirtyDeltaWeird,
                 g_dirtyMgrNonNull, g_dirtyMgrNull);
-            // v19.0 总账 (BG-LRU v4: no time-based expire)
-            fprintf(g_logFile, "  BG-LRU(v23.1): hits=%d moved=%d new=%d clean=%d drift=%d skip=%d full=%d oor=%d\n",
+            // v25.0 总账 (Engine vtable fill)
+            fprintf(g_logFile, "  V25Fill: calls=%d fails=%d\n", g_v25FillCount, g_v25FillFail);
+            // BG-LRU (v25 已禁用, 统计应为 0)
+            fprintf(g_logFile, "  BG-LRU(disabled): hits=%d moved=%d new=%d clean=%d drift=%d skip=%d full=%d oor=%d\n",
                 g_v15Hits, g_v15Moved, g_v15New, g_v15Clean, g_v15Drift, g_v15Skip, g_v15Full, g_v15OOR);
             // v16.0 总账
             fprintf(g_logFile, "  Motion: lines=%d\n", g_motionLines);
