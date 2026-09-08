@@ -1,4 +1,4 @@
-﻿// dllmain.cpp : Majesty HD Runtime Localization v23.2 (BG-LRU v8.2: eraseB=endY separates match-rect from erase-rect)
+﻿// dllmain.cpp : Majesty HD Runtime Localization v23.1 (BG-LRU v8.1: erase bottom=endY not clipB)
 //
 // v16.0 motion.log 定案(推翻 v15 推论): DirectBlit 在单位移动/相机平移期间
 //   **每帧都被调用且位置连续变化** (农民#1: 462 次移动/249 位置, +6px/帧平滑走 200px)。
@@ -115,15 +115,10 @@
 //   根因: clipB=effectiveEndY=startY+textHeight(CJK扩展) > endY → 擦除底边侵入
 //   血条区域 → Capture缓存旧血条 → WriteBack回写 → 蓝色伪影。
 //
-// v23.1 修复: 擦除底边用原版 endY 而非 clipB。但实测文字+血条伪影均有回退
-//   —— endY 太小漏 CJK 底部笔画→文字残影; slot 匹配也变了→某些 hit 变 moved→闪烁。
-//
-// v23.2 修复 (BG-LRU v8.2): **分离匹配矩形与擦除矩形**。
-//   V15Slot 增加 eraseB 字段: s.b=clipB(用于 slot 匹配, 保证 hit 精确命中),
-//   s.eraseB=endY(用于 Capture/WriteBack/BgDrifted 实际像素操作, 不碰血条)。
-//   内存分配按 eraseB 大小, BgDrifted/WriteBack/Capture 循环用 eraseB-s.t。
-//   两全其美: slot 匹配完整(无闪烁), 像素操作不碰血条(无蓝色伪影)。
-//   CJK 字底部(endY~clipB 间 1-2px): hit 时新字直接覆盖, moved 时不擦(微小残影)。
+// v23.1 修复: 擦除底边用原版 endY 而非 clipB。endY 是引擎给的文字区域下界,
+//   血条在 endY 以下。CJK扩展只用于画字裁剪(blitGlyph的clip检查), 不用于擦除。
+//   hit(同位置): 新字直接覆盖旧字底部像素, 无需擦到clipB。
+//   moved: CJK字底部1-2px可能微小残影, 但远好于血条伪影。
 
 #include "pch.h"
 #include <psapi.h>
@@ -1052,8 +1047,7 @@ static int V15ThisLastSeen(uint32_t thisPtr) {
 struct V15Slot {
     uint32_t thisPtr;         // DirectBlit 对象(this) — 标签归属
     uint32_t textHash;        // 文本 hash — 区分同 this 的不同标签
-    int l, t, r, b;           // 缓存矩形(用于 slot 匹配, b=clipB)
-    int eraseB;               // v23.2: 实际擦除/缓存底边(=endY, ≤b, 不碰血条)
+    int l, t, r, b;           // 缓存矩形(已按 clip 归一)
     int rowBytes;             // 一行字节数 = w*bppB
     int bppB;                 // bytes per pixel
     int lastTick;
@@ -1085,7 +1079,7 @@ static uint32_t V15TextHash(const wchar_t* s, int n) {
 // 返回 true = 背景已漂移(引擎滚动/重画过该区域) → 调用方应跳过写回。
 static bool V15BgDrifted(const V15Slot& s, const RenderDevInfo& rdi) {
     uint8_t* px = (uint8_t*)rdi.pixelBuf;
-    int w = s.r - s.l, h = s.eraseB - s.t;  // v23.2: eraseB 不碰血条
+    int w = s.r - s.l, h = s.b - s.t;
     if (w <= 0 || h <= 0) return false;
     int stepX = w / 8, stepY = h / 8;
     if (stepX < 1) stepX = 1;
@@ -1132,7 +1126,7 @@ static bool V15BgDrifted(const V15Slot& s, const RenderDevInfo& rdi) {
 static bool V15WriteBack(const V15Slot& s, const RenderDevInfo& rdi, bool force) {
     if (!force && V15BgDrifted(s, rdi)) return false;
     uint8_t* px = (uint8_t*)rdi.pixelBuf;
-    int h = s.eraseB - s.t;  // v23.2: eraseB 不碰血条
+    int h = s.b - s.t;
     for (int yy = 0; yy < h; yy++) {
         int dy = s.t + yy;
         if (dy < 0 || dy >= (int)rdi.height) continue;
@@ -1150,7 +1144,7 @@ static bool V15WriteBack(const V15Slot& s, const RenderDevInfo& rdi, bool force)
 // 把 pixelBuf 的 clip 区域背景保存进 slot.buf(全矩形宽, 含不可见列)
 static bool V15Capture(V15Slot& s, const RenderDevInfo& rdi) {
     uint8_t* px = (uint8_t*)rdi.pixelBuf;
-    int h = s.eraseB - s.t, w = s.r - s.l;  // v23.2: eraseB 不碰血条
+    int h = s.b - s.t, w = s.r - s.l;
     s.rowBytes = w * s.bppB;
     for (int yy = 0; yy < h; yy++) {
         int dy = s.t + yy;
@@ -1194,18 +1188,15 @@ static void V15Expire(const RenderDevInfo& rdi) {
 
 // 主入口: restore(命中→擦旧字) + capture(重存干净背景)。必须在画字前调用。
 // thisPtr/textHash: 标签归属键。同(this,text)矩形变了 = 移动 → 立即擦旧位置。
-// l/t/r/b: slot匹配矩形(用clipB)。eraseB: 实际擦除底边(=endY, ≤b, 不碰血条)。
 static void V15EraseOldText(uint32_t thisPtr, uint32_t textHash, int l, int t, int r, int b,
-                            int eraseB, const RenderDevInfo& rdi) {
+                            const RenderDevInfo& rdi) {
     if (r <= l || b <= t) return;
     if (!rdi.pixelBuf || !rdi.stride) return;
     int bppB = (int)(rdi.bpp / 8);
     if (bppB < 1 || bppB > 4) return;
-    if (eraseB > b) eraseB = b;  // 安全 clamp
-    if (eraseB <= t) eraseB = b; // 异常回退
-    int w = r - l, hErase = eraseB - t;  // 缓冲区按 eraseB 分配
-    if (w <= 0 || hErase <= 0) return;
-    if ((size_t)w * hErase * bppB > V15_MAX_BUF) { g_v15Skip++; return; }
+    int w = r - l, h = b - t;
+    if (w <= 0 || h <= 0) return;
+    if ((size_t)w * h * bppB > V15_MAX_BUF) { g_v15Skip++; return; }
 
     g_v15Tick++;
     V15TouchThis(thisPtr, g_v15Tick);   // 记录活跃(统计用; v19 不再驱动过期)
@@ -1259,12 +1250,11 @@ static void V15EraseOldText(uint32_t thisPtr, uint32_t textHash, int l, int t, i
     if (freeIdx < 0) { g_v15Full++; return; }
     V15Slot& s = g_v15[freeIdx];
     memset(&s, 0, sizeof(s));
-    s.buf = (uint8_t*)malloc((size_t)w * hErase * bppB);  // v23.2: 按 eraseB 分配
+    s.buf = (uint8_t*)malloc((size_t)w * h * bppB);
     if (!s.buf) { g_v15Skip++; return; }
     s.thisPtr = thisPtr;
     s.textHash = textHash;
     s.l = l; s.t = t; s.r = r; s.b = b;
-    s.eraseB = eraseB;  // v23.2: 实际擦除底边
     s.bppB = bppB;
     s.rowBytes = w * bppB;
     s.lastTick = g_v15Tick;
@@ -1643,25 +1633,24 @@ static bool DirectBlitText(int thisPtr, int a2, int a3, int a4,
     //   v17: 键 = (thisPtr, textHash)。同 this 同文本位置变化 = 移动 → 立即擦旧位
     {
         // 用文本实际落地区域(与画字裁剪一致), 外扩描边+反锯齿淡出余量。
-        // v23.2: slot 匹配矩形 b=clipB(完整匹配), eraseB=endY(不碰血条)。
-        //   clipB=effectiveEndY 经 CJK 扩展比 endY 多几像素→侵入血条→
-        //   Capture/WriteBack 若用 clipB 则缓存/回写含血条行→蓝色伪影。
-        //   eraseB=endY: 缓存只到 endY, 不碰血条; slot 匹配仍用 clipB 保证
-        //   hit(同位置含CJK扩展)精确命中。CJK字底部(endY~clipB间)1-2px在hit时
-        //   由新字直接覆盖, moved时不擦(微小残影可忽略)。
+        // v23: 非对称pad — 左/右/上=ow+2(覆盖描边+反锯齿), 底部=0。
+        // v23.1: 擦除底边用原版 endY 而非 clipB(=effectiveEndY)。
+        //   clipB 经 CJK 扩展(startY+textHeight) 比 endY 多几像素→侵入血条→
+        //   Capture 缓存旧血条→WriteBack 回写→蓝色伪影。
+        //   用 endY: 擦除不碰血条; CJK 字底部 1-2px 在 hit(同位置)由新字覆盖,
+        //   moved 时有微小残影但可忽略(用户:v21"文字没有残影")。
         int eL = clipL, eT = clipT, eR = clipR;
-        int eB = clipB;  // slot 匹配用 clipB(完整)
-        int eraseB = endY < (int)rdi.clipB ? endY : (int)rdi.clipB;  // 实际擦除用 endY
+        int eB = endY < (int)rdi.clipB ? endY : (int)rdi.clipB;  // v23.1: endY 非 clipB
         int ow = outlined ? (g_cfg.outlineWidth > 0 ? g_cfg.outlineWidth : 1) : 0;
         int padSide = ow + 2;   // 左/右/上
         if (eL - padSide > 0) eL -= padSide;
         if (eT - padSide > 0) eT -= padSide;
         if (eR + padSide < (int)rdi.width) eR += padSide;
-        // 底部不扩(eB=clipB不扩, eraseB=endY不扩; 血条在 endY 以下)
+        // 底部不扩(eB=endY, 血条在 endY 以下)
         // 注意: 这里不能包 __try(DirectBlitText 有 std::vector 需对象展开 → C2712)
         //       V15EraseOldText 内部已有 __try 保护
         uint32_t thash = V15TextHash(wstr, wlen);
-        V15EraseOldText((uint32_t)thisPtr, thash, eL, eT, eR, eB, eraseB, rdi);
+        V15EraseOldText((uint32_t)thisPtr, thash, eL, eT, eR, eB, rdi);
     }
 
     // ★ 渲染：使用换行位置逐行绘制
@@ -2097,7 +2086,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
         fflush(g_logFile);
     } else if (dwReason == DLL_PROCESS_DETACH) {
         if (g_logFile) {
-            fprintf(g_logFile, "\n[DllMain] DETACH (v23.2)\n");
+            fprintf(g_logFile, "\n[DllMain] DETACH (v23.1)\n");
             fprintf(g_logFile, "  Calls=%d Replaced=%d Hits=%d (unique=%d) Rollback=%d (unique=%d) Misses=%d (unique=%d)\n",
                 g_callCount, g_replacedCount, g_hitCount, (int)g_hitSeen.size(),
                 g_rollbackHitCount, (int)g_rollbackSeen.size(),
@@ -2111,7 +2100,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
                 g_dirtyDeltaOK, g_dirtyDeltaZero, g_dirtyDeltaWeird,
                 g_dirtyMgrNonNull, g_dirtyMgrNull);
             // v19.0 总账 (BG-LRU v4: no time-based expire)
-            fprintf(g_logFile, "  BG-LRU(v23.2): hits=%d moved=%d new=%d clean=%d drift=%d skip=%d full=%d oor=%d\n",
+            fprintf(g_logFile, "  BG-LRU(v23.1): hits=%d moved=%d new=%d clean=%d drift=%d skip=%d full=%d oor=%d\n",
                 g_v15Hits, g_v15Moved, g_v15New, g_v15Clean, g_v15Drift, g_v15Skip, g_v15Full, g_v15OOR);
             // v16.0 总账
             fprintf(g_logFile, "  Motion: lines=%d\n", g_motionLines);
