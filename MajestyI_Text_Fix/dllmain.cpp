@@ -1,4 +1,4 @@
-﻿// dllmain.cpp : Majesty HD Runtime Localization v20.0 (BG-LRU v5: forced moved-erase + wider drift tolerance)
+﻿// dllmain.cpp : Majesty HD Runtime Localization v21.0 (BG-LRU v6: drift 70% on all branches)
 //
 // v16.0 motion.log 定案(推翻 v15 推论): DirectBlit 在单位移动/相机平移期间
 //   **每帧都被调用且位置连续变化** (农民#1: 462 次移动/249 位置, +6px/帧平滑走 200px)。
@@ -76,6 +76,19 @@
 //       (hit 分支)的文字差异即被判 drift → 误跳过擦除 → 残影。70% 容忍
 //       文字差异同时仍能捕捉真实背景全变(引擎滚动)。
 //   (3) 矩形外扩 ow+2 → ow+4(用户明确要求"范围再大点")。
+//
+// v20.0 实测: 文字残影消除 ✓, 但**背景层伪影更严重**(force=true 强制写回
+//   把旧缓存背景覆盖到引擎新背景上)。缺字/闪烁基本可容忍。
+//   根因: moved 分支 force=true 完全跳过 drift 检测 → 即使旧位置背景已被
+//   引擎滚动/重画更新, 仍用过期缓存覆盖 → 背景花块。
+//
+// v21.0 修复 (BG-LRU v6):
+//   moved 分支恢复 drift 检测(force=false), 但阈值已 40%→70%(v20 已改)。
+//   关键洞察: v19 的问题不是 drift 检测本身, 而是阈值 40% 太低 —— 文字残影
+//   仅造成 30-50% 差异, 40% 阈值在刀尖上不稳定。70% 阈值下:
+//     - 旧位置只有残影 → drift 30-50% < 70% → 正常写回 → 擦残影 ✓
+//     - 旧位置背景全变(相机滚动) → drift > 70% → 跳过 → 不覆盖 ✓
+//   两个问题一次解决。ow+4 pad 保留。
 
 #include "pch.h"
 #include <psapi.h>
@@ -1190,11 +1203,13 @@ static void V15EraseOldText(uint32_t thisPtr, uint32_t textHash, int l, int t, i
     }
 
     // 2) 移动标签: 立即擦旧位置(不等过期 — 伪影消除的关键)
-    //    v20: force=true 跳过 drift 检测 — 旧位置当前画面含上一帧残影,
-    //    drift 检测会因残影像素差异>阈值而跳过擦除 → 残影永久留存(v19 败因)。
+    //    v20: force=true 跳过 drift 检测 → 背景层伪影(旧背景覆盖引擎新背景)。
+    //    v21: 恢复 drift 检测(force=false), 但阈值已从 40%→70%:
+    //    旧位置只有残影 → drift 30-50% < 70% → 正常写回 → 擦残影 ✓
+    //    旧位置背景全变(相机滚动) → drift > 70% → 跳过 → 不覆盖 ✓
     if (stale) {
         __try {
-            if (!V15WriteBack(*stale, rdi, true)) g_v15Drift++;  // force=true
+            if (!V15WriteBack(*stale, rdi, false)) g_v15Drift++;  // v21: 恢复 drift 检测
         } __except (EXCEPTION_EXECUTE_HANDLER) {}
         free(stale->buf);
         stale->buf = nullptr;
@@ -2038,7 +2053,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
         fflush(g_logFile);
     } else if (dwReason == DLL_PROCESS_DETACH) {
         if (g_logFile) {
-            fprintf(g_logFile, "\n[DllMain] DETACH (v20.0)\n");
+            fprintf(g_logFile, "\n[DllMain] DETACH (v21.0)\n");
             fprintf(g_logFile, "  Calls=%d Replaced=%d Hits=%d (unique=%d) Rollback=%d (unique=%d) Misses=%d (unique=%d)\n",
                 g_callCount, g_replacedCount, g_hitCount, (int)g_hitSeen.size(),
                 g_rollbackHitCount, (int)g_rollbackSeen.size(),
@@ -2052,7 +2067,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
                 g_dirtyDeltaOK, g_dirtyDeltaZero, g_dirtyDeltaWeird,
                 g_dirtyMgrNonNull, g_dirtyMgrNull);
             // v19.0 总账 (BG-LRU v4: no time-based expire)
-            fprintf(g_logFile, "  BG-LRU(v20): hits=%d moved=%d new=%d clean=%d drift=%d skip=%d full=%d oor=%d\n",
+            fprintf(g_logFile, "  BG-LRU(v21): hits=%d moved=%d new=%d clean=%d drift=%d skip=%d full=%d oor=%d\n",
                 g_v15Hits, g_v15Moved, g_v15New, g_v15Clean, g_v15Drift, g_v15Skip, g_v15Full, g_v15OOR);
             // v16.0 总账
             fprintf(g_logFile, "  Motion: lines=%d\n", g_motionLines);
