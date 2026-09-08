@@ -1,4 +1,4 @@
-﻿// dllmain.cpp : Majesty HD Runtime Localization v18.0 (BG-LRU v3: this-death expire + drift guard)
+﻿// dllmain.cpp : Majesty HD Runtime Localization v19.0 (BG-LRU v4: no time-based expire)
 //
 // v16.0 motion.log 定案(推翻 v15 推论): DirectBlit 在单位移动/相机平移期间
 //   **每帧都被调用且位置连续变化** (农民#1: 462 次移动/249 位置, +6px/帧平滑走 200px)。
@@ -37,6 +37,28 @@
 //   (2) V15WriteBack 前做**背景漂移检测**(抽样比较缓存 vs 当前 buffer 该区域,
 //       差异>40% → 引擎已滚动/重画) → 跳过写回, 不抹引擎新内容 → 修 UI 异常。
 //   motion.log 采样保留。
+//
+// v18.0 实测(v18 DETACH): hits=13657 moved=2075 new=3521 clean=1422 drift=731
+//   → 伪影大幅改善(用户:"好了不少"), 但用户:"常态情况下本来的字也消失了"
+//   → **this 失活过期依旧误杀**: 判定轴是全局 blit 计数, 阈值仅 48 blit
+//   (~0.1s)。静止游戏里大量"只在数值变化时才画"的低频字(金币/资源数字等)
+//   一旦 0.1s 不被重画 → 判 this 失活 → 擦掉; 且擦除后引擎**不会**自动重画
+//   它(不变化就不调 DirectBlit) → 字永久消失。clean=1422 基本全是误杀。
+//   → 从 DirectBlit 层面**无法区分**"this 死了(单位消失)"与"this 休眠
+//   (低频字暂时不画)" → 任何基于时间/blit 的主动过期都会误杀休眠字。
+//
+// v19.0 修复 (BG-LRU v4):
+//   (1) **彻底移除时间/blit 驱动的主动过期擦除**(V15Expire 不再被调用)。
+//       擦除只由语义事件驱动: moved(同标签位置变=移动 → 立即擦旧位) 与
+//       hit(同位置重画 → 擦旧字再画新字)。单位死亡/标签移除的静态残留交给
+//       引擎自己的合成/场景切换覆盖(引擎周期性全屏/大面积合成会清掉) —
+//       宁可留死亡残留, 不可误杀常驻字。
+//   (2) hit 命中但背景漂移(WriteBack 被拒)时: **作废并释放该 slot**(下次
+//       重画时新建), 不再把"含旧字残留的画面"误 Capture 成干净背景 —
+//       v18 该分支 WriteBack 失败后仍 Capture, 缓存被旧字污染 → 后续写回
+//       把残影固化。v18 残留"边缘"的一个来源。
+//   (3) 缓存矩形外扩: 描边外再 +2px(覆盖 alpha 反锯齿/描边的 1-2px 淡出
+//       边缘) → 修"残留点边缘"(移动文字边缘 1-2px 旧像素擦不净)。
 
 #include "pch.h"
 #include <psapi.h>
@@ -919,14 +941,19 @@ static bool GetRenderDevInfo(int a4, RenderDevInfo& info) {
 //   (2) 写回前**背景漂移检测**: 抽样比较 slot 缓存 vs 当前 pixelBuf 该区域,
 //       差异像素超阈值 → 引擎已滚动/重画该区域 → 跳过写回(勿抹引擎新内容)。
 //       → 修 UI 绘制异常(相机平移时旧字区已被引擎更新, 不需也不该恢复旧背景)。
+// v18.0 实测: hits=13657 moved=2075 new=3521 clean=1422 drift=731
+//   → 伪影大幅改善但"常态字消失"(见头注释 v19 分析)。
+// v19.0 (BG-LRU v4): **废弃 this 失活过期** —— V15Expire 不再被调用
+//   (时间/blit 轴主动过期必然误杀"休眠不画"的低频常驻字, v17/v18 两版教训)。
+//   擦除只由语义事件驱动: moved(位置变) + hit(同位置重画)。单位死亡/移除
+//   残留交给引擎合成/场景切换覆盖。V15Seen/g_v15Tick 保留仅作统计/未来用。
 #define V15_SLOTS 1024
 #define V15_MAX_BUF (192 * 1024)
-#define V15_SCAN_INTERVAL 4      // 每 4 次 blit 扫一轮过期
-#define V15_THIS_EXPIRE_TICKS 48 // this 失活判定: 连续 48 blit(~4-6帧)无该 this 的
-                                 // DirectBlit 视为标签已移除 → 兜底擦除
+#define V15_SCAN_INTERVAL 4      // (保留, V15Expire 已停用)
+#define V15_THIS_EXPIRE_TICKS 0  // v19: 0 = 禁用 this 失活过期擦除(v18 误杀常态字)
 #define V15_BGDRIFT_PCT 40       // 抽样差异 >40% 视为背景漂移 → 跳过写回
 
-// 活跃 this 追踪表: 记录每个 DirectBlit 对象的最近活跃 tick(用于失活判定)
+// 活跃 this 追踪表: (v19 仅统计用, 不再驱动过期擦除)
 #define V15_SEEN_MAX 256
 struct V15Seen { uint32_t thisPtr; int lastTick; };
 static V15Seen g_v15Seen[V15_SEEN_MAX];
@@ -1078,9 +1105,11 @@ static bool V15Capture(V15Slot& s, const RenderDevInfo& rdi) {
     return true;
 }
 
-// this 失活兜底扫描: 只擦"其 this 已连续 V15_THIS_EXPIRE_TICKS 无任何 DirectBlit"
-// 的 slot(单位死亡/标签移除)。低频重绘字(UI 容器 this 活跃)永不因过期被擦 —
-// v17 的 tick 过期把它们在重绘间隙擦光 → 缺字闪烁, 已废。
+// [v19 废弃] this 失活兜底扫描: 原设计只擦"其 this 已连续 V15_THIS_EXPIRE_TICKS
+// 无任何 DirectBlit"的 slot(单位死亡/标签移除)。v18 实测 clean=1422 几乎全是
+// 误杀 —— 静止低频字(金币/资源数字, 只在变化时画) 0.1s 不重画即判失活被擦,
+// 且引擎不会重画它 → 常态字消失。从 DirectBlit 层面无法区分"死亡"与"休眠",
+// 任何时间轴过期都误杀。v19 起不再调用本函数(擦除仅 moved/hit 语义驱动)。
 static void V15Expire(const RenderDevInfo& rdi) {
     for (int i = 0; i < V15_SLOTS; i++) {
         V15Slot& s = g_v15[i];
@@ -1110,11 +1139,8 @@ static void V15EraseOldText(uint32_t thisPtr, uint32_t textHash, int l, int t, i
     if ((size_t)w * h * bppB > V15_MAX_BUF) { g_v15Skip++; return; }
 
     g_v15Tick++;
-    V15TouchThis(thisPtr, g_v15Tick);   // 该 this 活跃
+    V15TouchThis(thisPtr, g_v15Tick);   // 记录活跃(统计用; v19 不再驱动过期)
     g_v15Scan++;
-    if ((g_v15Scan & (V15_SCAN_INTERVAL - 1)) == 0) {
-        __try { V15Expire(rdi); } __except (EXCEPTION_EXECUTE_HANDLER) {}
-    }
 
     // 1) 扫同 (this,text) 的旧 slot: 矩形相同 → 精确命中; 不同 → 记下待擦(移动)
     V15Slot* stale = nullptr;
@@ -1124,11 +1150,21 @@ static void V15EraseOldText(uint32_t thisPtr, uint32_t textHash, int l, int t, i
         if (!s.buf) { if (freeIdx < 0) freeIdx = i; continue; }
         if (s.thisPtr != thisPtr || s.textHash != textHash) continue;
         if (s.l == l && s.t == t && s.r == r && s.b == b) {
-            // 精确命中: 擦旧字(漂移则跳过) → 重存当前(干净)背景
-            __try {
-                if (!V15WriteBack(s, rdi)) g_v15Drift++;
-                V15Capture(s, rdi);
-            } __except (EXCEPTION_EXECUTE_HANDLER) {}
+            // 精确命中: 擦旧字(漂移则作废缓存) → 重存当前(干净)背景
+            bool wrote = false;
+            __try { wrote = V15WriteBack(s, rdi); } __except (EXCEPTION_EXECUTE_HANDLER) {}
+            if (!wrote) {
+                // v19: 背景已漂移(引擎重画过该区) → 旧缓存作废, 释放。
+                // v18 此处 WriteBack 失败后仍 Capture → 把"含旧字残留"的画面
+                // 误存成干净背景 → 后续写回固化残影(残留边缘的来源之一)。
+                // 释放后落到下方新建分支重新 Capture 当前(引擎已更新)背景。
+                g_v15Drift++;
+                free(s.buf);
+                s.buf = nullptr;
+                if (freeIdx < 0) freeIdx = i;
+                break;
+            }
+            __try { V15Capture(s, rdi); } __except (EXCEPTION_EXECUTE_HANDLER) {}
             s.lastTick = g_v15Tick;
             g_v15Hits++;
             return;
@@ -1533,13 +1569,16 @@ static bool DirectBlitText(int thisPtr, int a2, int a3, int a4,
     //   顺序: V15EraseOldText(恢复同位置背景→擦旧字) 必须先于任何画像素
     //   v17: 键 = (thisPtr, textHash)。同 this 同文本位置变化 = 移动 → 立即擦旧位
     {
-        // 用文本实际落地区域(与画字裁剪一致), 略外扩描边余量
+        // 用文本实际落地区域(与画字裁剪一致), 外扩描边+反锯齿淡出余量。
+        // v19: 原来只外扩 ow(描边1px) → 移动文字边缘 1-2px 反锯齿淡出像素
+        // 擦不净 → 用户"残留点边缘"。统一再多扩 2px。
         int eL = clipL, eT = clipT, eR = clipR, eB = clipB;
         int ow = outlined ? (g_cfg.outlineWidth > 0 ? g_cfg.outlineWidth : 1) : 0;
-        if (eL - ow > 0) eL -= ow;
-        if (eT - ow > 0) eT -= ow;
-        if (eR + ow < (int)rdi.width) eR += ow;
-        if (eB + ow < (int)rdi.height) eB += ow;
+        int pad = ow + 2;
+        if (eL - pad > 0) eL -= pad;
+        if (eT - pad > 0) eT -= pad;
+        if (eR + pad < (int)rdi.width) eR += pad;
+        if (eB + pad < (int)rdi.height) eB += pad;
         // 注意: 这里不能包 __try(DirectBlitText 有 std::vector 需对象展开 → C2712)
         //       V15EraseOldText 内部已有 __try 保护
         uint32_t thash = V15TextHash(wstr, wlen);
@@ -1915,7 +1954,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
         sprintf_s(motionLogPath, "%smotion.log", dllDir);
         g_motionFile = fopen(motionLogPath, "w");
         if (g_logFile) {
-            fprintf(g_logFile, "[MajestyHD Runtime Localization v18.0 BG-LRU v3 (this-death + drift guard)] DllMain ATTACH\n");
+            fprintf(g_logFile, "[MajestyHD Runtime Localization v19.0 BG-LRU v4 (no time-based expire)] DllMain ATTACH\n");
             fprintf(g_logFile, "  Exe path: %s\n", path);
             fprintf(g_logFile, "  Log path: %s\n", logPath);
             fprintf(g_logFile, "  Motion log: %s\n", motionLogPath);
@@ -1979,7 +2018,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
         fflush(g_logFile);
     } else if (dwReason == DLL_PROCESS_DETACH) {
         if (g_logFile) {
-            fprintf(g_logFile, "\n[DllMain] DETACH (v18.0)\n");
+            fprintf(g_logFile, "\n[DllMain] DETACH (v19.0)\n");
             fprintf(g_logFile, "  Calls=%d Replaced=%d Hits=%d (unique=%d) Rollback=%d (unique=%d) Misses=%d (unique=%d)\n",
                 g_callCount, g_replacedCount, g_hitCount, (int)g_hitSeen.size(),
                 g_rollbackHitCount, (int)g_rollbackSeen.size(),
@@ -1992,8 +2031,8 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
             fprintf(g_logFile, "  SubmitDelta: ok=%d zero=%d weird=%d  DirtyMgr: nonNull=%d null=%d\n",
                 g_dirtyDeltaOK, g_dirtyDeltaZero, g_dirtyDeltaWeird,
                 g_dirtyMgrNonNull, g_dirtyMgrNull);
-            // v18.0 总账 (BG-LRU v3: this-death expire + drift guard)
-            fprintf(g_logFile, "  BG-LRU(v18): hits=%d moved=%d new=%d clean=%d drift=%d skip=%d full=%d oor=%d\n",
+            // v19.0 总账 (BG-LRU v4: no time-based expire)
+            fprintf(g_logFile, "  BG-LRU(v19): hits=%d moved=%d new=%d clean=%d drift=%d skip=%d full=%d oor=%d\n",
                 g_v15Hits, g_v15Moved, g_v15New, g_v15Clean, g_v15Drift, g_v15Skip, g_v15Full, g_v15OOR);
             // v16.0 总账
             fprintf(g_logFile, "  Motion: lines=%d\n", g_motionLines);
