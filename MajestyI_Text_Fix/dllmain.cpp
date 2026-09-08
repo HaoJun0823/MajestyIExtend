@@ -1,4 +1,4 @@
-﻿// dllmain.cpp : Majesty HD Runtime Localization v21.0 (BG-LRU v6: drift 70% on all branches)
+﻿// dllmain.cpp : Majesty HD Runtime Localization v22.0 (BG-LRU v7: pad ow+2, drift 70%)
 //
 // v16.0 motion.log 定案(推翻 v15 推论): DirectBlit 在单位移动/相机平移期间
 //   **每帧都被调用且位置连续变化** (农民#1: 462 次移动/249 位置, +6px/帧平滑走 200px)。
@@ -89,6 +89,17 @@
 //     - 旧位置只有残影 → drift 30-50% < 70% → 正常写回 → 擦残影 ✓
 //     - 旧位置背景全变(相机滚动) → drift > 70% → 跳过 → 不覆盖 ✓
 //   两个问题一次解决。ow+4 pad 保留。
+//
+// v21.0 实测: 文字无残影 ✓, 背景伪影消除 ✓, 但文字紧邻血条时血条有伪影。
+//   根因: ow+4 pad 使擦除矩形侵入血条区域(文字下方几像素), WriteBack 用缓存
+//   背景覆盖时把血条几行像素盖成旧值。drift 检测抓不到(血条占比~10% < 70%)。
+//   用户还提到"有些字体下半部分"闪烁 — 似是某些CJK字形底部笔画(如"金"的捺
+//   尾、"建"的捺尾)超出 clipB 区域, 擦到了但画字时被 clip 裁掉 → 闪烁。
+//
+// v22.0 修复 (BG-LRU v7):
+//   pad 从 ow+4 降回 ow+2。v19 边缘残影的根因是 drift 40% 导致 moved 整条跳过,
+//   非pad不足。70% 阈值下 moved 正常处理, ow+2(3px/边: 1描边+2反锯齿)足够,
+//   且少侵入2px → 减轻血条伪影。clipB 闪烁问题留待观察(可能需扩 clipB)。
 
 #include "pch.h"
 #include <psapi.h>
@@ -1604,12 +1615,13 @@ static bool DirectBlitText(int thisPtr, int a2, int a3, int a4,
     //   v17: 键 = (thisPtr, textHash)。同 this 同文本位置变化 = 移动 → 立即擦旧位
     {
         // 用文本实际落地区域(与画字裁剪一致), 外扩描边+反锯齿淡出余量。
-        // v19: 原来只外扩 ow(描边1px) → 移动文字边缘 1-2px 反锯齿淡出像素
-        // 擦不净 → 用户"残留点边缘"。统一再多扩 2px。
-        // v20: 用户反馈"范围需要再大点" → ow+2 → ow+4, 覆盖更宽边缘淡出。
+        // v19: ow+2(3px/边) — 1px描边+2px反锯齿
+        // v20: ow+4(5px/边) — 用户要求"范围再大点", 但侵入紧邻血条→背景伪影
+        // v22: 回退到 ow+2 — v19边缘残影根因是drift 40%跳过moved, 非pad不足。
+        //     70%阈值下moved正常处理, ow+2足够覆盖描边+反锯齿, 且少2px侵入血条。
         int eL = clipL, eT = clipT, eR = clipR, eB = clipB;
         int ow = outlined ? (g_cfg.outlineWidth > 0 ? g_cfg.outlineWidth : 1) : 0;
-        int pad = ow + 4;
+        int pad = ow + 2;
         if (eL - pad > 0) eL -= pad;
         if (eT - pad > 0) eT -= pad;
         if (eR + pad < (int)rdi.width) eR += pad;
@@ -2053,7 +2065,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
         fflush(g_logFile);
     } else if (dwReason == DLL_PROCESS_DETACH) {
         if (g_logFile) {
-            fprintf(g_logFile, "\n[DllMain] DETACH (v21.0)\n");
+            fprintf(g_logFile, "\n[DllMain] DETACH (v22.0)\n");
             fprintf(g_logFile, "  Calls=%d Replaced=%d Hits=%d (unique=%d) Rollback=%d (unique=%d) Misses=%d (unique=%d)\n",
                 g_callCount, g_replacedCount, g_hitCount, (int)g_hitSeen.size(),
                 g_rollbackHitCount, (int)g_rollbackSeen.size(),
@@ -2067,7 +2079,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
                 g_dirtyDeltaOK, g_dirtyDeltaZero, g_dirtyDeltaWeird,
                 g_dirtyMgrNonNull, g_dirtyMgrNull);
             // v19.0 总账 (BG-LRU v4: no time-based expire)
-            fprintf(g_logFile, "  BG-LRU(v21): hits=%d moved=%d new=%d clean=%d drift=%d skip=%d full=%d oor=%d\n",
+            fprintf(g_logFile, "  BG-LRU(v22): hits=%d moved=%d new=%d clean=%d drift=%d skip=%d full=%d oor=%d\n",
                 g_v15Hits, g_v15Moved, g_v15New, g_v15Clean, g_v15Drift, g_v15Skip, g_v15Full, g_v15OOR);
             // v16.0 总账
             fprintf(g_logFile, "  Motion: lines=%d\n", g_motionLines);
