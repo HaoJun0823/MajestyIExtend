@@ -1,4 +1,4 @@
-﻿// dllmain.cpp : Majesty HD Runtime Localization v17.0 (BG-LRU v2: this-aware erase)
+﻿// dllmain.cpp : Majesty HD Runtime Localization v18.0 (BG-LRU v3: this-death expire + drift guard)
 //
 // v16.0 motion.log 定案(推翻 v15 推论): DirectBlit 在单位移动/相机平移期间
 //   **每帧都被调用且位置连续变化** (农民#1: 462 次移动/249 位置, +6px/帧平滑走 200px)。
@@ -21,6 +21,22 @@
 //       "该标签移动了" → **立即**擦旧位置(不等过期), 移动标签 0 帧残留;
 //       静止 UI(同 this 多文本每帧重画) 不受影响(各文本独立 slot, 精确命中刷新)。
 //   motion.log 采样保留(小开销)便于回归对照。
+//
+// v17.0 实测(v17 DETACH): hits=1831 moved=853 new=5520 clean=4659 skip=0 full=0
+//   → 伪影消除(moved 机制工作), 但 new/clean 占比异常高(70%/60%) → **过度擦除**:
+//   clean=4659 的 16-tick 过期把大量"低频重绘文字"在重绘间隙全部擦掉
+//   (如"950 金币"整局 157 次≈每12帧1次、"建造"5帧1次、一次性提示只画5次),
+//   引擎下次重画前画面缺字+闪烁; hit 写回在背景漂移(引擎滚动/重画)时把引擎
+//   新内容抹成旧背景 → UI 绘制异常。用户反馈: 缺字/闪烁/UI绘制问题, 伪影已消。
+//
+// v18.0 修复 (BG-LRU v3):
+//   (1) 过期策略: tick 过期 → **this 失活过期**。slot 只在"其 this 连续
+//       V15_THIS_EXPIRE_TICKS(48 blit) 无任何 DirectBlit"时才兜底擦除
+//       (单位死亡/标签移除)。UI 容器 this 持续画字 → 其名下低频静态字永不误擦
+//       → 消除缺字闪烁。(移动标签旧位置由 moved 立即擦, 不走过期)
+//   (2) V15WriteBack 前做**背景漂移检测**(抽样比较缓存 vs 当前 buffer 该区域,
+//       差异>40% → 引擎已滚动/重画) → 跳过写回, 不抹引擎新内容 → 修 UI 异常。
+//   motion.log 采样保留。
 
 #include "pch.h"
 #include <psapi.h>
@@ -890,10 +906,56 @@ static bool GetRenderDevInfo(int a4, RenderDevInfo& info) {
 //       v17: 同 this 同文本位置变化 → 立即擦旧位置(不等过期);
 //            写回不再受 rdi.clip 限制(旧字位置常落在当前调用的局部 clip 外);
 //            过期扫描仅作兜底(单位消失等场景)。
+//
+// v17.0 实测(v17 DETACH): hits=1831 moved=853 new=5520 clean=4659 → 伪影消除,
+//   但 new/clean 占比异常高(70%/60%) → 过度擦除: 16 tick 过期把大量**低频重绘
+//   文字**(如"950 金币"157次、"建造"每5帧1次、一次性提示只画5次)在重绘间隙
+//   全部擦掉 → 屏幕缺字+闪烁; hit 写回在背景漂移(引擎滚动/重画)时抹掉新内容
+//   → UI 绘制异常。
+// v18.0 修复:
+//   (1) 过期策略 v2: tick 过期 → **this 失活过期**。slot 只在"其 this 连续
+//       V15_THIS_EXPIRE_TICKS 无任何 DirectBlit"时才擦(单位死亡/标签移除)。
+//       UI 容器 this(0x1AFC24 等)持续画字 → 低频静态字永不误擦 → 消除缺字闪烁。
+//   (2) 写回前**背景漂移检测**: 抽样比较 slot 缓存 vs 当前 pixelBuf 该区域,
+//       差异像素超阈值 → 引擎已滚动/重画该区域 → 跳过写回(勿抹引擎新内容)。
+//       → 修 UI 绘制异常(相机平移时旧字区已被引擎更新, 不需也不该恢复旧背景)。
 #define V15_SLOTS 1024
 #define V15_MAX_BUF (192 * 1024)
-#define V15_EXPIRE_TICKS 16   // ~2 帧(实测 ~8 blit/帧)。兜底补擦延迟上限
-#define V15_SCAN_INTERVAL 4   // 每 4 次 blit 扫一轮过期
+#define V15_SCAN_INTERVAL 4      // 每 4 次 blit 扫一轮过期
+#define V15_THIS_EXPIRE_TICKS 48 // this 失活判定: 连续 48 blit(~4-6帧)无该 this 的
+                                 // DirectBlit 视为标签已移除 → 兜底擦除
+#define V15_BGDRIFT_PCT 40       // 抽样差异 >40% 视为背景漂移 → 跳过写回
+
+// 活跃 this 追踪表: 记录每个 DirectBlit 对象的最近活跃 tick(用于失活判定)
+#define V15_SEEN_MAX 256
+struct V15Seen { uint32_t thisPtr; int lastTick; };
+static V15Seen g_v15Seen[V15_SEEN_MAX];
+static int  g_v15SeenCount = 0;
+
+static void V15TouchThis(uint32_t thisPtr, int tick) {
+    if (!thisPtr) return;
+    for (int i = 0; i < g_v15SeenCount; i++) {
+        if (g_v15Seen[i].thisPtr == thisPtr) { g_v15Seen[i].lastTick = tick; return; }
+    }
+    if (g_v15SeenCount < V15_SEEN_MAX) {
+        g_v15Seen[g_v15SeenCount].thisPtr = thisPtr;
+        g_v15Seen[g_v15SeenCount].lastTick = tick;
+        g_v15SeenCount++;
+        return;
+    }
+    // 表满 → 覆盖最旧
+    int oldest = 0;
+    for (int i = 1; i < V15_SEEN_MAX; i++)
+        if (g_v15Seen[i].lastTick < g_v15Seen[oldest].lastTick) oldest = i;
+    g_v15Seen[oldest].thisPtr = thisPtr;
+    g_v15Seen[oldest].lastTick = tick;
+}
+// 返回该 this 最近活跃 tick; -1 = 从未跟踪(视为失活)
+static int V15ThisLastSeen(uint32_t thisPtr) {
+    for (int i = 0; i < g_v15SeenCount; i++)
+        if (g_v15Seen[i].thisPtr == thisPtr) return g_v15Seen[i].lastTick;
+    return -1;
+}
 
 struct V15Slot {
     uint32_t thisPtr;         // DirectBlit 对象(this) — 标签归属
@@ -910,7 +972,8 @@ static int  g_v15Scan = 0;
 static int  g_v15Hits = 0;     // 同(this,text,rect)恢复命中(擦旧字)
 static int  g_v15Moved = 0;    // 同(this,text)但矩形变了 → 立即擦旧位置
 static int  g_v15New = 0;      // 新建缓存
-static int  g_v15Clean = 0;    // 过期兜底补擦
+static int  g_v15Clean = 0;    // this 失活兜底补擦
+static int  g_v15Drift = 0;    // 背景漂移跳过写回
 static int  g_v15Skip = 0;     // 超尺寸/无内存跳过
 static int  g_v15Full = 0;     // slot 满
 static int  g_v15OOR = 0;      // 区域越界 clamp 计数
@@ -925,10 +988,56 @@ static uint32_t V15TextHash(const wchar_t* s, int n) {
     return h ? h : 1;
 }
 
+// 抽样比较 slot 缓存与当前 pixelBuf 对应区域。
+// 返回 true = 背景已漂移(引擎滚动/重画过该区域) → 调用方应跳过写回。
+static bool V15BgDrifted(const V15Slot& s, const RenderDevInfo& rdi) {
+    uint8_t* px = (uint8_t*)rdi.pixelBuf;
+    int w = s.r - s.l, h = s.b - s.t;
+    if (w <= 0 || h <= 0) return false;
+    int stepX = w / 8, stepY = h / 8;
+    if (stepX < 1) stepX = 1;
+    if (stepY < 1) stepY = 1;
+    int samples = 0, diff = 0;
+    for (int yy = 0; yy < h; yy += stepY) {
+        int dy = s.t + yy;
+        if (dy < 0 || dy >= (int)rdi.height) continue;
+        for (int xx = 0; xx < w; xx += stepX) {
+            int dx = s.l + xx;
+            if (dx < 0 || dx >= (int)rdi.width) continue;
+            const uint8_t* a = s.buf + (size_t)yy * s.rowBytes + (size_t)xx * s.bppB;
+            const uint8_t* b = px + dy * rdi.stride + (size_t)dx * s.bppB;
+            samples++;
+            bool differs = false;
+            if (s.bppB == 2) {
+                uint16_t va = *(const uint16_t*)a, vb = *(const uint16_t*)b;
+                if (abs(((va >> 11) & 31) - ((vb >> 11) & 31)) > 2 ||
+                    abs(((va >> 5) & 63) - ((vb >> 5) & 63)) > 2 ||
+                    abs((va & 31) - (vb & 31)) > 2) differs = true;
+            } else if (s.bppB == 4) {
+                uint32_t va = *(const uint32_t*)a, vb = *(const uint32_t*)b;
+                if (abs((int)((va >> 16) & 255) - (int)((vb >> 16) & 255)) > 8 ||
+                    abs((int)((va >> 8) & 255) - (int)((vb >> 8) & 255)) > 8 ||
+                    abs((int)(va & 255) - (int)(vb & 255)) > 8) differs = true;
+            } else {
+                if (abs((int)a[0] - (int)b[0]) > 8 ||
+                    abs((int)a[1] - (int)b[1]) > 8 ||
+                    abs((int)a[2] - (int)b[2]) > 8) differs = true;
+            }
+            if (differs) diff++;
+        }
+    }
+    if (!samples) return false;
+    return (diff * 100 / samples) > V15_BGDRIFT_PCT;
+}
+
 // 把 slot 缓存背景写回 pixelBuf(擦旧字)。行级 clamp 只按 buffer 尺寸防越界,
 // **不**用 rdi.clip —— 旧字位置是历史 DirectBlit 落点, 常在当前调用的局部
 // clip 之外; rdi.clip 只是引擎的绘制上界, 不是 buffer 内容边界。v15 败因之一。
-static void V15WriteBack(const V15Slot& s, const RenderDevInfo& rdi) {
+// v18: 写回前做背景漂移检测 —— 该区域已被引擎滚动/重画(缓存过期)则跳过,
+//      避免把引擎新内容抹成旧背景(相机平移时的 UI 花块)。
+// 返回 false = 漂移跳过(未写回)。
+static bool V15WriteBack(const V15Slot& s, const RenderDevInfo& rdi) {
+    if (V15BgDrifted(s, rdi)) return false;
     uint8_t* px = (uint8_t*)rdi.pixelBuf;
     int h = s.b - s.t;
     for (int yy = 0; yy < h; yy++) {
@@ -942,6 +1051,7 @@ static void V15WriteBack(const V15Slot& s, const RenderDevInfo& rdi) {
                s.buf + (size_t)yy * s.rowBytes + (size_t)(x0 - s.l) * s.bppB,
                (size_t)(x1 - x0) * s.bppB);
     }
+    return true;
 }
 
 // 把 pixelBuf 的 clip 区域背景保存进 slot.buf(全矩形宽, 含不可见列)
@@ -968,14 +1078,18 @@ static bool V15Capture(V15Slot& s, const RenderDevInfo& rdi) {
     return true;
 }
 
-// 过期兜底扫描: 超过 V15_EXPIRE_TICKS 未更新的 slot 恢复(单位消失/引擎不再画)并释放
+// this 失活兜底扫描: 只擦"其 this 已连续 V15_THIS_EXPIRE_TICKS 无任何 DirectBlit"
+// 的 slot(单位死亡/标签移除)。低频重绘字(UI 容器 this 活跃)永不因过期被擦 —
+// v17 的 tick 过期把它们在重绘间隙擦光 → 缺字闪烁, 已废。
 static void V15Expire(const RenderDevInfo& rdi) {
     for (int i = 0; i < V15_SLOTS; i++) {
         V15Slot& s = g_v15[i];
         if (!s.buf) continue;
-        if (g_v15Tick - s.lastTick <= V15_EXPIRE_TICKS) continue;
+        int seen = V15ThisLastSeen(s.thisPtr);
+        if (seen < 0) continue;                     // 未跟踪(异常) → 跳过
+        if (g_v15Tick - seen <= V15_THIS_EXPIRE_TICKS) continue;  // this 仍活跃
         __try {
-            V15WriteBack(s, rdi);
+            if (!V15WriteBack(s, rdi)) g_v15Drift++;
         } __except (EXCEPTION_EXECUTE_HANDLER) {}
         free(s.buf);
         s.buf = nullptr;
@@ -996,6 +1110,7 @@ static void V15EraseOldText(uint32_t thisPtr, uint32_t textHash, int l, int t, i
     if ((size_t)w * h * bppB > V15_MAX_BUF) { g_v15Skip++; return; }
 
     g_v15Tick++;
+    V15TouchThis(thisPtr, g_v15Tick);   // 该 this 活跃
     g_v15Scan++;
     if ((g_v15Scan & (V15_SCAN_INTERVAL - 1)) == 0) {
         __try { V15Expire(rdi); } __except (EXCEPTION_EXECUTE_HANDLER) {}
@@ -1009,9 +1124,9 @@ static void V15EraseOldText(uint32_t thisPtr, uint32_t textHash, int l, int t, i
         if (!s.buf) { if (freeIdx < 0) freeIdx = i; continue; }
         if (s.thisPtr != thisPtr || s.textHash != textHash) continue;
         if (s.l == l && s.t == t && s.r == r && s.b == b) {
-            // 精确命中: 擦旧字 → 重存当前(干净)背景
+            // 精确命中: 擦旧字(漂移则跳过) → 重存当前(干净)背景
             __try {
-                V15WriteBack(s, rdi);
+                if (!V15WriteBack(s, rdi)) g_v15Drift++;
                 V15Capture(s, rdi);
             } __except (EXCEPTION_EXECUTE_HANDLER) {}
             s.lastTick = g_v15Tick;
@@ -1021,9 +1136,11 @@ static void V15EraseOldText(uint32_t thisPtr, uint32_t textHash, int l, int t, i
         if (!stale) stale = &s;   // 同文本不同位置 = 该标签移动了
     }
 
-    // 2) 移动标签: 立即擦旧位置(不等过期 — v15 败因之二: 48tick≈6帧太慢)
+    // 2) 移动标签: 立即擦旧位置(不等过期 — 伪影消除的关键)
     if (stale) {
-        __try { V15WriteBack(*stale, rdi); } __except (EXCEPTION_EXECUTE_HANDLER) {}
+        __try {
+            if (!V15WriteBack(*stale, rdi)) g_v15Drift++;
+        } __except (EXCEPTION_EXECUTE_HANDLER) {}
         free(stale->buf);
         stale->buf = nullptr;
         g_v15Moved++;
@@ -1798,7 +1915,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
         sprintf_s(motionLogPath, "%smotion.log", dllDir);
         g_motionFile = fopen(motionLogPath, "w");
         if (g_logFile) {
-            fprintf(g_logFile, "[MajestyHD Runtime Localization v17.0 BG-LRU v2 (this-aware erase)] DllMain ATTACH\n");
+            fprintf(g_logFile, "[MajestyHD Runtime Localization v18.0 BG-LRU v3 (this-death + drift guard)] DllMain ATTACH\n");
             fprintf(g_logFile, "  Exe path: %s\n", path);
             fprintf(g_logFile, "  Log path: %s\n", logPath);
             fprintf(g_logFile, "  Motion log: %s\n", motionLogPath);
@@ -1862,7 +1979,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
         fflush(g_logFile);
     } else if (dwReason == DLL_PROCESS_DETACH) {
         if (g_logFile) {
-            fprintf(g_logFile, "\n[DllMain] DETACH (v17.0)\n");
+            fprintf(g_logFile, "\n[DllMain] DETACH (v18.0)\n");
             fprintf(g_logFile, "  Calls=%d Replaced=%d Hits=%d (unique=%d) Rollback=%d (unique=%d) Misses=%d (unique=%d)\n",
                 g_callCount, g_replacedCount, g_hitCount, (int)g_hitSeen.size(),
                 g_rollbackHitCount, (int)g_rollbackSeen.size(),
@@ -1875,9 +1992,9 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
             fprintf(g_logFile, "  SubmitDelta: ok=%d zero=%d weird=%d  DirtyMgr: nonNull=%d null=%d\n",
                 g_dirtyDeltaOK, g_dirtyDeltaZero, g_dirtyDeltaWeird,
                 g_dirtyMgrNonNull, g_dirtyMgrNull);
-            // v17.0 总账 (BG-LRU v2: this-aware)
-            fprintf(g_logFile, "  BG-LRU(v17): hits=%d moved=%d new=%d clean=%d skip=%d full=%d oor=%d\n",
-                g_v15Hits, g_v15Moved, g_v15New, g_v15Clean, g_v15Skip, g_v15Full, g_v15OOR);
+            // v18.0 总账 (BG-LRU v3: this-death expire + drift guard)
+            fprintf(g_logFile, "  BG-LRU(v18): hits=%d moved=%d new=%d clean=%d drift=%d skip=%d full=%d oor=%d\n",
+                g_v15Hits, g_v15Moved, g_v15New, g_v15Clean, g_v15Drift, g_v15Skip, g_v15Full, g_v15OOR);
             // v16.0 总账
             fprintf(g_logFile, "  Motion: lines=%d\n", g_motionLines);
             fclose(g_logFile);
