@@ -1,4 +1,4 @@
-﻿// dllmain.cpp : Majesty HD Runtime Localization v25.0 (Engine vtable fill: use engine's own FillRect to cover old text)
+﻿// dllmain.cpp : Majesty HD Runtime Localization v25.1 (Engine vtable fill + moved position erase)
 //
 // v16.0 motion.log 定案(推翻 v15 推论): DirectBlit 在单位移动/相机平移期间
 //   **每帧都被调用且位置连续变化** (农民#1: 462 次移动/249 位置, +6px/帧平滑走 200px)。
@@ -117,8 +117,8 @@
 //   v25: 在 DirectBlitText 画字前同样调用 vtable[62] 填充背景, 并禁用 BG-LRU。
 //   - 半透明不完全遮挡背景 → 视觉可接受
 //   - 引擎自己的填充函数知道边界 → 不会花块
-//   - 完全不需要 BG-LRU 像素缓存/恢复 → 无血条伪影
-//   - BG-LRU 代码保留但不调用(V15EraseOldText 不再被调用), 便于回退
+//   v25.1: 追踪上一帧位置, moved时先填旧位置再填新位置 → 覆盖移动残影。
+//   BG-LRU 代码保留但不调用(V15EraseOldText 不再被调用), 便于回退
 
 #include "pch.h"
 #include <psapi.h>
@@ -1425,6 +1425,46 @@ typedef void (__thiscall *EngineFillRect_t)(uint32_t device, int left, int top, 
 
 static int g_v25FillCount = 0;
 static int g_v25FillFail = 0;
+static int g_v25MovedFill = 0;
+
+// V25 位置追踪: 记录每个标签(thisPtr+textHash)上一帧的填充矩形,
+// moved 时先用 vtable[62] 填充旧位置 → 覆盖旧字残影。
+struct V25PrevRect {
+    uint32_t thisPtr;
+    uint32_t textHash;
+    int l, t, r, b;   // 上一帧的填充矩形(startX, startY, endX, fillBottom)
+};
+#define V25_PREV_SLOTS 512
+static V25PrevRect g_v25Prev[V25_PREV_SLOTS];
+static int g_v25PrevCount = 0;
+
+static V25PrevRect* V25FindPrev(uint32_t thisPtr, uint32_t textHash) {
+    for (int i = 0; i < g_v25PrevCount; i++) {
+        if (g_v25Prev[i].thisPtr == thisPtr && g_v25Prev[i].textHash == textHash)
+            return &g_v25Prev[i];
+    }
+    return nullptr;
+}
+
+static void V25RecordPos(uint32_t thisPtr, uint32_t textHash, int l, int t, int r, int b) {
+    V25PrevRect* s = V25FindPrev(thisPtr, textHash);
+    if (s) { s->l = l; s->t = t; s->r = r; s->b = b; return; }
+    if (g_v25PrevCount < V25_PREV_SLOTS) {
+        g_v25Prev[g_v25PrevCount].thisPtr = thisPtr;
+        g_v25Prev[g_v25PrevCount].textHash = textHash;
+        g_v25Prev[g_v25PrevCount].l = l;
+        g_v25Prev[g_v25PrevCount].t = t;
+        g_v25Prev[g_v25PrevCount].r = r;
+        g_v25Prev[g_v25PrevCount].b = b;
+        g_v25PrevCount++;
+    } else {
+        // 表满→覆盖 slot 0 (最旧的, 简单 LRU 近似)
+        g_v25Prev[0].thisPtr = thisPtr;
+        g_v25Prev[0].textHash = textHash;
+        g_v25Prev[0].l = l; g_v25Prev[0].t = t;
+        g_v25Prev[0].r = r; g_v25Prev[0].b = b;
+    }
+}
 
 static void V25FillBackground(const RenderDevInfo& rdi, int left, int top, int right, int bottom, int color) {
     if (!rdi.obj || left >= right || top >= bottom) return;
@@ -1656,19 +1696,39 @@ static bool DirectBlitText(int thisPtr, int a2, int a3, int a4,
         }
     }
 
-    // ★ v25.0: 用引擎 vtable[62] 填充半透明背景, 替代 BG-LRU
+    // ★ v25.1: 用引擎 vtable[62] 填充半透明背景, 替代 BG-LRU
     //   原版 sub_66E7B0 在画字前用 vtable[0xF8] 填充整个文字区域,
     //   背景色 dwordBase[13] (半透明, 默认 0x80FFFFFF)。
-    //   每帧重绘时半透明背景覆盖旧字 → 无残影, 无需像素缓存/恢复。
+    //   v25.0: 填充当前位置 → 同位置重绘无残影, 但移动标签旧位置有残影。
+    //   v25.1: 追踪上一帧位置, moved 时先填充旧位置 → 覆盖旧字残影。
     //   BG-LRU (V15EraseOldText) 不再调用, 代码保留便于回退。
     {
         int bgFillColor = (int)dwordBase[13];   // 引擎的填充背景色
         if (bgFillColor == 0) bgFillColor = 0x80FFFFFF;  // 默认: 半透明白色
         int fillBottom = effectiveEndY;  // CJK 字体可能比 endY 高
+
+        // v25.1: 检查上一帧位置, moved 时先填充旧位置
+        uint32_t thash = V15TextHash(wstr, wlen);
+        V25PrevRect* prev = V25FindPrev((uint32_t)thisPtr, thash);
+        if (prev) {
+            // 位置变了 → moved: 先填旧位置
+            if (prev->l != startX || prev->t != startY || prev->r != endX || prev->b != fillBottom) {
+                V25FillBackground(rdi, prev->l, prev->t, prev->r, prev->b, bgFillColor);
+                g_v25MovedFill++;
+                if (g_blitCount < 20) {
+                    LogWrite("[V25] moved fill old=(%d,%d,%d,%d) new=(%d,%d,%d,%d)\n",
+                        prev->l, prev->t, prev->r, prev->b, startX, startY, endX, fillBottom);
+                }
+            }
+        }
+
+        // 填充当前位置
         V25FillBackground(rdi, startX, startY, endX, fillBottom, bgFillColor);
+        V25RecordPos((uint32_t)thisPtr, thash, startX, startY, endX, fillBottom);
+
         if (g_blitCount < 20) {
-            LogWrite("[V25] fill bg=0x%X rect=(%d,%d,%d,%d) fillCalls=%d\n",
-                bgFillColor, startX, startY, endX, fillBottom, g_v25FillCount);
+            LogWrite("[V25] fill bg=0x%X rect=(%d,%d,%d,%d) fillCalls=%d moved=%d\n",
+                bgFillColor, startX, startY, endX, fillBottom, g_v25FillCount, g_v25MovedFill);
         }
     }
 
@@ -2118,8 +2178,8 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
             fprintf(g_logFile, "  SubmitDelta: ok=%d zero=%d weird=%d  DirtyMgr: nonNull=%d null=%d\n",
                 g_dirtyDeltaOK, g_dirtyDeltaZero, g_dirtyDeltaWeird,
                 g_dirtyMgrNonNull, g_dirtyMgrNull);
-            // v25.0 总账 (Engine vtable fill)
-            fprintf(g_logFile, "  V25Fill: calls=%d fails=%d\n", g_v25FillCount, g_v25FillFail);
+            // v25.1 总账 (Engine vtable fill + moved erase)
+            fprintf(g_logFile, "  V25Fill: calls=%d fails=%d movedFill=%d prevSlots=%d\n", g_v25FillCount, g_v25FillFail, g_v25MovedFill, g_v25PrevCount);
             // BG-LRU (v25 已禁用, 统计应为 0)
             fprintf(g_logFile, "  BG-LRU(disabled): hits=%d moved=%d new=%d clean=%d drift=%d skip=%d full=%d oor=%d\n",
                 g_v15Hits, g_v15Moved, g_v15New, g_v15Clean, g_v15Drift, g_v15Skip, g_v15Full, g_v15OOR);
