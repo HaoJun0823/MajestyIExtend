@@ -1,4 +1,4 @@
-﻿// dllmain.cpp : Majesty HD Runtime Localization v19.0 (BG-LRU v4: no time-based expire)
+﻿// dllmain.cpp : Majesty HD Runtime Localization v20.0 (BG-LRU v5: forced moved-erase + wider drift tolerance)
 //
 // v16.0 motion.log 定案(推翻 v15 推论): DirectBlit 在单位移动/相机平移期间
 //   **每帧都被调用且位置连续变化** (农民#1: 462 次移动/249 位置, +6px/帧平滑走 200px)。
@@ -59,6 +59,23 @@
 //       把残影固化。v18 残留"边缘"的一个来源。
 //   (3) 缓存矩形外扩: 描边外再 +2px(覆盖 alpha 反锯齿/描边的 1-2px 淡出
 //       边缘) → 修"残留点边缘"(移动文字边缘 1-2px 旧像素擦不净)。
+//
+// v19.0 实测: 常态字基本不消失(v18 regression 修复 ✓), 但残影比 v18 更严重。
+//   根因: moved 分支 WriteBack 受 drift guard 保护。旧位置当前画面含上一帧
+//   文字残影 → drift 检测比较"干净背景缓存 vs 含残影画面" → 文字像素差异
+//   占比大(30-50%) → 超 40% 阈值 → 判 drift → 跳过擦除 → 残影永久留存。
+//   v18 靠 V15Expire(clean=1422) 兜底擦掉了这些 moved-drift 残影, 但代价是
+//   误杀常态字。v19 移除 V15Expire 后这些残影无人清 → 比 v18 更差。
+//
+// v20.0 修复 (BG-LRU v5):
+//   (1) moved 分支 WriteBack **强制执行**(force=true 跳过 drift 检测)。
+//       移动标签的旧位置必然含残影, drift 检测反而阻止擦除 → 本末倒置。
+//       hit 分支仍保留 drift 检测(force=false) — 原地重绘时背景真漂移(引擎
+//       滚动/重画)则不抹引擎新内容。
+//   (2) drift 阈值 40% → 70%。文字像素约占 30-50%, 40% 阈值下正常重绘
+//       (hit 分支)的文字差异即被判 drift → 误跳过擦除 → 残影。70% 容忍
+//       文字差异同时仍能捕捉真实背景全变(引擎滚动)。
+//   (3) 矩形外扩 ow+2 → ow+4(用户明确要求"范围再大点")。
 
 #include "pch.h"
 #include <psapi.h>
@@ -951,7 +968,7 @@ static bool GetRenderDevInfo(int a4, RenderDevInfo& info) {
 #define V15_MAX_BUF (192 * 1024)
 #define V15_SCAN_INTERVAL 4      // (保留, V15Expire 已停用)
 #define V15_THIS_EXPIRE_TICKS 0  // v19: 0 = 禁用 this 失活过期擦除(v18 误杀常态字)
-#define V15_BGDRIFT_PCT 40       // 抽样差异 >40% 视为背景漂移 → 跳过写回
+#define V15_BGDRIFT_PCT 70       // v20: 40→70, 文字像素约占30-50%, 40%太低导致正常重绘误判drift
 
 // 活跃 this 追踪表: (v19 仅统计用, 不再驱动过期擦除)
 #define V15_SEEN_MAX 256
@@ -1062,9 +1079,9 @@ static bool V15BgDrifted(const V15Slot& s, const RenderDevInfo& rdi) {
 // clip 之外; rdi.clip 只是引擎的绘制上界, 不是 buffer 内容边界。v15 败因之一。
 // v18: 写回前做背景漂移检测 —— 该区域已被引擎滚动/重画(缓存过期)则跳过,
 //      避免把引擎新内容抹成旧背景(相机平移时的 UI 花块)。
-// 返回 false = 漂移跳过(未写回)。
-static bool V15WriteBack(const V15Slot& s, const RenderDevInfo& rdi) {
-    if (V15BgDrifted(s, rdi)) return false;
+// 返回 false = 漂移跳过(未写回)。force=true 时跳过漂移检测(moved 强制擦)。
+static bool V15WriteBack(const V15Slot& s, const RenderDevInfo& rdi, bool force) {
+    if (!force && V15BgDrifted(s, rdi)) return false;
     uint8_t* px = (uint8_t*)rdi.pixelBuf;
     int h = s.b - s.t;
     for (int yy = 0; yy < h; yy++) {
@@ -1118,7 +1135,7 @@ static void V15Expire(const RenderDevInfo& rdi) {
         if (seen < 0) continue;                     // 未跟踪(异常) → 跳过
         if (g_v15Tick - seen <= V15_THIS_EXPIRE_TICKS) continue;  // this 仍活跃
         __try {
-            if (!V15WriteBack(s, rdi)) g_v15Drift++;
+            if (!V15WriteBack(s, rdi, false)) g_v15Drift++;
         } __except (EXCEPTION_EXECUTE_HANDLER) {}
         free(s.buf);
         s.buf = nullptr;
@@ -1152,7 +1169,7 @@ static void V15EraseOldText(uint32_t thisPtr, uint32_t textHash, int l, int t, i
         if (s.l == l && s.t == t && s.r == r && s.b == b) {
             // 精确命中: 擦旧字(漂移则作废缓存) → 重存当前(干净)背景
             bool wrote = false;
-            __try { wrote = V15WriteBack(s, rdi); } __except (EXCEPTION_EXECUTE_HANDLER) {}
+            __try { wrote = V15WriteBack(s, rdi, false); } __except (EXCEPTION_EXECUTE_HANDLER) {}
             if (!wrote) {
                 // v19: 背景已漂移(引擎重画过该区) → 旧缓存作废, 释放。
                 // v18 此处 WriteBack 失败后仍 Capture → 把"含旧字残留"的画面
@@ -1173,9 +1190,11 @@ static void V15EraseOldText(uint32_t thisPtr, uint32_t textHash, int l, int t, i
     }
 
     // 2) 移动标签: 立即擦旧位置(不等过期 — 伪影消除的关键)
+    //    v20: force=true 跳过 drift 检测 — 旧位置当前画面含上一帧残影,
+    //    drift 检测会因残影像素差异>阈值而跳过擦除 → 残影永久留存(v19 败因)。
     if (stale) {
         __try {
-            if (!V15WriteBack(*stale, rdi)) g_v15Drift++;
+            if (!V15WriteBack(*stale, rdi, true)) g_v15Drift++;  // force=true
         } __except (EXCEPTION_EXECUTE_HANDLER) {}
         free(stale->buf);
         stale->buf = nullptr;
@@ -1572,9 +1591,10 @@ static bool DirectBlitText(int thisPtr, int a2, int a3, int a4,
         // 用文本实际落地区域(与画字裁剪一致), 外扩描边+反锯齿淡出余量。
         // v19: 原来只外扩 ow(描边1px) → 移动文字边缘 1-2px 反锯齿淡出像素
         // 擦不净 → 用户"残留点边缘"。统一再多扩 2px。
+        // v20: 用户反馈"范围需要再大点" → ow+2 → ow+4, 覆盖更宽边缘淡出。
         int eL = clipL, eT = clipT, eR = clipR, eB = clipB;
         int ow = outlined ? (g_cfg.outlineWidth > 0 ? g_cfg.outlineWidth : 1) : 0;
-        int pad = ow + 2;
+        int pad = ow + 4;
         if (eL - pad > 0) eL -= pad;
         if (eT - pad > 0) eT -= pad;
         if (eR + pad < (int)rdi.width) eR += pad;
@@ -2018,7 +2038,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
         fflush(g_logFile);
     } else if (dwReason == DLL_PROCESS_DETACH) {
         if (g_logFile) {
-            fprintf(g_logFile, "\n[DllMain] DETACH (v19.0)\n");
+            fprintf(g_logFile, "\n[DllMain] DETACH (v20.0)\n");
             fprintf(g_logFile, "  Calls=%d Replaced=%d Hits=%d (unique=%d) Rollback=%d (unique=%d) Misses=%d (unique=%d)\n",
                 g_callCount, g_replacedCount, g_hitCount, (int)g_hitSeen.size(),
                 g_rollbackHitCount, (int)g_rollbackSeen.size(),
@@ -2032,7 +2052,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
                 g_dirtyDeltaOK, g_dirtyDeltaZero, g_dirtyDeltaWeird,
                 g_dirtyMgrNonNull, g_dirtyMgrNull);
             // v19.0 总账 (BG-LRU v4: no time-based expire)
-            fprintf(g_logFile, "  BG-LRU(v19): hits=%d moved=%d new=%d clean=%d drift=%d skip=%d full=%d oor=%d\n",
+            fprintf(g_logFile, "  BG-LRU(v20): hits=%d moved=%d new=%d clean=%d drift=%d skip=%d full=%d oor=%d\n",
                 g_v15Hits, g_v15Moved, g_v15New, g_v15Clean, g_v15Drift, g_v15Skip, g_v15Full, g_v15OOR);
             // v16.0 总账
             fprintf(g_logFile, "  Motion: lines=%d\n", g_motionLines);
