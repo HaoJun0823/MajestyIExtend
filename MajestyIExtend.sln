@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.37530.8
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MajestyI_Text_Fix", "MajestyI_Text_Fix\MajestyI_Text_Fix.vcxproj", "{89D6FFD8-1A9A-45B1-AAA9-F7D387D68288}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MajestyI_StrFix", "MajestyI_StrFix\MajestyI_StrFix.vcxproj", "{7C4E1D92-3B5A-4F0E-9A21-6D8E4C1B7A55}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -15,6 +17,10 @@ Global
 		{89D6FFD8-1A9A-45B1-AAA9-F7D387D68288}.Debug|x86.Build.0 = Debug|Win32
 		{89D6FFD8-1A9A-45B1-AAA9-F7D387D68288}.Release|x86.ActiveCfg = Release|Win32
 		{89D6FFD8-1A9A-45B1-AAA9-F7D387D68288}.Release|x86.Build.0 = Release|Win32
+		{7C4E1D92-3B5A-4F0E-9A21-6D8E4C1B7A55}.Debug|x86.ActiveCfg = Debug|Win32
+		{7C4E1D92-3B5A-4F0E-9A21-6D8E4C1B7A55}.Debug|x86.Build.0 = Debug|Win32
+		{7C4E1D92-3B5A-4F0E-9A21-6D8E4C1B7A55}.Release|x86.ActiveCfg = Release|Win32
+		{7C4E1D92-3B5A-4F0E-9A21-6D8E4C1B7A55}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
