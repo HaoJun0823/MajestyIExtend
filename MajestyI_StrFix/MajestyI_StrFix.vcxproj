@@ -102,6 +102,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <!-- ★ v2.0：AOB 特征码定位模块。以 #include 方式接入 dllmain.cpp，
+         不作为独立编译单元（故用 None，避免重复编译）。 -->
+    <None Include="sigscan.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
