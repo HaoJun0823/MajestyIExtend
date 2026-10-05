@@ -28,13 +28,13 @@ name: build-release
 
 on:
   push:
-    branches: [main, master]
+    branches: [main, master, rebuild]
     paths-ignore:
       - '**.md'
       - 'original/**'
       - 'docs/**'
   pull_request:
-    branches: [main, master]
+    branches: [main, master, rebuild]
     paths-ignore:
       - '**.md'
       - 'original/**'
