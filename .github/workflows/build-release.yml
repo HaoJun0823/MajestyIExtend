@@ -269,10 +269,12 @@ jobs:
           path: build_out/MajestyHD-CHS-*.zip
           if-no-files-found: error
 
-  # ── 发布：push master/main 时自动打日期 tag + 发 Release ─────────────
+  # ── 发布：每次 push 成功构建后自动打日期 tag + 发 Release ───────────
+  # 复刻 MajestyIIExtend：不再限制分支，rebuild/master/main 均自动发布。
+  # 同一 run 内由 gh CLI 直接建 tag + 发 Release，无需手动打 tag。
   publish:
     name: 发布 Release
-    if: ${{ github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main') }}
+    if: ${{ github.event_name == 'push' }}
     needs: build
     runs-on: ubuntu-latest
     permissions:
