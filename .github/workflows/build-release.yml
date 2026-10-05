@@ -183,8 +183,13 @@ jobs:
       #     /W3(WarningLevel3) /sdl(SDLCheck) /Y-(禁PCH,简化CI)
       #     /utf-8(源码编码) /EHsc(C++异常)
       #     定义: WIN32 NDEBUG MAJESTYISTRFIX_EXPORTS _WINDOWS _USRDLL _CRT_SECURE_NO_WARNINGS
-      #     链接: /SUBSYSTEM:WINDOWS /DEBUG /OPT:ICF /OPT:REF
+      #     链接: /SUBSYSTEM:WINDOWS /OPT:ICF /OPT:REF
       #           kernel32.lib user32.lib libMinHook-x86-v141-mt.lib
+      #   ★ 不加 -DEBUG：本地部署的 asi（34816B）无 .debug 段，debug 信息
+      #     仅生成 .pdb 不嵌入 PE。wine 下 link.exe 加 -DEBUG 会嵌入旧式
+      #     .debug 段导致体积膨胀到 139776B，远超体积闸门。
+      #   ★ MinHook .lib 含 /GL（全程序优化），link 会自动重启加 /LTCG，
+      #     属正常行为（仅影响链接速度，不影响产物体积）。
       - name: 编译 MajestyI_StrFix.asi
         if: ${{ github.event.inputs.skip_dll != 'true' }}
         run: |
@@ -201,7 +206,7 @@ jobs:
             -I. -I"$MH_INC" \
             dllmain.cpp pch.cpp \
             -link -OUT:MajestyI_StrFix.dll \
-            -SUBSYSTEM:WINDOWS -DEBUG -OPT:ICF -OPT:REF \
+            -SUBSYSTEM:WINDOWS -OPT:ICF -OPT:REF \
             kernel32.lib user32.lib "$MH_LIB"
           if [ ! -f MajestyI_StrFix.dll ]; then
             echo "!! cl did not produce MajestyI_StrFix.dll" >&2; exit 1
