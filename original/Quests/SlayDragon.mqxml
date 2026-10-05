@@ -1,0 +1,21 @@
+<Majesty>
+	<Quest id="{38305551-0000-0000-0000-000000000000}">
+		<Name>SLAY_DRAGON</Name>
+		<Description lang="en_US">
+			<Short>The only guild you have is a Temple to Helia. [newline][newline]You do not have the means to build any Guilds or Temples, so you'll have to find and organize the locals in order to defend your establishment. Use Solarii to rally the guilds lying in the countryside![newline][newline]Find the Hidden Sword Site and destroy it in order to obtain the Magic Sword, which will make Vendral mortal.[newline][newline]Use the Magic Sword to slay Vendral.[newline][newline](You can't build any guilds or temples in this quest.)</Short>
+			<Long>"Forgive the intrusion, your Majesty, but you must awaken! The day that Juleck the Prophet spoke of is upon us. The mighty dragon, Vendral, has awakened from his thousand-year slumber in the Mountains of Doom, and is attacking the realm![newline]There is little time. You must recruit forces to find the weapons that will help destroy this threat before the kingdom becomes a scorched, barren waste. Send heroes to find the sword of Byran the Dragonsmiter. This manner of blade is the only known weapon that may cleave Vendral's hide."</Long>
+		</Description>
+		<DataConfiguration>
+			<Dataset base="Majesty">
+				<Load>
+					<Template>Slay_Dragon.q</Template>
+				</Load>
+				<Unload>
+					<CAM></CAM>
+					<GPL></GPL>
+					<Constants></Constants>
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

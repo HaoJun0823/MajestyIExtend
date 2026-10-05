@@ -1,0 +1,21 @@
+<Majesty>
+	<Quest id="{34315551-0000-0000-0000-000000000000}">
+		<Name>LICHE_QUEEN</Name>
+		<Description lang="en_US">
+			<Short>Drive the Liche Queen from her rocky lair, and then defeat her.[newline][newline](No Temples to Krypta available. No Blacksmiths, Inns, Dwarven Settlements, or Rogues Guilds may be built, but there may be hidden remnants of an earlier settlement left...)</Short>
+			<Long>"Majesty. I'm here with the latest report from the Chief Tax Collector. He reports that the fiscal quarter will soon be ending and the treasury reports a deficit of..."[newline][newline]{Voice of the Liche Queen} [newline]"You dare interfere with the plans of the Liche Queen?  Your meddling presence has been like a thorn in my side. I will soon remove you and your sorry heroes, permanently."[newline][newline] "...though such outlays could damage income potential if not properly balanced against spending in other areas.[newline][newline]Uh, Your Highness? Did you hear what I was saying?"</Long>
+		</Description>
+		<DataConfiguration>
+			<Dataset base="Majesty">
+				<Load>
+					<Template>Liche_queen.q</Template>
+				</Load>
+				<Unload>
+					<CAM></CAM>
+					<GPL></GPL>
+					<Constants></Constants>
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

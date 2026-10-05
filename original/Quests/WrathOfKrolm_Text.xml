@@ -1,0 +1,6 @@
+<Majesty>
+	<Language id="en_US">
+		<Text id="IDTXT_QUEST_WIN_MESSAGE">"Well done, Your Majesty. With the defeat of Krolm's Avatar, his influence over these lands has been broken.[newline][newline]Most of Krolm's followers have scattered back into the wilderness and these routes into the north are now once again safe for civilized trade."</Text>
+		<Text id="IDTXT_QUEST_LOSS_MESSAGE">Krolm's power has proven to be too great for you and his will remains supreme in these lands - for now.</Text>
+	</Language>
+</Majesty>

@@ -1,0 +1,21 @@
+<Majesty>
+	<Quest id="{33315551-0000-0000-0000-000000000000}">
+		<Name>GOBLIN_HORDES</Name>
+		<Description lang="en_US">
+			<Short>Destroy all Goblin Settlements.[newline][newline](Rangers Guilds cannot be constructed.)</Short>
+			<Long>"Dreadful news! Scouts from the frontier report that Goblins have been seen heading this way, in massive numbers. We must stem this dark tide before they overrun and utterly destroy the kingdom. I suggest you put out a call for heroes - as many as we can muster - to protect our village and keep this vile swarm at bay. [newline]I implore you to act quickly! The most recent sightings were not far from the village and we are ill-prepared for such an invasion."</Long>
+		</Description>
+		<DataConfiguration>
+			<Dataset base="Majesty">
+				<Load>
+					<Template>Goblin_Hordes.q</Template>
+				</Load>
+				<Unload>
+					<CAM></CAM>
+					<GPL></GPL>
+					<Constants></Constants>
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

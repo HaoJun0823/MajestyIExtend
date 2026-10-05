@@ -1,0 +1,21 @@
+<Majesty>
+	<Quest id="{38315551-0000-0000-0000-000000000000}">
+		<Name>BRASHNARD</Name>
+		<Description lang="en_US">
+			<Short>寻回组成布拉什纳德终极之球的七块碎片。</Short>
+			<Long>"我理解殿下是在寻找布拉什纳德的终极之力球？拥有那件传奇神器必定会为您的统治增添威权。[newline]您想必还记得，此球被分成七块碎片，散落到了王国的四面八方。必须召集大量英雄，在境内搜寻这些失落的碎片。以您的权威，让这项壮举开始吧。[newline]陛下？这不是卑微的仆人该质疑您英明指示的地方，但此事……嗯，"雄心勃勃"。我们真的能在无数前人失败之处成功吗？"</Long>
+		</Description>
+		<DataConfiguration>
+			<Dataset base="Majesty">
+				<Load>
+					<Template>Brashnard.q</Template>
+				</Load>
+				<Unload>
+					<CAM />
+					<GPL />
+					<Constants />
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

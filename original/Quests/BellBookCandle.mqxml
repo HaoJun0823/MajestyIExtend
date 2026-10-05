@@ -1,0 +1,21 @@
+<Majesty>
+	<Quest id="{32305551-0000-0000-0000-000000000000}">
+		<Name>BELL_BOOK_CANDLE</Name>
+		<Description lang="en_US">
+			<Short>Recover the three items which have been stolen from your Palace and hidden in lairs throughout this realm.[newline][newline](No Warriors or Wizards available in this quest.)</Short>
+			<Long>"Forgive the intrusion, Highness, but we've been robbed! Someone has stolen the Magic Bell, the Holy Book, and the Eternal Candle! Right from under our noses, they were whisked away from the royal treasury by some scoundrel. We must do something to recover them! They are treasures beyond value."</Long>
+		</Description>
+		<DataConfiguration>
+			<Dataset base="Majesty">
+				<Load>
+					<Template>Bell_book_candle.q</Template>
+				</Load>
+				<Unload>
+					<CAM></CAM>
+					<GPL></GPL>
+					<Constants></Constants>
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

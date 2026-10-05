@@ -1,0 +1,21 @@
+<Majesty>
+	<Quest id="{37315551-0000-0000-0000-000000000000}">
+		<Name>SLAVE_PITS</Name>
+		<Description lang="en_US">
+			<Short>Destroy four Slave Pits, releasing all slaves.[newline][newline]Kill Url-Shekk, the three-headed beast.</Short>
+			<Long>"Disturbing rumors have reached my ears, Majesty. There are many reports of villagers gone missing near the edge of town. Fearful whispers speak of some foul creature who has been harvesting the unwitting as slaves for its diabolic schemes.[newline]Panic is beginning to well within the village. Something must be done, your highness, or we face a grave crisis. I suggest you initiate efforts to recover these people and to rid the land of this frightful menace."</Long>
+		</Description>
+		<DataConfiguration>
+			<Dataset base="Majesty">
+				<Load>
+					<Template>free_slaves.q</Template>
+				</Load>
+				<Unload>
+					<CAM></CAM>
+					<GPL></GPL>
+					<Constants></Constants>
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

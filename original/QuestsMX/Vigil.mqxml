@@ -1,0 +1,21 @@
+<Majesty>
+	<Quest id="{32315158-0000-0000-0000-000000000000}">
+		<Name>VIGIL</Name>
+		<Description lang="en_US">
+			<Short>Destroy the Abomination that lives in the hills.[newline][newline](No Fairgrounds, Sorcerers Abodes, Magic Bazaars, Outposts, Guilds or Temples can be built.)</Short>
+			<Long>"My Liege, it pains me to inform you that our realm's most valiant and renowned Paladin, Glohrea Oathtaker, was slain while questing in the outlands. There is not one hero or peasant in this village who does not owe their lives to her selfless acts. Your subjects demand the head of whoever...or whatever murdered our brave Glohrea. Please move quickly and send a small contingent of battle-hardened heroes to the outlands. This deed can not go unpunished!"</Long>
+		</Description>
+		<DataConfiguration>
+			<Dataset base="MajestyExpansion">
+				<Load>
+					<Template>Vigil.q</Template>
+				</Load>
+				<Unload>
+					<CAM></CAM>
+					<GPL></GPL>
+					<Constants></Constants>
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

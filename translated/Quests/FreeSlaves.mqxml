@@ -1,0 +1,21 @@
+<Majesty>
+	<Quest id="{37315551-0000-0000-0000-000000000000}">
+		<Name>SLAVE_PITS</Name>
+		<Description lang="en_US">
+			<Short>摧毁四座奴隶坑，释放所有奴隶。[newline][newline]杀死三头野兽乌尔-谢克。</Short>
+			<Long>"令人不安的传言已传入我耳中，陛下。许多报告称村镇边缘的村民失踪了。恐惧的窃窃私语说，某个邪恶的生物正在收割不知情的人，将其作为奴隶用于它的邪恶计划。[newline]恐慌正在村中蔓延。殿下，必须采取行动，否则我们将面临严重的危机。我建议您着手找回这些民众，并清除这片土地上的可怕威胁。"</Long>
+		</Description>
+		<DataConfiguration>
+			<Dataset base="Majesty">
+				<Load>
+					<Template>free_slaves.q</Template>
+				</Load>
+				<Unload>
+					<CAM />
+					<GPL />
+					<Constants />
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

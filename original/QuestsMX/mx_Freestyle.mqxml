@@ -1,0 +1,21 @@
+<Majesty>
+	<Quest id="{31455246-0000-0000-0000-000000000000}">
+		<Name>MX FREESTYLE</Name>
+		<Description lang="en_US">
+			<Short>Majesty:Expansion Free Style game parameters</Short>
+			<Long></Long>
+		</Description>
+		<DataConfiguration>
+			<Dataset base="MajestyExpansion">
+				<Load>
+					<Template>mx_Freestyle.q</Template>
+				</Load>
+				<Unload>
+					<CAM></CAM>
+					<GPL></GPL>
+					<Constants></Constants>
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

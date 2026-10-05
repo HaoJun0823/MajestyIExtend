@@ -1,0 +1,21 @@
+<Majesty>
+	<Quest id="{35305158-0000-0000-0000-000000000000}">
+		<Name>RISE_RATMEN</Name>
+		<Description lang="en_US">
+			<Short>Destroy Rhoden, the Rat King, and all Broken Sewer Mains in the realm.</Short>
+			<Long>"Sovereign, the Ratmen grow bolder day by day. Their numbers appear to increase and strange new sounds can be heard issuing from our sewers. Rumors have reached our ears of a new ruler among Ratkind - a rodent with a taste for surface conquest.[newline]We must be vigilant against a potential Ratmen invasion. If they choose to strike, we must target their new leader. Without their ruler, the Ratmen will not be able to maintain such an onslaught."</Long>
+		</Description>
+		<DataConfiguration>
+			<Dataset base="MajestyExpansion">
+				<Load>
+					<Template>Rise_ratmen.q</Template>
+				</Load>
+				<Unload>
+					<CAM></CAM>
+					<GPL></GPL>
+					<Constants></Constants>
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

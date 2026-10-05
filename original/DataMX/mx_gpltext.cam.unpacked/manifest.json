@@ -1,0 +1,641 @@
+{
+  "source": "mx_gpltext.cam",
+  "size": 136573,
+  "sha256": "723e3aa30fc0413f63640a6d53443697b3f53e95532a0e3a713d08901fd78918",
+  "magic": "43594c4250432020",
+  "version": "01000100",
+  "file_dummy": 2192,
+  "sections": [
+    {
+      "ext": "STRT",
+      "ext_raw": "53545254",
+      "section_dummy": 0,
+      "files": [
+        {
+          "index": 0,
+          "name": "QUES",
+          "name_raw": "5155455300000000000000000000000000000000",
+          "file": "000_QUES.bin",
+          "size": 966,
+          "orig_offset": 2220
+        },
+        {
+          "index": 1,
+          "name": "QITM",
+          "name_raw": "5149544d00000000000000000000000000000000",
+          "file": "001_QITM.bin",
+          "size": 1514,
+          "orig_offset": 3186
+        },
+        {
+          "index": 2,
+          "name": "AITX",
+          "name_raw": "4149545800000000000000000000000000000000",
+          "file": "002_AITX.bin",
+          "size": 32088,
+          "orig_offset": 4700
+        },
+        {
+          "index": 3,
+          "name": "ENTX",
+          "name_raw": "454e545800000000000000000000000000000000",
+          "file": "003_ENTX.bin",
+          "size": 347,
+          "orig_offset": 36788
+        },
+        {
+          "index": 4,
+          "name": "EDTX",
+          "name_raw": "4544545800000000000000000000000000000000",
+          "file": "004_EDTX.bin",
+          "size": 1253,
+          "orig_offset": 37135
+        },
+        {
+          "index": 5,
+          "name": "EVSC",
+          "name_raw": "4556534300000000000000000000000000000000",
+          "file": "005_EVSC.bin",
+          "size": 413,
+          "orig_offset": 38388
+        },
+        {
+          "index": 6,
+          "name": "HPTX",
+          "name_raw": "4850545800000000000000000000000000000000",
+          "file": "006_HPTX.bin",
+          "size": 59393,
+          "orig_offset": 38801
+        },
+        {
+          "index": 7,
+          "name": "DPTX",
+          "name_raw": "4450545800000000000000000000000000000000",
+          "file": "007_DPTX.bin",
+          "size": 2916,
+          "orig_offset": 98194
+        },
+        {
+          "index": 8,
+          "name": "LOSX",
+          "name_raw": "4c4f535800000000000000000000000000000000",
+          "file": "008_LOSX.bin",
+          "size": 2016,
+          "orig_offset": 101110
+        },
+        {
+          "index": 9,
+          "name": "QEND",
+          "name_raw": "51454e4400000000000000000000000000000000",
+          "file": "009_QEND.bin",
+          "size": 8845,
+          "orig_offset": 103126
+        },
+        {
+          "index": 10,
+          "name": "HN01",
+          "name_raw": "484e303100000000000000000000000000000000",
+          "file": "010_HN01.bin",
+          "size": 567,
+          "orig_offset": 111971
+        },
+        {
+          "index": 11,
+          "name": "HN02",
+          "name_raw": "484e303200000000000000000000000000000000",
+          "file": "011_HN02.bin",
+          "size": 812,
+          "orig_offset": 112538
+        },
+        {
+          "index": 12,
+          "name": "HN03",
+          "name_raw": "484e303300000000000000000000000000000000",
+          "file": "012_HN03.bin",
+          "size": 4,
+          "orig_offset": 113350
+        },
+        {
+          "index": 13,
+          "name": "HN04",
+          "name_raw": "484e303400000000000000000000000000000000",
+          "file": "013_HN04.bin",
+          "size": 4,
+          "orig_offset": 113354
+        },
+        {
+          "index": 14,
+          "name": "HN05",
+          "name_raw": "484e303500000000000000000000000000000000",
+          "file": "014_HN05.bin",
+          "size": 631,
+          "orig_offset": 113358
+        },
+        {
+          "index": 15,
+          "name": "HN06",
+          "name_raw": "484e303600000000000000000000000000000000",
+          "file": "015_HN06.bin",
+          "size": 970,
+          "orig_offset": 113989
+        },
+        {
+          "index": 16,
+          "name": "HN07",
+          "name_raw": "484e303700000000000000000000000000000000",
+          "file": "016_HN07.bin",
+          "size": 4,
+          "orig_offset": 114959
+        },
+        {
+          "index": 17,
+          "name": "HN08",
+          "name_raw": "484e303800000000000000000000000000000000",
+          "file": "017_HN08.bin",
+          "size": 4,
+          "orig_offset": 114963
+        },
+        {
+          "index": 18,
+          "name": "HN09",
+          "name_raw": "484e303900000000000000000000000000000000",
+          "file": "018_HN09.bin",
+          "size": 720,
+          "orig_offset": 114967
+        },
+        {
+          "index": 19,
+          "name": "HN10",
+          "name_raw": "484e313000000000000000000000000000000000",
+          "file": "019_HN10.bin",
+          "size": 653,
+          "orig_offset": 115687
+        },
+        {
+          "index": 20,
+          "name": "HN11",
+          "name_raw": "484e313100000000000000000000000000000000",
+          "file": "020_HN11.bin",
+          "size": 4,
+          "orig_offset": 116340
+        },
+        {
+          "index": 21,
+          "name": "HN12",
+          "name_raw": "484e313200000000000000000000000000000000",
+          "file": "021_HN12.bin",
+          "size": 4,
+          "orig_offset": 116344
+        },
+        {
+          "index": 22,
+          "name": "HN13",
+          "name_raw": "484e313300000000000000000000000000000000",
+          "file": "022_HN13.bin",
+          "size": 711,
+          "orig_offset": 116348
+        },
+        {
+          "index": 23,
+          "name": "HN14",
+          "name_raw": "484e313400000000000000000000000000000000",
+          "file": "023_HN14.bin",
+          "size": 956,
+          "orig_offset": 117059
+        },
+        {
+          "index": 24,
+          "name": "HN15",
+          "name_raw": "484e313500000000000000000000000000000000",
+          "file": "024_HN15.bin",
+          "size": 4,
+          "orig_offset": 118015
+        },
+        {
+          "index": 25,
+          "name": "HN16",
+          "name_raw": "484e313600000000000000000000000000000000",
+          "file": "025_HN16.bin",
+          "size": 4,
+          "orig_offset": 118019
+        },
+        {
+          "index": 26,
+          "name": "HN17",
+          "name_raw": "484e313700000000000000000000000000000000",
+          "file": "026_HN17.bin",
+          "size": 636,
+          "orig_offset": 118023
+        },
+        {
+          "index": 27,
+          "name": "HN18",
+          "name_raw": "484e313800000000000000000000000000000000",
+          "file": "027_HN18.bin",
+          "size": 884,
+          "orig_offset": 118659
+        },
+        {
+          "index": 28,
+          "name": "HN19",
+          "name_raw": "484e313900000000000000000000000000000000",
+          "file": "028_HN19.bin",
+          "size": 4,
+          "orig_offset": 119543
+        },
+        {
+          "index": 29,
+          "name": "HN20",
+          "name_raw": "484e323000000000000000000000000000000000",
+          "file": "029_HN20.bin",
+          "size": 4,
+          "orig_offset": 119547
+        },
+        {
+          "index": 30,
+          "name": "HN21",
+          "name_raw": "484e323100000000000000000000000000000000",
+          "file": "030_HN21.bin",
+          "size": 693,
+          "orig_offset": 119551
+        },
+        {
+          "index": 31,
+          "name": "HN22",
+          "name_raw": "484e323200000000000000000000000000000000",
+          "file": "031_HN22.bin",
+          "size": 921,
+          "orig_offset": 120244
+        },
+        {
+          "index": 32,
+          "name": "HN23",
+          "name_raw": "484e323300000000000000000000000000000000",
+          "file": "032_HN23.bin",
+          "size": 4,
+          "orig_offset": 121165
+        },
+        {
+          "index": 33,
+          "name": "HN24",
+          "name_raw": "484e323400000000000000000000000000000000",
+          "file": "033_HN24.bin",
+          "size": 4,
+          "orig_offset": 121169
+        },
+        {
+          "index": 34,
+          "name": "HN25",
+          "name_raw": "484e323500000000000000000000000000000000",
+          "file": "034_HN25.bin",
+          "size": 641,
+          "orig_offset": 121173
+        },
+        {
+          "index": 35,
+          "name": "HN26",
+          "name_raw": "484e323600000000000000000000000000000000",
+          "file": "035_HN26.bin",
+          "size": 74,
+          "orig_offset": 121814
+        },
+        {
+          "index": 36,
+          "name": "HN27",
+          "name_raw": "484e323700000000000000000000000000000000",
+          "file": "036_HN27.bin",
+          "size": 4,
+          "orig_offset": 121888
+        },
+        {
+          "index": 37,
+          "name": "HN28",
+          "name_raw": "484e323800000000000000000000000000000000",
+          "file": "037_HN28.bin",
+          "size": 4,
+          "orig_offset": 121892
+        },
+        {
+          "index": 38,
+          "name": "HN29",
+          "name_raw": "484e323900000000000000000000000000000000",
+          "file": "038_HN29.bin",
+          "size": 656,
+          "orig_offset": 121896
+        },
+        {
+          "index": 39,
+          "name": "HN30",
+          "name_raw": "484e333000000000000000000000000000000000",
+          "file": "039_HN30.bin",
+          "size": 855,
+          "orig_offset": 122552
+        },
+        {
+          "index": 40,
+          "name": "HN31",
+          "name_raw": "484e333100000000000000000000000000000000",
+          "file": "040_HN31.bin",
+          "size": 4,
+          "orig_offset": 123407
+        },
+        {
+          "index": 41,
+          "name": "HN32",
+          "name_raw": "484e333200000000000000000000000000000000",
+          "file": "041_HN32.bin",
+          "size": 4,
+          "orig_offset": 123411
+        },
+        {
+          "index": 42,
+          "name": "HN33",
+          "name_raw": "484e333300000000000000000000000000000000",
+          "file": "042_HN33.bin",
+          "size": 613,
+          "orig_offset": 123415
+        },
+        {
+          "index": 43,
+          "name": "HN34",
+          "name_raw": "484e333400000000000000000000000000000000",
+          "file": "043_HN34.bin",
+          "size": 1100,
+          "orig_offset": 124028
+        },
+        {
+          "index": 44,
+          "name": "HN35",
+          "name_raw": "484e333500000000000000000000000000000000",
+          "file": "044_HN35.bin",
+          "size": 4,
+          "orig_offset": 125128
+        },
+        {
+          "index": 45,
+          "name": "HN36",
+          "name_raw": "484e333600000000000000000000000000000000",
+          "file": "045_HN36.bin",
+          "size": 4,
+          "orig_offset": 125132
+        },
+        {
+          "index": 46,
+          "name": "HN37",
+          "name_raw": "484e333700000000000000000000000000000000",
+          "file": "046_HN37.bin",
+          "size": 650,
+          "orig_offset": 125136
+        },
+        {
+          "index": 47,
+          "name": "HN38",
+          "name_raw": "484e333800000000000000000000000000000000",
+          "file": "047_HN38.bin",
+          "size": 960,
+          "orig_offset": 125786
+        },
+        {
+          "index": 48,
+          "name": "HN39",
+          "name_raw": "484e333900000000000000000000000000000000",
+          "file": "048_HN39.bin",
+          "size": 4,
+          "orig_offset": 126746
+        },
+        {
+          "index": 49,
+          "name": "HN40",
+          "name_raw": "484e343000000000000000000000000000000000",
+          "file": "049_HN40.bin",
+          "size": 4,
+          "orig_offset": 126750
+        },
+        {
+          "index": 50,
+          "name": "HN41",
+          "name_raw": "484e343100000000000000000000000000000000",
+          "file": "050_HN41.bin",
+          "size": 19,
+          "orig_offset": 126754
+        },
+        {
+          "index": 51,
+          "name": "HN42",
+          "name_raw": "484e343200000000000000000000000000000000",
+          "file": "051_HN42.bin",
+          "size": 959,
+          "orig_offset": 126773
+        },
+        {
+          "index": 52,
+          "name": "HN43",
+          "name_raw": "484e343300000000000000000000000000000000",
+          "file": "052_HN43.bin",
+          "size": 4,
+          "orig_offset": 127732
+        },
+        {
+          "index": 53,
+          "name": "HN44",
+          "name_raw": "484e343400000000000000000000000000000000",
+          "file": "053_HN44.bin",
+          "size": 4,
+          "orig_offset": 127736
+        },
+        {
+          "index": 54,
+          "name": "HN45",
+          "name_raw": "484e343500000000000000000000000000000000",
+          "file": "054_HN45.bin",
+          "size": 664,
+          "orig_offset": 127740
+        },
+        {
+          "index": 55,
+          "name": "HN46",
+          "name_raw": "484e343600000000000000000000000000000000",
+          "file": "055_HN46.bin",
+          "size": 923,
+          "orig_offset": 128404
+        },
+        {
+          "index": 56,
+          "name": "HN47",
+          "name_raw": "484e343700000000000000000000000000000000",
+          "file": "056_HN47.bin",
+          "size": 4,
+          "orig_offset": 129327
+        },
+        {
+          "index": 57,
+          "name": "HN48",
+          "name_raw": "484e343800000000000000000000000000000000",
+          "file": "057_HN48.bin",
+          "size": 4,
+          "orig_offset": 129331
+        },
+        {
+          "index": 58,
+          "name": "HN49",
+          "name_raw": "484e343900000000000000000000000000000000",
+          "file": "058_HN49.bin",
+          "size": 620,
+          "orig_offset": 129335
+        },
+        {
+          "index": 59,
+          "name": "HN50",
+          "name_raw": "484e353000000000000000000000000000000000",
+          "file": "059_HN50.bin",
+          "size": 875,
+          "orig_offset": 129955
+        },
+        {
+          "index": 60,
+          "name": "HN51",
+          "name_raw": "484e353100000000000000000000000000000000",
+          "file": "060_HN51.bin",
+          "size": 4,
+          "orig_offset": 130830
+        },
+        {
+          "index": 61,
+          "name": "HN52",
+          "name_raw": "484e353200000000000000000000000000000000",
+          "file": "061_HN52.bin",
+          "size": 4,
+          "orig_offset": 130834
+        },
+        {
+          "index": 62,
+          "name": "HN53",
+          "name_raw": "484e353300000000000000000000000000000000",
+          "file": "062_HN53.bin",
+          "size": 667,
+          "orig_offset": 130838
+        },
+        {
+          "index": 63,
+          "name": "HN54",
+          "name_raw": "484e353400000000000000000000000000000000",
+          "file": "063_HN54.bin",
+          "size": 730,
+          "orig_offset": 131505
+        },
+        {
+          "index": 64,
+          "name": "HN55",
+          "name_raw": "484e353500000000000000000000000000000000",
+          "file": "064_HN55.bin",
+          "size": 4,
+          "orig_offset": 132235
+        },
+        {
+          "index": 65,
+          "name": "HN56",
+          "name_raw": "484e353600000000000000000000000000000000",
+          "file": "065_HN56.bin",
+          "size": 4,
+          "orig_offset": 132239
+        },
+        {
+          "index": 66,
+          "name": "HN57",
+          "name_raw": "484e353700000000000000000000000000000000",
+          "file": "066_HN57.bin",
+          "size": 16,
+          "orig_offset": 132243
+        },
+        {
+          "index": 67,
+          "name": "HN58",
+          "name_raw": "484e353800000000000000000000000000000000",
+          "file": "067_HN58.bin",
+          "size": 920,
+          "orig_offset": 132259
+        },
+        {
+          "index": 68,
+          "name": "HN59",
+          "name_raw": "484e353900000000000000000000000000000000",
+          "file": "068_HN59.bin",
+          "size": 559,
+          "orig_offset": 133179
+        },
+        {
+          "index": 69,
+          "name": "HN60",
+          "name_raw": "484e363000000000000000000000000000000000",
+          "file": "069_HN60.bin",
+          "size": 4,
+          "orig_offset": 133738
+        },
+        {
+          "index": 70,
+          "name": "HN61",
+          "name_raw": "484e363100000000000000000000000000000000",
+          "file": "070_HN61.bin",
+          "size": 704,
+          "orig_offset": 133742
+        },
+        {
+          "index": 71,
+          "name": "HN62",
+          "name_raw": "484e363200000000000000000000000000000000",
+          "file": "071_HN62.bin",
+          "size": 1029,
+          "orig_offset": 134446
+        },
+        {
+          "index": 72,
+          "name": "HN63",
+          "name_raw": "484e363300000000000000000000000000000000",
+          "file": "072_HN63.bin",
+          "size": 4,
+          "orig_offset": 135475
+        },
+        {
+          "index": 73,
+          "name": "HN64",
+          "name_raw": "484e363400000000000000000000000000000000",
+          "file": "073_HN64.bin",
+          "size": 4,
+          "orig_offset": 135479
+        },
+        {
+          "index": 74,
+          "name": "BN01",
+          "name_raw": "424e303100000000000000000000000000000000",
+          "file": "074_BN01.bin",
+          "size": 1078,
+          "orig_offset": 135483
+        },
+        {
+          "index": 75,
+          "name": "BN02",
+          "name_raw": "424e303200000000000000000000000000000000",
+          "file": "075_BN02.bin",
+          "size": 4,
+          "orig_offset": 136561
+        },
+        {
+          "index": 76,
+          "name": "BN03",
+          "name_raw": "424e303300000000000000000000000000000000",
+          "file": "076_BN03.bin",
+          "size": 4,
+          "orig_offset": 136565
+        },
+        {
+          "index": 77,
+          "name": "BN04",
+          "name_raw": "424e303400000000000000000000000000000000",
+          "file": "077_BN04.bin",
+          "size": 4,
+          "orig_offset": 136569
+        }
+      ]
+    }
+  ]
+}

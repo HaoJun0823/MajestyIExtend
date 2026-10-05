@@ -1,0 +1,21 @@
+<Majesty>
+	<Quest id="{34305158-0000-0000-0000-000000000000}">
+		<Name>LEGENDARY_HEROES</Name>
+		<Description lang="en_US">
+			<Short>在三十天内摧毁所有古冢，否则此地区不稳定的能量将把你的王国化为废墟。[newline][newline]每座建筑同一时间只能容纳一名英雄。[newline][newline]英雄初始经验很高。[newline][newline]升级二三级宫殿所需英雄更少。[newline][newline]此地区部分巢穴会在一段时间后重生。</Short>
+			<Long>"陛下，您的子民心中不安。我们驻扎在克罗尔玛之砧的边缘，这是一片古老的战场。自有记载之前，此地便已荒芜。据说那些在此死去之人的幽灵在此地出没，许多凶猛的生物潜伏在其阴暗的古冢和山丘中。游侠将其视为整个阿达尼亚最危险的地区之一。[newline]据说许多古老而强大的神器散落在那些伟大英雄陨落之处。无论危险如何，找回这些物品将向这些寒冷北境的居民展示您的胆识。"</Long>
+		</Description>
+		<DataConfiguration>
+			<Dataset base="MajestyExpansion">
+				<Load>
+					<Template>Legendary_Heroes.q</Template>
+				</Load>
+				<Unload>
+					<CAM />
+					<GPL />
+					<Constants />
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

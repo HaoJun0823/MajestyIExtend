@@ -1,0 +1,21 @@
+<Majesty>
+	<Quest id="{39305158-0000-0000-0000-000000000000}">
+		<Name>TRADE_ROUTES</Name>
+		<Description lang="en_US">
+			<Short>清理路线并保护下个月进入我王国的商队。至少一半商队需完好抵达集市。若集市被毁，则任务失败。[newline][newline]（不可建造集市或贸易站。）</Short>
+			<Long>"陛下，我刚从几个北方王国归来。它们对贸易持开放态度，并提供各种奇珍异货。然而，它们的信任需要争取。[newline]在接下来的几周里，一支支商队将开辟新的贸易路线，前往我们的定居点。如果我们能确保它们安全通行，这便履行了我们的契约，我们将从北方获得源源不断的货物和财富。"</Long>
+		</Description>
+		<DataConfiguration>
+			<Dataset base="MajestyExpansion">
+				<Load>
+					<Template>Trade_Routes.q</Template>
+				</Load>
+				<Unload>
+					<CAM />
+					<GPL />
+					<Constants />
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

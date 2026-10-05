@@ -1,0 +1,70 @@
+[
+  {
+    "id": 0,
+    "text": "Function Body"
+  },
+  {
+    "id": 1,
+    "text": "调试器"
+  },
+  {
+    "id": 2,
+    "text": "性能分析器"
+  },
+  {
+    "id": 3,
+    "text": "性能分析器"
+  },
+  {
+    "id": 4,
+    "text": "Output"
+  },
+  {
+    "id": 5,
+    "text": "Tracking"
+  },
+  {
+    "id": 6,
+    "text": "Hierarchical"
+  },
+  {
+    "id": 7,
+    "text": "Xml"
+  },
+  {
+    "id": 8,
+    "text": "Sort Order: "
+  },
+  {
+    "id": 9,
+    "text": "Resume Play"
+  },
+  {
+    "id": 10,
+    "text": "Self-time"
+  },
+  {
+    "id": 11,
+    "text": "Critical Chain"
+  },
+  {
+    "id": 12,
+    "text": "Profiling Off"
+  },
+  {
+    "id": 13,
+    "text": "Reset"
+  },
+  {
+    "id": 14,
+    "text": "Hierarchical"
+  },
+  {
+    "id": 15,
+    "text": "Total Profile Time :"
+  },
+  {
+    "id": 16,
+    "text": "000000000"
+  }
+]

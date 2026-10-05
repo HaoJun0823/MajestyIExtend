@@ -1,0 +1,729 @@
+{
+  "source": "mx_gpltext.cam",
+  "size": 98432,
+  "sha256": "1b8347c4fa68ca692d6b8b417926b0a07cca03b1d137ef021ad4c27f2cbe98bf",
+  "magic": "43594c4250432020",
+  "version": "01000100",
+  "file_dummy": 2192,
+  "sections": [
+    {
+      "ext": "STRT",
+      "ext_raw": "53545254",
+      "section_dummy": 0,
+      "files": [
+        {
+          "index": 0,
+          "name": "QUES",
+          "name_raw": "5155455300000000000000000000000000000000",
+          "file": "000_QUES.bin",
+          "size": 750,
+          "orig_offset": 2220,
+          "strt_json": "000_QUES.json",
+          "strt_count": 34
+        },
+        {
+          "index": 1,
+          "name": "QITM",
+          "name_raw": "5149544d00000000000000000000000000000000",
+          "file": "001_QITM.bin",
+          "size": 1474,
+          "orig_offset": 2970,
+          "strt_json": "001_QITM.json",
+          "strt_count": 32
+        },
+        {
+          "index": 2,
+          "name": "AITX",
+          "name_raw": "4149545800000000000000000000000000000000",
+          "file": "002_AITX.bin",
+          "size": 15994,
+          "orig_offset": 4444,
+          "strt_json": "002_AITX.json",
+          "strt_count": 309
+        },
+        {
+          "index": 3,
+          "name": "ENTX",
+          "name_raw": "454e545800000000000000000000000000000000",
+          "file": "003_ENTX.bin",
+          "size": 302,
+          "orig_offset": 20438,
+          "strt_json": "003_ENTX.json",
+          "strt_count": 16
+        },
+        {
+          "index": 4,
+          "name": "EDTX",
+          "name_raw": "4544545800000000000000000000000000000000",
+          "file": "004_EDTX.bin",
+          "size": 792,
+          "orig_offset": 20740,
+          "strt_json": "004_EDTX.json",
+          "strt_count": 16
+        },
+        {
+          "index": 5,
+          "name": "EVSC",
+          "name_raw": "4556534300000000000000000000000000000000",
+          "file": "005_EVSC.bin",
+          "size": 410,
+          "orig_offset": 21532,
+          "strt_json": "005_EVSC.json",
+          "strt_count": 16
+        },
+        {
+          "index": 6,
+          "name": "HPTX",
+          "name_raw": "4850545800000000000000000000000000000000",
+          "file": "006_HPTX.bin",
+          "size": 40338,
+          "orig_offset": 21942,
+          "strt_json": "006_HPTX.json",
+          "strt_count": 164
+        },
+        {
+          "index": 7,
+          "name": "DPTX",
+          "name_raw": "4450545800000000000000000000000000000000",
+          "file": "007_DPTX.bin",
+          "size": 2316,
+          "orig_offset": 62280,
+          "strt_json": "007_DPTX.json",
+          "strt_count": 55
+        },
+        {
+          "index": 8,
+          "name": "LOSX",
+          "name_raw": "4c4f535800000000000000000000000000000000",
+          "file": "008_LOSX.bin",
+          "size": 1370,
+          "orig_offset": 64596,
+          "strt_json": "008_LOSX.json",
+          "strt_count": 34
+        },
+        {
+          "index": 9,
+          "name": "QEND",
+          "name_raw": "51454e4400000000000000000000000000000000",
+          "file": "009_QEND.bin",
+          "size": 6010,
+          "orig_offset": 65966,
+          "strt_json": "009_QEND.json",
+          "strt_count": 33
+        },
+        {
+          "index": 10,
+          "name": "HN01",
+          "name_raw": "484e303100000000000000000000000000000000",
+          "file": "010_HN01.bin",
+          "size": 704,
+          "orig_offset": 71976,
+          "strt_json": "010_HN01.json",
+          "strt_count": 39
+        },
+        {
+          "index": 11,
+          "name": "HN02",
+          "name_raw": "484e303200000000000000000000000000000000",
+          "file": "011_HN02.bin",
+          "size": 906,
+          "orig_offset": 72680,
+          "strt_json": "011_HN02.json",
+          "strt_count": 41
+        },
+        {
+          "index": 12,
+          "name": "HN03",
+          "name_raw": "484e303300000000000000000000000000000000",
+          "file": "012_HN03.bin",
+          "size": 4,
+          "orig_offset": 73586
+        },
+        {
+          "index": 13,
+          "name": "HN04",
+          "name_raw": "484e303400000000000000000000000000000000",
+          "file": "013_HN04.bin",
+          "size": 4,
+          "orig_offset": 73590
+        },
+        {
+          "index": 14,
+          "name": "HN05",
+          "name_raw": "484e303500000000000000000000000000000000",
+          "file": "014_HN05.bin",
+          "size": 798,
+          "orig_offset": 73594,
+          "strt_json": "014_HN05.json",
+          "strt_count": 45
+        },
+        {
+          "index": 15,
+          "name": "HN06",
+          "name_raw": "484e303600000000000000000000000000000000",
+          "file": "015_HN06.bin",
+          "size": 974,
+          "orig_offset": 74392,
+          "strt_json": "015_HN06.json",
+          "strt_count": 48
+        },
+        {
+          "index": 16,
+          "name": "HN07",
+          "name_raw": "484e303700000000000000000000000000000000",
+          "file": "016_HN07.bin",
+          "size": 4,
+          "orig_offset": 75366
+        },
+        {
+          "index": 17,
+          "name": "HN08",
+          "name_raw": "484e303800000000000000000000000000000000",
+          "file": "017_HN08.bin",
+          "size": 4,
+          "orig_offset": 75370
+        },
+        {
+          "index": 18,
+          "name": "HN09",
+          "name_raw": "484e303900000000000000000000000000000000",
+          "file": "018_HN09.bin",
+          "size": 724,
+          "orig_offset": 75374,
+          "strt_json": "018_HN09.json",
+          "strt_count": 45
+        },
+        {
+          "index": 19,
+          "name": "HN10",
+          "name_raw": "484e313000000000000000000000000000000000",
+          "file": "019_HN10.bin",
+          "size": 758,
+          "orig_offset": 76098,
+          "strt_json": "019_HN10.json",
+          "strt_count": 44
+        },
+        {
+          "index": 20,
+          "name": "HN11",
+          "name_raw": "484e313100000000000000000000000000000000",
+          "file": "020_HN11.bin",
+          "size": 4,
+          "orig_offset": 76856
+        },
+        {
+          "index": 21,
+          "name": "HN12",
+          "name_raw": "484e313200000000000000000000000000000000",
+          "file": "021_HN12.bin",
+          "size": 4,
+          "orig_offset": 76860
+        },
+        {
+          "index": 22,
+          "name": "HN13",
+          "name_raw": "484e313300000000000000000000000000000000",
+          "file": "022_HN13.bin",
+          "size": 876,
+          "orig_offset": 76864,
+          "strt_json": "022_HN13.json",
+          "strt_count": 44
+        },
+        {
+          "index": 23,
+          "name": "HN14",
+          "name_raw": "484e313400000000000000000000000000000000",
+          "file": "023_HN14.bin",
+          "size": 914,
+          "orig_offset": 77740,
+          "strt_json": "023_HN14.json",
+          "strt_count": 44
+        },
+        {
+          "index": 24,
+          "name": "HN15",
+          "name_raw": "484e313500000000000000000000000000000000",
+          "file": "024_HN15.bin",
+          "size": 4,
+          "orig_offset": 78654
+        },
+        {
+          "index": 25,
+          "name": "HN16",
+          "name_raw": "484e313600000000000000000000000000000000",
+          "file": "025_HN16.bin",
+          "size": 4,
+          "orig_offset": 78658
+        },
+        {
+          "index": 26,
+          "name": "HN17",
+          "name_raw": "484e313700000000000000000000000000000000",
+          "file": "026_HN17.bin",
+          "size": 770,
+          "orig_offset": 78662,
+          "strt_json": "026_HN17.json",
+          "strt_count": 43
+        },
+        {
+          "index": 27,
+          "name": "HN18",
+          "name_raw": "484e313800000000000000000000000000000000",
+          "file": "027_HN18.bin",
+          "size": 902,
+          "orig_offset": 79432,
+          "strt_json": "027_HN18.json",
+          "strt_count": 44
+        },
+        {
+          "index": 28,
+          "name": "HN19",
+          "name_raw": "484e313900000000000000000000000000000000",
+          "file": "028_HN19.bin",
+          "size": 4,
+          "orig_offset": 80334
+        },
+        {
+          "index": 29,
+          "name": "HN20",
+          "name_raw": "484e323000000000000000000000000000000000",
+          "file": "029_HN20.bin",
+          "size": 4,
+          "orig_offset": 80338
+        },
+        {
+          "index": 30,
+          "name": "HN21",
+          "name_raw": "484e323100000000000000000000000000000000",
+          "file": "030_HN21.bin",
+          "size": 830,
+          "orig_offset": 80342,
+          "strt_json": "030_HN21.json",
+          "strt_count": 43
+        },
+        {
+          "index": 31,
+          "name": "HN22",
+          "name_raw": "484e323200000000000000000000000000000000",
+          "file": "031_HN22.bin",
+          "size": 934,
+          "orig_offset": 81172,
+          "strt_json": "031_HN22.json",
+          "strt_count": 47
+        },
+        {
+          "index": 32,
+          "name": "HN23",
+          "name_raw": "484e323300000000000000000000000000000000",
+          "file": "032_HN23.bin",
+          "size": 4,
+          "orig_offset": 82106
+        },
+        {
+          "index": 33,
+          "name": "HN24",
+          "name_raw": "484e323400000000000000000000000000000000",
+          "file": "033_HN24.bin",
+          "size": 4,
+          "orig_offset": 82110
+        },
+        {
+          "index": 34,
+          "name": "HN25",
+          "name_raw": "484e323500000000000000000000000000000000",
+          "file": "034_HN25.bin",
+          "size": 804,
+          "orig_offset": 82114,
+          "strt_json": "034_HN25.json",
+          "strt_count": 47
+        },
+        {
+          "index": 35,
+          "name": "HN26",
+          "name_raw": "484e323600000000000000000000000000000000",
+          "file": "035_HN26.bin",
+          "size": 98,
+          "orig_offset": 82918,
+          "strt_json": "035_HN26.json",
+          "strt_count": 5
+        },
+        {
+          "index": 36,
+          "name": "HN27",
+          "name_raw": "484e323700000000000000000000000000000000",
+          "file": "036_HN27.bin",
+          "size": 4,
+          "orig_offset": 83016
+        },
+        {
+          "index": 37,
+          "name": "HN28",
+          "name_raw": "484e323800000000000000000000000000000000",
+          "file": "037_HN28.bin",
+          "size": 4,
+          "orig_offset": 83020
+        },
+        {
+          "index": 38,
+          "name": "HN29",
+          "name_raw": "484e323900000000000000000000000000000000",
+          "file": "038_HN29.bin",
+          "size": 772,
+          "orig_offset": 83024,
+          "strt_json": "038_HN29.json",
+          "strt_count": 43
+        },
+        {
+          "index": 39,
+          "name": "HN30",
+          "name_raw": "484e333000000000000000000000000000000000",
+          "file": "039_HN30.bin",
+          "size": 896,
+          "orig_offset": 83796,
+          "strt_json": "039_HN30.json",
+          "strt_count": 43
+        },
+        {
+          "index": 40,
+          "name": "HN31",
+          "name_raw": "484e333100000000000000000000000000000000",
+          "file": "040_HN31.bin",
+          "size": 4,
+          "orig_offset": 84692
+        },
+        {
+          "index": 41,
+          "name": "HN32",
+          "name_raw": "484e333200000000000000000000000000000000",
+          "file": "041_HN32.bin",
+          "size": 4,
+          "orig_offset": 84696
+        },
+        {
+          "index": 42,
+          "name": "HN33",
+          "name_raw": "484e333300000000000000000000000000000000",
+          "file": "042_HN33.bin",
+          "size": 728,
+          "orig_offset": 84700,
+          "strt_json": "042_HN33.json",
+          "strt_count": 43
+        },
+        {
+          "index": 43,
+          "name": "HN34",
+          "name_raw": "484e333400000000000000000000000000000000",
+          "file": "043_HN34.bin",
+          "size": 868,
+          "orig_offset": 85428,
+          "strt_json": "043_HN34.json",
+          "strt_count": 43
+        },
+        {
+          "index": 44,
+          "name": "HN35",
+          "name_raw": "484e333500000000000000000000000000000000",
+          "file": "044_HN35.bin",
+          "size": 4,
+          "orig_offset": 86296
+        },
+        {
+          "index": 45,
+          "name": "HN36",
+          "name_raw": "484e333600000000000000000000000000000000",
+          "file": "045_HN36.bin",
+          "size": 4,
+          "orig_offset": 86300
+        },
+        {
+          "index": 46,
+          "name": "HN37",
+          "name_raw": "484e333700000000000000000000000000000000",
+          "file": "046_HN37.bin",
+          "size": 778,
+          "orig_offset": 86304,
+          "strt_json": "046_HN37.json",
+          "strt_count": 43
+        },
+        {
+          "index": 47,
+          "name": "HN38",
+          "name_raw": "484e333800000000000000000000000000000000",
+          "file": "047_HN38.bin",
+          "size": 894,
+          "orig_offset": 87082,
+          "strt_json": "047_HN38.json",
+          "strt_count": 43
+        },
+        {
+          "index": 48,
+          "name": "HN39",
+          "name_raw": "484e333900000000000000000000000000000000",
+          "file": "048_HN39.bin",
+          "size": 4,
+          "orig_offset": 87976
+        },
+        {
+          "index": 49,
+          "name": "HN40",
+          "name_raw": "484e343000000000000000000000000000000000",
+          "file": "049_HN40.bin",
+          "size": 4,
+          "orig_offset": 87980
+        },
+        {
+          "index": 50,
+          "name": "HN41",
+          "name_raw": "484e343100000000000000000000000000000000",
+          "file": "050_HN41.bin",
+          "size": 24,
+          "orig_offset": 87984,
+          "strt_json": "050_HN41.json",
+          "strt_count": 1
+        },
+        {
+          "index": 51,
+          "name": "HN42",
+          "name_raw": "484e343200000000000000000000000000000000",
+          "file": "051_HN42.bin",
+          "size": 1122,
+          "orig_offset": 88008,
+          "strt_json": "051_HN42.json",
+          "strt_count": 54
+        },
+        {
+          "index": 52,
+          "name": "HN43",
+          "name_raw": "484e343300000000000000000000000000000000",
+          "file": "052_HN43.bin",
+          "size": 4,
+          "orig_offset": 89130
+        },
+        {
+          "index": 53,
+          "name": "HN44",
+          "name_raw": "484e343400000000000000000000000000000000",
+          "file": "053_HN44.bin",
+          "size": 4,
+          "orig_offset": 89134
+        },
+        {
+          "index": 54,
+          "name": "HN45",
+          "name_raw": "484e343500000000000000000000000000000000",
+          "file": "054_HN45.bin",
+          "size": 800,
+          "orig_offset": 89138,
+          "strt_json": "054_HN45.json",
+          "strt_count": 43
+        },
+        {
+          "index": 55,
+          "name": "HN46",
+          "name_raw": "484e343600000000000000000000000000000000",
+          "file": "055_HN46.bin",
+          "size": 880,
+          "orig_offset": 89938,
+          "strt_json": "055_HN46.json",
+          "strt_count": 43
+        },
+        {
+          "index": 56,
+          "name": "HN47",
+          "name_raw": "484e343700000000000000000000000000000000",
+          "file": "056_HN47.bin",
+          "size": 4,
+          "orig_offset": 90818
+        },
+        {
+          "index": 57,
+          "name": "HN48",
+          "name_raw": "484e343800000000000000000000000000000000",
+          "file": "057_HN48.bin",
+          "size": 4,
+          "orig_offset": 90822
+        },
+        {
+          "index": 58,
+          "name": "HN49",
+          "name_raw": "484e343900000000000000000000000000000000",
+          "file": "058_HN49.bin",
+          "size": 760,
+          "orig_offset": 90826,
+          "strt_json": "058_HN49.json",
+          "strt_count": 43
+        },
+        {
+          "index": 59,
+          "name": "HN50",
+          "name_raw": "484e353000000000000000000000000000000000",
+          "file": "059_HN50.bin",
+          "size": 904,
+          "orig_offset": 91586,
+          "strt_json": "059_HN50.json",
+          "strt_count": 43
+        },
+        {
+          "index": 60,
+          "name": "HN51",
+          "name_raw": "484e353100000000000000000000000000000000",
+          "file": "060_HN51.bin",
+          "size": 4,
+          "orig_offset": 92490
+        },
+        {
+          "index": 61,
+          "name": "HN52",
+          "name_raw": "484e353200000000000000000000000000000000",
+          "file": "061_HN52.bin",
+          "size": 4,
+          "orig_offset": 92494
+        },
+        {
+          "index": 62,
+          "name": "HN53",
+          "name_raw": "484e353300000000000000000000000000000000",
+          "file": "062_HN53.bin",
+          "size": 808,
+          "orig_offset": 92498,
+          "strt_json": "062_HN53.json",
+          "strt_count": 43
+        },
+        {
+          "index": 63,
+          "name": "HN54",
+          "name_raw": "484e353400000000000000000000000000000000",
+          "file": "063_HN54.bin",
+          "size": 754,
+          "orig_offset": 93306,
+          "strt_json": "063_HN54.json",
+          "strt_count": 35
+        },
+        {
+          "index": 64,
+          "name": "HN55",
+          "name_raw": "484e353500000000000000000000000000000000",
+          "file": "064_HN55.bin",
+          "size": 4,
+          "orig_offset": 94060
+        },
+        {
+          "index": 65,
+          "name": "HN56",
+          "name_raw": "484e353600000000000000000000000000000000",
+          "file": "065_HN56.bin",
+          "size": 4,
+          "orig_offset": 94064
+        },
+        {
+          "index": 66,
+          "name": "HN57",
+          "name_raw": "484e353700000000000000000000000000000000",
+          "file": "066_HN57.bin",
+          "size": 16,
+          "orig_offset": 94068,
+          "strt_json": "066_HN57.json",
+          "strt_count": 1
+        },
+        {
+          "index": 67,
+          "name": "HN58",
+          "name_raw": "484e353800000000000000000000000000000000",
+          "file": "067_HN58.bin",
+          "size": 1134,
+          "orig_offset": 94084,
+          "strt_json": "067_HN58.json",
+          "strt_count": 56
+        },
+        {
+          "index": 68,
+          "name": "HN59",
+          "name_raw": "484e353900000000000000000000000000000000",
+          "file": "068_HN59.bin",
+          "size": 524,
+          "orig_offset": 95218,
+          "strt_json": "068_HN59.json",
+          "strt_count": 26
+        },
+        {
+          "index": 69,
+          "name": "HN60",
+          "name_raw": "484e363000000000000000000000000000000000",
+          "file": "069_HN60.bin",
+          "size": 4,
+          "orig_offset": 95742
+        },
+        {
+          "index": 70,
+          "name": "HN61",
+          "name_raw": "484e363100000000000000000000000000000000",
+          "file": "070_HN61.bin",
+          "size": 824,
+          "orig_offset": 95746,
+          "strt_json": "070_HN61.json",
+          "strt_count": 44
+        },
+        {
+          "index": 71,
+          "name": "HN62",
+          "name_raw": "484e363200000000000000000000000000000000",
+          "file": "071_HN62.bin",
+          "size": 932,
+          "orig_offset": 96570,
+          "strt_json": "071_HN62.json",
+          "strt_count": 44
+        },
+        {
+          "index": 72,
+          "name": "HN63",
+          "name_raw": "484e363300000000000000000000000000000000",
+          "file": "072_HN63.bin",
+          "size": 4,
+          "orig_offset": 97502
+        },
+        {
+          "index": 73,
+          "name": "HN64",
+          "name_raw": "484e363400000000000000000000000000000000",
+          "file": "073_HN64.bin",
+          "size": 4,
+          "orig_offset": 97506
+        },
+        {
+          "index": 74,
+          "name": "BN01",
+          "name_raw": "424e303100000000000000000000000000000000",
+          "file": "074_BN01.bin",
+          "size": 910,
+          "orig_offset": 97510,
+          "strt_json": "074_BN01.json",
+          "strt_count": 43
+        },
+        {
+          "index": 75,
+          "name": "BN02",
+          "name_raw": "424e303200000000000000000000000000000000",
+          "file": "075_BN02.bin",
+          "size": 4,
+          "orig_offset": 98420
+        },
+        {
+          "index": 76,
+          "name": "BN03",
+          "name_raw": "424e303300000000000000000000000000000000",
+          "file": "076_BN03.bin",
+          "size": 4,
+          "orig_offset": 98424
+        },
+        {
+          "index": 77,
+          "name": "BN04",
+          "name_raw": "424e303400000000000000000000000000000000",
+          "file": "077_BN04.bin",
+          "size": 4,
+          "orig_offset": 98428
+        }
+      ]
+    }
+  ]
+}

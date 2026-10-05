@@ -1,0 +1,21 @@
+<Majesty>
+	<Quest id="{38305158-0000-0000-0000-000000000000}">
+		<Name>SPIRES_DEATH</Name>
+		<Description lang="en_US">
+			<Short>Seek out and destroy each of the five spires.[newline][newline]Beware! They grow more powerful with each one that falls...</Short>
+			<Long>"The richest lands of the Northern Reaches sit tantalizingly close to us. However, our way to these tracts is blocked by huge spires that hurl magical bolts and summon ferocious monsters against anyone approaching.[newline]A local nomad explained that, long ago, a race of northlanders angered their god so greatly that she hurled them out of their homeland, forbidding them ever to return. She then raised five cursed spires to turn them back.[newline]While the name of this god is long forgotten, her spires still stand. If you can clear away those obstacles, we can enter the promising lands beyond."</Long>
+		</Description>
+		<DataConfiguration>
+			<Dataset base="MajestyExpansion">
+				<Load>
+					<Template>Spires_Death.q</Template>
+				</Load>
+				<Unload>
+					<CAM></CAM>
+					<GPL></GPL>
+					<Constants></Constants>
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

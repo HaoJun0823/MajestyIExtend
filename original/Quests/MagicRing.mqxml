@@ -1,0 +1,21 @@
+<Majesty>
+	<Quest id="{36315551-0000-0000-0000-000000000000}">
+		<Name>MAGIC_RING</Name>
+		<Description lang="en_US">
+			<Short>Recover the Ring of Healing.</Short>
+			<Long>"Majesty? I fear my vision grows alarmingly dim. The dark plague which grips our land does not respect the boundaries of these castle walls.[newline]This epidemic sweeps through our land, leeching away the very life from your royal subjects. Our best doctors seem unable to slow the pace of this dread disease. [newline]Before slipping into unconsciousness, the mighty Wizard Rezzenthell insisted that there was only one way to halt this affliction. You must recover the Ring of Healing, which the legends say is located somewhere in Ardania.[newline]Please, your Majesty, act with greatest haste...."</Long>
+		</Description>
+		<DataConfiguration>
+			<Dataset base="Majesty">
+				<Load>
+					<Template>Magic_ring.q</Template>
+				</Load>
+				<Unload>
+					<CAM></CAM>
+					<GPL></GPL>
+					<Constants></Constants>
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

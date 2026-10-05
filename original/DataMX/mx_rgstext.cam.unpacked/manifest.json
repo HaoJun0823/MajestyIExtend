@@ -1,0 +1,41 @@
+{
+  "source": "mx_rgstext.cam",
+  "size": 19571,
+  "sha256": "d4f4cea8e7a31fc02f97b5071c668e8c23c831f78cf1afcc9add59f18114377f",
+  "magic": "43594c4250432020",
+  "version": "01000100",
+  "file_dummy": 92,
+  "sections": [
+    {
+      "ext": "STRT",
+      "ext_raw": "53545254",
+      "section_dummy": 0,
+      "files": [
+        {
+          "index": 0,
+          "name": "FNTX",
+          "name_raw": "464e545800000000000000000000000000000000",
+          "file": "000_FNTX.bin",
+          "size": 4777,
+          "orig_offset": 120
+        },
+        {
+          "index": 1,
+          "name": "FDTX",
+          "name_raw": "4644545800000000000000000000000000000000",
+          "file": "001_FDTX.bin",
+          "size": 13889,
+          "orig_offset": 4897
+        },
+        {
+          "index": 2,
+          "name": "LNTX",
+          "name_raw": "4c4e545800000000000000000000000000000000",
+          "file": "002_LNTX.bin",
+          "size": 785,
+          "orig_offset": 18786
+        }
+      ]
+    }
+  ]
+}

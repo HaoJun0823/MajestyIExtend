@@ -1,0 +1,21 @@
+<Majesty>
+	<Quest id="{33305158-0000-0000-0000-000000000000}">
+		<Name>FORTRESS_IXMIL</Name>
+		<Description lang="en_US">
+			<Short>找到并摧毁伊克斯米尔的要塞。</Short>
+			<Long>"殿下，传来极为令人不安的消息。似乎疯狂的大法师伊克斯米尔已向北境笼罩了一层恐惧。伊克斯米尔控制着一座令人畏惧的神秘要塞，它能自行移动，从一个地方出现又消失。每次要塞出现，都会吐出一大群充满敌意的生物。[newline]伊克斯米尔如今已将目光投向您新获得的领地。我们必须想办法阻止他的恐怖统治，否则您的子民将被其出没不定的袭击所挫伤。否则我们可能不得不从这些来之不易的土地上撤退。"</Long>
+		</Description>
+		<DataConfiguration>
+			<Dataset base="MajestyExpansion">
+				<Load>
+					<Template>Fortress_Ixmil.q</Template>
+				</Load>
+				<Unload>
+					<CAM />
+					<GPL />
+					<Constants />
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

@@ -1,0 +1,21 @@
+<Majesty>
+	<Quest id="{35305551-0000-0000-0000-000000000000}">
+		<Name>DARK_FOREST</Name>
+		<Description lang="en_US">
+			<Short>Cure the adventurers of the sickness.[newline][newline]Defeat the Witch King who dwells in the tower.</Short>
+			<Long>"A curse afflicts the land, your Majesty, sapping your loyal subjects of their strength. Few have even the strength to leave their houses. [newline]A single Warrior from the local guild remains mobile. He offers his services in finding a cure to this debilitating bane.[newline]I... I recommend you take him up on the offer. Now if you'll excuse me, I really must lie down."</Long>
+		</Description>
+		<DataConfiguration>
+			<Dataset base="Majesty">
+				<Load>
+					<Template>DF.q</Template>
+				</Load>
+				<Unload>
+					<CAM></CAM>
+					<GPL></GPL>
+					<Constants></Constants>
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

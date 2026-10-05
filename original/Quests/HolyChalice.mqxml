@@ -1,0 +1,21 @@
+<Majesty>
+	<Quest id="{33305551-0000-0000-0000-000000000000}">
+		<Name>HOLY_CHALICE</Name>
+		<Description lang="en_US">
+			<Short>Recover the Holy Chalice within thirty days, or your illness will consume you.[newline][newline]There are rumors that a guild of mighty Paladins resides somewhere in the countryside. If you find it, they may aid you...[newline][newline]Beware! Lairs in this land never die - they just go dormant for awhile.[newline][newline](Can't build Marketplaces in this quest.)</Short>
+			<Long>"Your Majesty's recent illness has taken its toll on the people. Their grief for your suffering only increases with sad news that your condition does not improve. It should now be clear to all that dark magics fuel this insidious ailment.[newline]I would not disturb your rest were it not for some hopeful news. The trusted old Wizard, Rezzenthell,  told me of a relic - a chalice - containing incredible healing power. It is hidden somewhere in the realm. I implore you to send your heroes scouring the land in search of this Holy Chalice. It may be the only thing which can put an end to your illness."</Long>
+		</Description>
+		<DataConfiguration>
+			<Dataset base="Majesty">
+				<Load>
+					<Template>Holy_Chalice.q</Template>
+				</Load>
+				<Unload>
+					<CAM></CAM>
+					<GPL></GPL>
+					<Constants></Constants>
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

@@ -1,0 +1,28 @@
+<Majesty>
+	<Quest id="{31445158-0000-0000-0000-000000000000}">
+		<Name>XQD1</Name>
+		<DisplayName lang="en_US">Balance of Twilight</DisplayName>		
+		<Description lang="en_US">
+			<Short>Defend your kingdom from the Black Phantoms.[newline]Find the resting place of the ancient sage and restore him to life.[newline]Resanctify the Shrine of Light.[newline]Destroy the Black Phantoms.</Short>
+			<Long>"Somehow, the Shrine of Light has been despoiled, causing its opposing shrine to grow greatly in power. The dreaded Black Phantoms have been drawn to the power of the Shrine of Darkness, and so long as they are permitted to feed upon it, they cannot be destroyed.[newline]It is said that an ancient sage was entombed in this place long ago - if we can find his tomb and restore him to life, perhaps he will know how to restore the Shrine of Light.[newline]Once the balance between the two shrines has been restored, it should be possible to destroy the Black Phantoms and eliminate their presence here for good."</Long>
+		</Description>
+		<DataConfiguration>
+			<Dataset base="MajestyExpansion">
+				<Load>
+					<CAM>$(MajestyExpansionDataPath)/XQD1_intro.cam</CAM>
+					<CAM>$(MajestyExpansionDataPath)/XQD1_MainData.cam</CAM>
+					<CAM>$(MajestyExpansionDataPath)/XQD1_SoundFX.cam</CAM>
+					<CAM>$(MajestyExpansionDataPath)/XQD1_UnitType.cam</CAM>
+					<CAM>$(MajestyExpansionDataPath)/XQD1_Voices.cam</CAM>
+					<GPL>$(MajestyExpansionDataPath)/XQD1_Bytecode.bcd</GPL>
+					<Template>Balance_Of_Twilight.q</Template>
+				</Load>
+				<Unload>
+					<CAM></CAM>
+					<GPL></GPL>
+					<Constants></Constants>
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

@@ -1,0 +1,21 @@
+<Majesty>
+	<Quest id="{31315551-0000-0000-0000-000000000000}">
+		<Name>FERTILE_PLAIN</Name>
+		<Description lang="en_US">
+			<Short>Survive seven waves of raiders who attempt to destroy you.[newline][newline]Destroy all raiders![newline][newline](No non-Human races available in this quest.)</Short>
+			<Long>"It honors me to counsel one so wise. Your forebears would be truly proud of the prosperity you've fostered in this land. This region has become rich and pleasant to dwell in thanks to your recent land acquisition. It is wonderful that the former Baron traded it for only a hundred and fifty head of cattle.[newline]However, such prosperity does not go without notice. Rumors have reached the castle walls that there are many who seek to claim this idyllic setting for themselves. You must be on guard against any such marauders."</Long>
+		</Description>
+		<DataConfiguration>
+			<Dataset base="Majesty">
+				<Load>
+					<Template>fertile_plain.q</Template>
+				</Load>
+				<Unload>
+					<CAM></CAM>
+					<GPL></GPL>
+					<Constants></Constants>
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

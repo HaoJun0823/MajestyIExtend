@@ -1,0 +1,21 @@
+<Majesty>
+	<Quest id="{39305551-0000-0000-0000-000000000000}">
+		<Name>TOMB_DRAGON</Name>
+		<Description lang="en_US">
+			<Short>Destroy the three monster lairs to reveal the location of the Tomb.[newline][newline]Destroy the Tomb of the Dragon King.[newline][newline](No Guards are willing to venture out in this hostile land, so you can't construct any Guardhouses.)</Short>
+			<Long>"Your Majesty, I bear news of great import. Using his crystals and ethereal energies, the old Wizard, Tarsival, has divined the destiny of your kingdom. His vision in such matters is usually quite clear, so I urge you to respect his forecast.[newline]The Wizard claimed to see an ancient tomb, forgotten by all. It is rediscovered and visited by many heroes. One eventually recovered a magic sword that rests within. Tarsival insists that for the good of the land, this event must come to pass."</Long>
+		</Description>
+		<DataConfiguration>
+			<Dataset base="Majesty">
+				<Load>
+					<Template>Tomb_dragon.q</Template>
+				</Load>
+				<Unload>
+					<CAM></CAM>
+					<GPL></GPL>
+					<Constants></Constants>
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

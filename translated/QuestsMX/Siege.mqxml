@@ -1,0 +1,21 @@
+<Majesty>
+	<Quest id="{37305158-0000-0000-0000-000000000000}">
+		<Name>SIEGE</Name>
+		<Description lang="en_US">
+			<Short>摧毁博尔金的宫殿或切断为其供金的商队路线。如果他们资源耗尽，必将被迫向我军投降。[newline][newline]（无法师公会可建。）</Short>
+			<Long>"陛下，我们与博尔金这个敌对而野蛮的王国之间的战斗，已使我们围攻其据点。我们必须通过封锁其补给商队来迫使其投降，或者强攻其堡垒以武力夺取。挑战的复杂性在于本地的法师公会选择站在博尔金一边。尽管如此，我觉得只要您果断行事，我们必能取胜。"</Long>
+		</Description>
+		<DataConfiguration>
+			<Dataset base="MajestyExpansion">
+				<Load>
+					<Template>Siege.q</Template>
+				</Load>
+				<Unload>
+					<CAM />
+					<GPL />
+					<Constants />
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

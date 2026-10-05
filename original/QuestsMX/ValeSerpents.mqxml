@@ -1,0 +1,21 @@
+<Majesty>
+	<Quest id="{31315158-0000-0000-0000-000000000000}">
+		<Name>VALE_SERPENTS</Name>
+		<Description lang="en_US">
+			<Short>Destroy the Snake Pits that are encroaching on your realm.[newline][newline]If you lose all Elven Bungalows, you lose this quest.[newline][newline]You are restricted from placing Elven Bungalows, as it is up to your Elven neighbors to decide when and where to place them...[newline][newline]Many citizens refuse to settle in this threated valley. Hence, much of your normal infrastructure such as General Housing, Sewers, and Broken Sewer Mains, and Graveyards will not appear.</Short>
+			<Long>"Your Highness, our newest settlement borders an Elven enclave. They offer their warmest greetings and have pledged an alliance with us, in hopes of improving trade and relations.[newline]On a less pleasant note, there has been talk among the merchants. They speak of skirmishes with a powerful adversary on the distant boundaries of the Elven lands. Perhaps we should make ready our defenses in case these turn out to be more than unfounded rumors."</Long>
+		</Description>
+		<DataConfiguration>
+			<Dataset base="MajestyExpansion">
+				<Load>
+					<Template>Vale_Serpents.q</Template>
+				</Load>
+				<Unload>
+					<CAM></CAM>
+					<GPL></GPL>
+					<Constants></Constants>
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

@@ -1,0 +1,159 @@
+{
+  "source": "UIData_1024_768.dat",
+  "size": 4521592,
+  "sha256": "5579fd9f0be7fab3f23b63f299ee2d5cf66c81ac3bc9d541556a15a9380d9f0a",
+  "magic": "43594c4250432020",
+  "version": "01000100",
+  "file_dummy": 296,
+  "sections": [
+    {
+      "ext": "SMNU",
+      "ext_raw": "534d4e55",
+      "section_dummy": 0,
+      "files": [
+        {
+          "index": 0,
+          "name": "AP37",
+          "name_raw": "4150333700000000000000000000000000000000",
+          "file": "000_AP37.bin",
+          "size": 2200,
+          "orig_offset": 488
+        },
+        {
+          "index": 1,
+          "name": "APd9",
+          "name_raw": "4150643900000000000000000000000000000000",
+          "file": "001_APd9.bin",
+          "size": 732,
+          "orig_offset": 2688
+        },
+        {
+          "index": 2,
+          "name": "APda",
+          "name_raw": "4150646100000000000000000000000000000000",
+          "file": "002_APda.bin",
+          "size": 2016,
+          "orig_offset": 3420
+        },
+        {
+          "index": 3,
+          "name": "APMK",
+          "name_raw": "41504d4b00000000000000000000000000000000",
+          "file": "003_APMK.bin",
+          "size": 6864,
+          "orig_offset": 5436
+        },
+        {
+          "index": 4,
+          "name": "APdc",
+          "name_raw": "4150646300000000000000000000000000000000",
+          "file": "004_APdc.bin",
+          "size": 5472,
+          "orig_offset": 12300
+        },
+        {
+          "index": 5,
+          "name": "AP29",
+          "name_raw": "4150323900000000000000000000000000000000",
+          "file": "005_AP29.bin",
+          "size": 5352,
+          "orig_offset": 17772
+        }
+      ]
+    },
+    {
+      "ext": "STRT",
+      "ext_raw": "53545254",
+      "section_dummy": 0,
+      "files": [
+        {
+          "index": 0,
+          "name": "APd9",
+          "name_raw": "4150643900000000000000000000000000000000",
+          "file": "000_APd9.bin",
+          "size": 102,
+          "orig_offset": 23124,
+          "strt_json": "000_APd9.json",
+          "strt_count": 5
+        },
+        {
+          "index": 1,
+          "name": "APda",
+          "name_raw": "4150646100000000000000000000000000000000",
+          "file": "001_APda.bin",
+          "size": 182,
+          "orig_offset": 23226,
+          "strt_json": "001_APda.json",
+          "strt_count": 8
+        },
+        {
+          "index": 2,
+          "name": "APdc",
+          "name_raw": "4150646300000000000000000000000000000000",
+          "file": "002_APdc.bin",
+          "size": 194,
+          "orig_offset": 23408,
+          "strt_json": "002_APdc.json",
+          "strt_count": 11
+        },
+        {
+          "index": 3,
+          "name": "AP29",
+          "name_raw": "4150323900000000000000000000000000000000",
+          "file": "003_AP29.bin",
+          "size": 984,
+          "orig_offset": 23602,
+          "strt_json": "003_AP29.json",
+          "strt_count": 29
+        }
+      ]
+    },
+    {
+      "ext": "FONT",
+      "ext_raw": "464f4e54",
+      "section_dummy": 0,
+      "files": [
+        {
+          "index": 0,
+          "name": "fnt2",
+          "name_raw": "666e743200000000000000000000000000000000",
+          "file": "000_fnt2.bin",
+          "size": 783314,
+          "orig_offset": 24586
+        },
+        {
+          "index": 1,
+          "name": "fnt4",
+          "name_raw": "666e743400000000000000000000000000000000",
+          "file": "001_fnt4.bin",
+          "size": 547988,
+          "orig_offset": 807900
+        },
+        {
+          "index": 2,
+          "name": "fnt7",
+          "name_raw": "666e743700000000000000000000000000000000",
+          "file": "002_fnt7.bin",
+          "size": 547988,
+          "orig_offset": 1355888
+        },
+        {
+          "index": 3,
+          "name": "fn10",
+          "name_raw": "666e313000000000000000000000000000000000",
+          "file": "003_fn10.bin",
+          "size": 641020,
+          "orig_offset": 1903876
+        },
+        {
+          "index": 4,
+          "name": "fn11",
+          "name_raw": "666e313100000000000000000000000000000000",
+          "file": "004_fn11.bin",
+          "size": 1976696,
+          "orig_offset": 2544896
+        }
+      ]
+    }
+  ]
+}

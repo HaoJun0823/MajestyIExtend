@@ -1,0 +1,21 @@
+<Majesty>
+	<Quest id="{37305551-0000-0000-0000-000000000000}">
+		<Name>DEAL_DEMON</Name>
+		<Description lang="en_US">
+			<Short>Make 100,000 gold within 40 days, or lose this quest.</Short>
+			<Long>"Mighty Leader, forgive this intrusion, but a terrible presence has visited our castle! A Demon! He claims he's here to collect on a debt owed to him by your mother. Can this be true?[newline]Since we were unable to immediately deliver the requested bounty, he said he'd return later for TRIPLE the amount of gold, or he'd curse the entire village. He then vanished in a cloud of foul smelling, green smoke.[newline]Your Majesty? I hope you have a plan. Something MUST be done before he returns!"</Long>
+		</Description>
+		<DataConfiguration>
+			<Dataset base="Majesty">
+				<Load>
+					<Template>Deal_demon.q</Template>
+				</Load>
+				<Unload>
+					<CAM></CAM>
+					<GPL></GPL>
+					<Constants></Constants>
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

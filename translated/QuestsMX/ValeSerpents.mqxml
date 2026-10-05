@@ -1,0 +1,21 @@
+<Majesty>
+	<Quest id="{31315158-0000-0000-0000-000000000000}">
+		<Name>VALE_SERPENTS</Name>
+		<Description lang="en_US">
+			<Short>摧毁不断蚕食你领地的蛇坑。[newline][newline]若失去所有精灵别馆，则任务失败。[newline][newline]你不可主动放置精灵别馆，由你的精灵邻居决定何时何地建造……[newline][newline]许多平民拒绝在此险谷定居。因此，平民住宅、下水道、破损下水主管和墓地等常规基础设施不会出现。</Short>
+			<Long>"殿下，我们最新的定居点与一个精灵聚落接壤。他们致以最热情的问候，并宣誓与我们结盟，以期改善贸易和关系。[newline]不太好的消息是，商人们之间有些风声。他们说在精灵领地的远方边界与一个强大对手发生了冲突。也许我们应该做好防备，以防这些不仅仅是空穴来风。"</Long>
+		</Description>
+		<DataConfiguration>
+			<Dataset base="MajestyExpansion">
+				<Load>
+					<Template>Vale_Serpents.q</Template>
+				</Load>
+				<Unload>
+					<CAM />
+					<GPL />
+					<Constants />
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

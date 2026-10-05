@@ -1,0 +1,104 @@
+{
+  "source": "UIData_1024_768.dat",
+  "size": 24145,
+  "sha256": "3d2edabe91679541190331cc12f92b70a50a0d969a2663b453342c1c70ea30c1",
+  "magic": "43594c4250432020",
+  "version": "01000100",
+  "file_dummy": 296,
+  "sections": [
+    {
+      "ext": "SMNU",
+      "ext_raw": "534d4e55",
+      "section_dummy": 0,
+      "files": [
+        {
+          "index": 0,
+          "name": "AP37",
+          "name_raw": "4150333700000000000000000000000000000000",
+          "file": "000_AP37.bin",
+          "size": 2200,
+          "orig_offset": 332
+        },
+        {
+          "index": 1,
+          "name": "APd9",
+          "name_raw": "4150643900000000000000000000000000000000",
+          "file": "001_APd9.bin",
+          "size": 732,
+          "orig_offset": 2532
+        },
+        {
+          "index": 2,
+          "name": "APda",
+          "name_raw": "4150646100000000000000000000000000000000",
+          "file": "002_APda.bin",
+          "size": 2016,
+          "orig_offset": 3264
+        },
+        {
+          "index": 3,
+          "name": "APMK",
+          "name_raw": "41504d4b00000000000000000000000000000000",
+          "file": "003_APMK.bin",
+          "size": 6864,
+          "orig_offset": 5280
+        },
+        {
+          "index": 4,
+          "name": "APdc",
+          "name_raw": "4150646300000000000000000000000000000000",
+          "file": "004_APdc.bin",
+          "size": 5472,
+          "orig_offset": 12144
+        },
+        {
+          "index": 5,
+          "name": "AP29",
+          "name_raw": "4150323900000000000000000000000000000000",
+          "file": "005_AP29.bin",
+          "size": 5352,
+          "orig_offset": 17616
+        }
+      ]
+    },
+    {
+      "ext": "STRT",
+      "ext_raw": "53545254",
+      "section_dummy": 0,
+      "files": [
+        {
+          "index": 0,
+          "name": "APd9",
+          "name_raw": "4150643900000000000000000000000000000000",
+          "file": "000_APd9.bin",
+          "size": 110,
+          "orig_offset": 22968
+        },
+        {
+          "index": 1,
+          "name": "APda",
+          "name_raw": "4150646100000000000000000000000000000000",
+          "file": "001_APda.bin",
+          "size": 167,
+          "orig_offset": 23078
+        },
+        {
+          "index": 2,
+          "name": "APdc",
+          "name_raw": "4150646300000000000000000000000000000000",
+          "file": "002_APdc.bin",
+          "size": 202,
+          "orig_offset": 23245
+        },
+        {
+          "index": 3,
+          "name": "AP29",
+          "name_raw": "4150323900000000000000000000000000000000",
+          "file": "003_AP29.bin",
+          "size": 698,
+          "orig_offset": 23447
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,86 @@
+[
+  {
+    "id": 0,
+    "text": "Function Body"
+  },
+  {
+    "id": 1,
+    "text": "调试器"
+  },
+  {
+    "id": 2,
+    "text": "游戏对象与脚本跟踪"
+  },
+  {
+    "id": 3,
+    "text": "All Agents:"
+  },
+  {
+    "id": 4,
+    "text": "Currently Tracking:"
+  },
+  {
+    "id": 5,
+    "text": "Add                   >>"
+  },
+  {
+    "id": 6,
+    "text": "Add All                 >>"
+  },
+  {
+    "id": 7,
+    "text": "Remove                    <<"
+  },
+  {
+    "id": 8,
+    "text": "Remove All                 <<"
+  },
+  {
+    "id": 9,
+    "text": "Script Callbacks"
+  },
+  {
+    "id": 10,
+    "text": "Object Attributes"
+  },
+  {
+    "id": 11,
+    "text": "DebugOut Tracking"
+  },
+  {
+    "id": 12,
+    "text": "Script Callbacks:"
+  },
+  {
+    "id": 13,
+    "text": "Object Attributes:"
+  },
+  {
+    "id": 14,
+    "text": "Output"
+  },
+  {
+    "id": 15,
+    "text": "Crash"
+  },
+  {
+    "id": 16,
+    "text": "This will crash the program  (no joke!) ^"
+  },
+  {
+    "id": 17,
+    "text": "Tracking"
+  },
+  {
+    "id": 18,
+    "text": "Resume Play"
+  },
+  {
+    "id": 19,
+    "text": "Xml"
+  },
+  {
+    "id": 20,
+    "text": "性能分析器"
+  }
+]

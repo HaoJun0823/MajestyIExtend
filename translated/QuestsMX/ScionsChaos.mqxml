@@ -1,0 +1,21 @@
+<Majesty>
+	<Quest id="{36305158-0000-0000-0000-000000000000}">
+		<Name>SCIONS_CHAOS</Name>
+		<Description lang="en_US">
+			<Short>消灭混沌三子——女祭司、狂信徒和纷争战士。[newline][newline]（此地仅可建造克里普塔和弗瓦斯神殿。也无法师公会、集市、非人族种族、前哨或使馆可建。）</Short>
+			<Long>"事情变得有趣了，殿下。三位被称为"混沌之子"的传奇英雄向我们定居点的勇士们发出了挑战。他们要求我们的英雄在战场上与他们会面。必须在真正击败全部三位混沌之子后，我们才能宣称已战胜他们。"</Long>
+		</Description>
+		<DataConfiguration>
+			<Dataset base="MajestyExpansion">
+				<Load>
+					<Template>Scions_chaos.q</Template>
+				</Load>
+				<Unload>
+					<CAM />
+					<GPL />
+					<Constants />
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

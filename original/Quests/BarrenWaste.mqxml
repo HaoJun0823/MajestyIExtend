@@ -1,0 +1,21 @@
+<Majesty>
+	<Quest id="{31305551-0000-0000-0000-000000000000}">
+		<Name>BARREN_WASTE</Name>
+		<Description lang="en_US">
+			<Short>Build a Fairgrounds to win this quest.[newline][newline](No non-Human races or Wizards available.)</Short>
+			<Long>"Do not despair, Your Majesty. Though this swampy region has yet to be transformed into a comfortable abode, I'm sure we can fulfill your mother's dream. I suggest we start small and figure out a way to productively use more of this swampy ground. Perhaps building a festive Fairground in the middle of this desolate quagmire will be sufficient proof of your achievement and ability."</Long>
+		</Description>
+		<DataConfiguration>
+			<Dataset base="Majesty">
+				<Load>
+					<Template>barren_waste.q</Template>
+				</Load>
+				<Unload>
+					<CAM></CAM>
+					<GPL></GPL>
+					<Constants></Constants>
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

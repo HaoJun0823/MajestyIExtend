@@ -1,0 +1,31 @@
+<Majesty>
+	<Quest id="{3130444D-0000-0000-0000-000000000000}">
+		<Name>MD01</Name>
+		<DisplayName lang="en_US">Wrath of Krolm</DisplayName>		
+		<Description lang="en_US">
+			<Short>摧毁所有克罗尔玛祭坛，或击败他的化身，以从克罗尔玛的掌控中夺取这片土地。[newline]此地的野生生物已被克罗尔玛之灵强化。[newline]你只能建造公会、神殿、塔楼和铁匠铺。[newline]你不可建造克罗尔玛神殿。</Short>
+			<Long>"克罗尔玛的追随者已质疑您统治这片蛮荒北境的资格，陛下。在我们面前是一座为供奉克罗尔玛而建的圣谷。据说在此地，克罗尔玛之灵本身会现身，消灭任何胆敢闯入其圣地的人。"[newline]"其他诸神不认可克罗尔玛对整个北境的独占主张，他们的祭司已交付我们任务——削弱他在此地的影响力。但要警惕，陛下——克罗尔玛在此地的力量毋庸置疑。空气中脉动着他的存在，他追随者的战吼在这些山丘间永不止息地回荡。"</Long>
+		</Description>
+		<Difficulty>Hard</Difficulty>
+		<DataConfiguration>
+			<Dataset base="Majesty">
+				<Load>
+					<CAM>$(MajestyDataPath)/MDL1_action.cam</CAM>
+					<CAM>$(MajestyDataPath)/MDL1_maindata.cam</CAM>
+					<CAM>$(MajestyDataPath)/MDL1_sounddesc.cam</CAM>
+					<CAM>$(MajestyDataPath)/MDL1_soundfx.cam</CAM>
+					<CAM>$(MajestyDataPath)/MDL1_unittype.cam</CAM>
+					<CAM>$(MajestyDataPath)/MDL1_voices.cam</CAM>
+					<GPL>$(MajestyDataPath)/MDL1.bcd</GPL>
+					<Template>Krolm.q</Template>
+					<Strings>WrathOfKrolm_Text.xml</Strings>
+				</Load>
+				<Unload>
+					<CAM />
+					<GPL />
+					<Constants />
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

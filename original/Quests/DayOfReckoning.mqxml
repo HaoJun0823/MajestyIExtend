@@ -1,0 +1,21 @@
+<Majesty>
+	<Quest id="{36305551-0000-0000-0000-000000000000}">
+		<Name>DAY_OF_RECKONING</Name>
+		<Description lang="en_US">
+			<Short>Survive the onslaught of all the most evil creatures in the realm.[newline][newline](No temples of any kind, or any non-Human dwelling may be built.)</Short>
+			<Long>"Corruption blossoms from the earth! Hordes of the Underworld are springing up to ravage the land. Surely this plague of evil is a sign of sickness in the heavens - the gods are at war and we are all in danger![newline]The realm must be defended from this sweeping chaos! Though mortal strength seems a fragile deterrent, you must call forth all possible might to reckon with these ultimate manifestations of all things foul and pestilent."</Long>
+		</Description>
+		<DataConfiguration>
+			<Dataset base="Majesty">
+				<Load>
+					<Template>day_reckoning.q</Template>
+				</Load>
+				<Unload>
+					<CAM></CAM>
+					<GPL></GPL>
+					<Constants></Constants>
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

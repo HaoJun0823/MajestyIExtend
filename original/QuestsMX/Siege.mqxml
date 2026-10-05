@@ -1,0 +1,21 @@
+<Majesty>
+	<Quest id="{37305158-0000-0000-0000-000000000000}">
+		<Name>SIEGE</Name>
+		<Description lang="en_US">
+			<Short>Destroy Borjin's Palace or cut off the caravan routes supplying him with gold. If they run out of resources they will surely be forced to surrender to our forces.[newline][newline](No Wizards Guilds may be built.)</Short>
+			<Long>"Majesty, our battle with the hostile and barbaric kingdom of Borjin the Conqueror has brought us to a siege of his stronghold. We must either force his surrender by blockading his supply Caravans, or storm his fortress and take it by force. Our challenge is complicated by our local Wizards Guild, which has chosen to side with Borjin's forces. Still, I feel we can prevail if you act decisively."</Long>
+		</Description>
+		<DataConfiguration>
+			<Dataset base="MajestyExpansion">
+				<Load>
+					<Template>Siege.q</Template>
+				</Load>
+				<Unload>
+					<CAM></CAM>
+					<GPL></GPL>
+					<Constants></Constants>
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

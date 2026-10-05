@@ -1,0 +1,31 @@
+<Majesty>
+	<Quest id="{3130444D-0000-0000-0000-000000000000}">
+		<Name>MD01</Name>
+		<DisplayName lang="en_US">Wrath of Krolm</DisplayName>		
+		<Description lang="en_US">
+			<Short>Destroy all Altars to Krolm, or defeat his Avatar in order to wrest Krolm's grip from the land.[newline]The wild creatures of this place have been strengthened by the spirit of Krolm.[newline]You may only build Guilds, Temples, Towers and Blacksmiths. [newline]You may not build Temples of Krolm.</Short>
+			<Long>"The followers of Krolm have challenged your fitness to rule over the wild northlands,Your Majesty. Before us lies a valley consecrated to the worship of Krolm. It is said that in this place, the spirit of Krolm himself manifests to destroy any who would intrude on their holy ground." [newline]"The other gods contest Krolm's claim to the entirety of the northlands, and their priests have charged us with the duty of weakening his presence in this place. But be warned, Your Majesty - There is no doubting Krolm's power in this place. The very air throbs with his presense and the warcries of his followers echo through these hills unceasingly."</Long>
+		</Description>
+		<Difficulty>Hard</Difficulty>
+		<DataConfiguration>
+			<Dataset base="Majesty">
+				<Load>
+					<CAM>$(MajestyDataPath)/MDL1_action.cam</CAM>
+					<CAM>$(MajestyDataPath)/MDL1_maindata.cam</CAM>
+					<CAM>$(MajestyDataPath)/MDL1_sounddesc.cam</CAM>
+					<CAM>$(MajestyDataPath)/MDL1_soundfx.cam</CAM>
+					<CAM>$(MajestyDataPath)/MDL1_unittype.cam</CAM>
+					<CAM>$(MajestyDataPath)/MDL1_voices.cam</CAM>
+					<GPL>$(MajestyDataPath)/MDL1.bcd</GPL>
+					<Template>Krolm.q</Template>
+					<Strings>WrathOfKrolm_Text.xml</Strings>
+				</Load>
+				<Unload>
+					<CAM></CAM>
+					<GPL></GPL>
+					<Constants></Constants>
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

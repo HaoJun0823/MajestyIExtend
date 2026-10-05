@@ -1,0 +1,72 @@
+{
+  "source": "mx_btdata.cam",
+  "size": 747,
+  "sha256": "470720d1036a0c11f0bbd4be6e1627b4f4eab6f0279172d6486e8ec10cd6de63",
+  "magic": "43594c4250432020",
+  "version": "01000100",
+  "file_dummy": 184,
+  "sections": [
+    {
+      "ext": "STRT",
+      "ext_raw": "53545254",
+      "section_dummy": 0,
+      "files": [
+        {
+          "index": 0,
+          "name": "BTDN",
+          "name_raw": "4254444e00000000000000000000000000000000",
+          "file": "000_BTDN.bin",
+          "size": 99,
+          "orig_offset": 220
+        }
+      ]
+    },
+    {
+      "ext": "BTDT",
+      "ext_raw": "42544454",
+      "section_dummy": 0,
+      "files": [
+        {
+          "index": 0,
+          "name": "BTD1",
+          "name_raw": "4254443100000000000000000000000000000000",
+          "file": "000_BTD1.bin",
+          "size": 16,
+          "orig_offset": 319
+        },
+        {
+          "index": 1,
+          "name": "BTD2",
+          "name_raw": "4254443200000000000000000000000000000000",
+          "file": "001_BTD2.bin",
+          "size": 100,
+          "orig_offset": 335
+        },
+        {
+          "index": 2,
+          "name": "BTD3",
+          "name_raw": "4254443300000000000000000000000000000000",
+          "file": "002_BTD3.bin",
+          "size": 42,
+          "orig_offset": 435
+        },
+        {
+          "index": 3,
+          "name": "BTD4",
+          "name_raw": "4254443400000000000000000000000000000000",
+          "file": "003_BTD4.bin",
+          "size": 150,
+          "orig_offset": 477
+        },
+        {
+          "index": 4,
+          "name": "BTD5",
+          "name_raw": "4254443500000000000000000000000000000000",
+          "file": "004_BTD5.bin",
+          "size": 120,
+          "orig_offset": 627
+        }
+      ]
+    }
+  ]
+}

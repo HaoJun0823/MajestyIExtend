@@ -1,0 +1,21 @@
+<Majesty>
+	<Quest id="{39315551-0000-0000-0000-000000000000}">
+		<Name>WIZARDS_CURSE</Name>
+		<Description lang="en_US">
+			<Short>There are two different ways to rid the curse:[newline][newline]Method One: Arrest the Hooligan who stole the book of spells, return it to the Wizard, and then perform whatever the Wizard deems "sufficient good deeds".[newline][newline]Method Two: Destroy the angry Wizard.[newline][newline]Your heroes are cursed, so they won't act like their regular selves...[newline][newline](Wizards Guilds and Temples to Fervus, Krypta, Agrela, Krolm or Dauros, aren't available in this quest.)</Short>
+			<Long> "I humbly beg for your forgiveness for this rude intrusion, but there's an angry Wizard who..."[newline][newline]{Angry Wizard}[newline]"Move aside, you sniveling toad! [newline]Sovereign! I will have words with you. Under your lawless rule, one of your foolish subjects has stolen my book of spells. The value of that great tome is beyond measure! You and your realm must now pay a price for its loss! [newline]Until such a time as sufficient good deeds have been performed, I curse all the dwellers of this land to be as stupid as the dead."</Long>
+		</Description>
+		<DataConfiguration>
+			<Dataset base="Majesty">
+				<Load>
+					<Template>Wizards_Curse.q</Template>
+				</Load>
+				<Unload>
+					<CAM></CAM>
+					<GPL></GPL>
+					<Constants></Constants>
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

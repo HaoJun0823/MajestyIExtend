@@ -1,0 +1,21 @@
+<Majesty>
+	<Quest id="{38315551-0000-0000-0000-000000000000}">
+		<Name>BRASHNARD</Name>
+		<Description lang="en_US">
+			<Short>Recover the seven shards that make up Brashnard's Ultimate Sphere.</Short>
+			<Long>"Do I understand that your highness seeks Brashnard's Ultimate Sphere of Power? Possession of that legendary artifact would certainly lend authority to your rule. [newline]As you surely recall, the sphere was broken into seven sections which were scattered to the far reaches of the land. A great number of heroes must be summoned in order to scour the realm for these lost shards. By your authority, let this bold undertaking commence.[newline]Majesty? It is not this humble servant's place to question your wise directives, but this undertaking is... well, "ambitious". Can we truly succeed where countless others have failed?"</Long>
+		</Description>
+		<DataConfiguration>
+			<Dataset base="Majesty">
+				<Load>
+					<Template>Brashnard.q</Template>
+				</Load>
+				<Unload>
+					<CAM></CAM>
+					<GPL></GPL>
+					<Constants></Constants>
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

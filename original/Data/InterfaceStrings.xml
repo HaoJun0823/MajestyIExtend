@@ -1,0 +1,14 @@
+<Majesty>
+	<Language id="en_US">
+		<Text id="IDTXT_QUEST_DEFINITION_MISSING_TITLE">Quest Data Missing</Text>
+		<Text id="IDTXT_QUEST_DEFINITION_MISSING_BODY">The Quest data used to create this save is missing.  The Quest may need to be re-downloaded and installed in your user folder.</Text>
+		<Text id="IDTXT_MODDING_ACTIVATE_MODS">ACTIVATE MODS</Text>
+		<Text id="IDTXT_MODDING_DEACTIVATE_MODS">DEACTIVATE MODS</Text>
+		<Text id="IDTXT_MODDING_MOD_WORKS_WITH_BASE">Works with: Original Majesty Quests</Text>
+		<Text id="IDTXT_MODDING_MOD_WORKS_WITH_EXPANSION">Works with: Northern Expansion Quests</Text>
+		<Text id="IDTXT_MODDING_MOD_WORKS_WITH_BOTH">Works with: Original and Northern Expansion Quests</Text>		
+		<Text id="IDTXT_MODDING_MOD_WORKS_WITH_UNKNOWN">Works with: Unknown Data Set</Text>		
+		<Text id="IDTXT_MOD_DEFINITION_MISSING_TITLE">Mods Missing</Text>		
+		
+	</Language>
+</Majesty>

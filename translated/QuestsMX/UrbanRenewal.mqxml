@@ -1,0 +1,21 @@
+<Majesty>
+	<Quest id="{30315158-0000-0000-0000-000000000000}">
+		<Name>URBAN_RENEWAL</Name>
+		<Description lang="en_US">
+			<Short>摧毁所有红色公会、精灵休闲屋和赌场。[newline][newline]（不可建造盗贼公会或精灵别馆。）</Short>
+			<Long>"（……叹气……）我该如何向我们的君主报告这个消息？……[newline]嗯，陛下，我有好消息也有坏消息。好消息是您的叔叔去世了……[newline][newline]不，这不行……[newline][newline]（咳咳）殿下，您已故的叔叔遗赠给您一座城镇！……某种意义上……[newline][newline]嗯，也许说得更积极些……[newline][newline]我很高兴地通知您，您获得了一个千载难逢的机会！您可以成为第一位让"贫民窟"这个词变得好听的阿达尼亚君主！……[newline][newline]哦，这也不行。（……叹气……）没用的……[newline][newline]陛下，看看窗外吧。盗贼、精灵，还有放眼所及的纵欲狂欢。这一切都归您所有，都怪您那个死掉的叔叔。您觉得您能收拾好那堆烂摊子吗？"</Long>
+		</Description>
+		<DataConfiguration>
+			<Dataset base="MajestyExpansion">
+				<Load>
+					<Template>urban_renewal.q</Template>
+				</Load>
+				<Unload>
+					<CAM />
+					<GPL />
+					<Constants />
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

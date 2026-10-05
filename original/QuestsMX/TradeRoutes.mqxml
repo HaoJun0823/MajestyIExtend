@@ -1,0 +1,21 @@
+<Majesty>
+	<Quest id="{39305158-0000-0000-0000-000000000000}">
+		<Name>TRADE_ROUTES</Name>
+		<Description lang="en_US">
+			<Short>Clear routes and protect the caravans entering our kingdom over the next month.  At least half of them must reach our markets intact. If our marketplace is destroyed we will have failed regardless.[newline][newline](No Marketplaces or Trading Posts may be built.)</Short>
+			<Long>"Majesty, I have just returned from several of the northern kingdoms. They are open to the idea of trade and offer all manner of exotic goods. However, their trust must be earned.[newline]Over the next several weeks, a stream of Caravans, opening new trade routes, will be heading to our settlement. If we assure their safe passage, this will seal our end of the bargain and we'll receive a continued stream of goods and riches from the northlands."</Long>
+		</Description>
+		<DataConfiguration>
+			<Dataset base="MajestyExpansion">
+				<Load>
+					<Template>Trade_Routes.q</Template>
+				</Load>
+				<Unload>
+					<CAM></CAM>
+					<GPL></GPL>
+					<Constants></Constants>
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

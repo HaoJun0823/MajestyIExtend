@@ -1,0 +1,785 @@
+{
+  "source": "gpltext.cam",
+  "size": 102519,
+  "sha256": "999938336948fffcec9b33ae9f20e2032915f80d927fd57a8b8381b2981829de",
+  "magic": "43594c4250432020",
+  "version": "01000100",
+  "file_dummy": 2696,
+  "sections": [
+    {
+      "ext": "STRT",
+      "ext_raw": "53545254",
+      "section_dummy": 0,
+      "files": [
+        {
+          "index": 0,
+          "name": "HN01",
+          "name_raw": "484e303100000000000000000000000000000000",
+          "file": "000_HN01.bin",
+          "size": 510,
+          "orig_offset": 2724
+        },
+        {
+          "index": 1,
+          "name": "HN02",
+          "name_raw": "484e303200000000000000000000000000000000",
+          "file": "001_HN02.bin",
+          "size": 631,
+          "orig_offset": 3234
+        },
+        {
+          "index": 2,
+          "name": "HN03",
+          "name_raw": "484e303300000000000000000000000000000000",
+          "file": "002_HN03.bin",
+          "size": 4,
+          "orig_offset": 3865
+        },
+        {
+          "index": 3,
+          "name": "HN04",
+          "name_raw": "484e303400000000000000000000000000000000",
+          "file": "003_HN04.bin",
+          "size": 4,
+          "orig_offset": 3869
+        },
+        {
+          "index": 4,
+          "name": "HN05",
+          "name_raw": "484e303500000000000000000000000000000000",
+          "file": "004_HN05.bin",
+          "size": 462,
+          "orig_offset": 3873
+        },
+        {
+          "index": 5,
+          "name": "HN06",
+          "name_raw": "484e303600000000000000000000000000000000",
+          "file": "005_HN06.bin",
+          "size": 657,
+          "orig_offset": 4335
+        },
+        {
+          "index": 6,
+          "name": "HN07",
+          "name_raw": "484e303700000000000000000000000000000000",
+          "file": "006_HN07.bin",
+          "size": 4,
+          "orig_offset": 4992
+        },
+        {
+          "index": 7,
+          "name": "HN08",
+          "name_raw": "484e303800000000000000000000000000000000",
+          "file": "007_HN08.bin",
+          "size": 4,
+          "orig_offset": 4996
+        },
+        {
+          "index": 8,
+          "name": "HN09",
+          "name_raw": "484e303900000000000000000000000000000000",
+          "file": "008_HN09.bin",
+          "size": 506,
+          "orig_offset": 5000
+        },
+        {
+          "index": 9,
+          "name": "HN10",
+          "name_raw": "484e313000000000000000000000000000000000",
+          "file": "009_HN10.bin",
+          "size": 494,
+          "orig_offset": 5506
+        },
+        {
+          "index": 10,
+          "name": "HN11",
+          "name_raw": "484e313100000000000000000000000000000000",
+          "file": "010_HN11.bin",
+          "size": 4,
+          "orig_offset": 6000
+        },
+        {
+          "index": 11,
+          "name": "HN12",
+          "name_raw": "484e313200000000000000000000000000000000",
+          "file": "011_HN12.bin",
+          "size": 4,
+          "orig_offset": 6004
+        },
+        {
+          "index": 12,
+          "name": "HN13",
+          "name_raw": "484e313300000000000000000000000000000000",
+          "file": "012_HN13.bin",
+          "size": 507,
+          "orig_offset": 6008
+        },
+        {
+          "index": 13,
+          "name": "HN14",
+          "name_raw": "484e313400000000000000000000000000000000",
+          "file": "013_HN14.bin",
+          "size": 726,
+          "orig_offset": 6515
+        },
+        {
+          "index": 14,
+          "name": "HN15",
+          "name_raw": "484e313500000000000000000000000000000000",
+          "file": "014_HN15.bin",
+          "size": 4,
+          "orig_offset": 7241
+        },
+        {
+          "index": 15,
+          "name": "HN16",
+          "name_raw": "484e313600000000000000000000000000000000",
+          "file": "015_HN16.bin",
+          "size": 4,
+          "orig_offset": 7245
+        },
+        {
+          "index": 16,
+          "name": "HN17",
+          "name_raw": "484e313700000000000000000000000000000000",
+          "file": "016_HN17.bin",
+          "size": 456,
+          "orig_offset": 7249
+        },
+        {
+          "index": 17,
+          "name": "HN18",
+          "name_raw": "484e313800000000000000000000000000000000",
+          "file": "017_HN18.bin",
+          "size": 639,
+          "orig_offset": 7705
+        },
+        {
+          "index": 18,
+          "name": "HN19",
+          "name_raw": "484e313900000000000000000000000000000000",
+          "file": "018_HN19.bin",
+          "size": 4,
+          "orig_offset": 8344
+        },
+        {
+          "index": 19,
+          "name": "HN20",
+          "name_raw": "484e323000000000000000000000000000000000",
+          "file": "019_HN20.bin",
+          "size": 4,
+          "orig_offset": 8348
+        },
+        {
+          "index": 20,
+          "name": "HN21",
+          "name_raw": "484e323100000000000000000000000000000000",
+          "file": "020_HN21.bin",
+          "size": 522,
+          "orig_offset": 8352
+        },
+        {
+          "index": 21,
+          "name": "HN22",
+          "name_raw": "484e323200000000000000000000000000000000",
+          "file": "021_HN22.bin",
+          "size": 636,
+          "orig_offset": 8874
+        },
+        {
+          "index": 22,
+          "name": "HN23",
+          "name_raw": "484e323300000000000000000000000000000000",
+          "file": "022_HN23.bin",
+          "size": 4,
+          "orig_offset": 9510
+        },
+        {
+          "index": 23,
+          "name": "HN24",
+          "name_raw": "484e323400000000000000000000000000000000",
+          "file": "023_HN24.bin",
+          "size": 4,
+          "orig_offset": 9514
+        },
+        {
+          "index": 24,
+          "name": "HN25",
+          "name_raw": "484e323500000000000000000000000000000000",
+          "file": "024_HN25.bin",
+          "size": 467,
+          "orig_offset": 9518
+        },
+        {
+          "index": 25,
+          "name": "HN26",
+          "name_raw": "484e323600000000000000000000000000000000",
+          "file": "025_HN26.bin",
+          "size": 74,
+          "orig_offset": 9985
+        },
+        {
+          "index": 26,
+          "name": "HN27",
+          "name_raw": "484e323700000000000000000000000000000000",
+          "file": "026_HN27.bin",
+          "size": 4,
+          "orig_offset": 10059
+        },
+        {
+          "index": 27,
+          "name": "HN28",
+          "name_raw": "484e323800000000000000000000000000000000",
+          "file": "027_HN28.bin",
+          "size": 4,
+          "orig_offset": 10063
+        },
+        {
+          "index": 28,
+          "name": "HN29",
+          "name_raw": "484e323900000000000000000000000000000000",
+          "file": "028_HN29.bin",
+          "size": 475,
+          "orig_offset": 10067
+        },
+        {
+          "index": 29,
+          "name": "HN30",
+          "name_raw": "484e333000000000000000000000000000000000",
+          "file": "029_HN30.bin",
+          "size": 499,
+          "orig_offset": 10542
+        },
+        {
+          "index": 30,
+          "name": "HN31",
+          "name_raw": "484e333100000000000000000000000000000000",
+          "file": "030_HN31.bin",
+          "size": 4,
+          "orig_offset": 11041
+        },
+        {
+          "index": 31,
+          "name": "HN32",
+          "name_raw": "484e333200000000000000000000000000000000",
+          "file": "031_HN32.bin",
+          "size": 4,
+          "orig_offset": 11045
+        },
+        {
+          "index": 32,
+          "name": "HN33",
+          "name_raw": "484e333300000000000000000000000000000000",
+          "file": "032_HN33.bin",
+          "size": 387,
+          "orig_offset": 11049
+        },
+        {
+          "index": 33,
+          "name": "HN34",
+          "name_raw": "484e333400000000000000000000000000000000",
+          "file": "033_HN34.bin",
+          "size": 684,
+          "orig_offset": 11436
+        },
+        {
+          "index": 34,
+          "name": "HN35",
+          "name_raw": "484e333500000000000000000000000000000000",
+          "file": "034_HN35.bin",
+          "size": 4,
+          "orig_offset": 12120
+        },
+        {
+          "index": 35,
+          "name": "HN36",
+          "name_raw": "484e333600000000000000000000000000000000",
+          "file": "035_HN36.bin",
+          "size": 4,
+          "orig_offset": 12124
+        },
+        {
+          "index": 36,
+          "name": "HN37",
+          "name_raw": "484e333700000000000000000000000000000000",
+          "file": "036_HN37.bin",
+          "size": 427,
+          "orig_offset": 12128
+        },
+        {
+          "index": 37,
+          "name": "HN38",
+          "name_raw": "484e333800000000000000000000000000000000",
+          "file": "037_HN38.bin",
+          "size": 417,
+          "orig_offset": 12555
+        },
+        {
+          "index": 38,
+          "name": "HN39",
+          "name_raw": "484e333900000000000000000000000000000000",
+          "file": "038_HN39.bin",
+          "size": 4,
+          "orig_offset": 12972
+        },
+        {
+          "index": 39,
+          "name": "HN40",
+          "name_raw": "484e343000000000000000000000000000000000",
+          "file": "039_HN40.bin",
+          "size": 4,
+          "orig_offset": 12976
+        },
+        {
+          "index": 40,
+          "name": "HN41",
+          "name_raw": "484e343100000000000000000000000000000000",
+          "file": "040_HN41.bin",
+          "size": 19,
+          "orig_offset": 12980
+        },
+        {
+          "index": 41,
+          "name": "HN42",
+          "name_raw": "484e343200000000000000000000000000000000",
+          "file": "041_HN42.bin",
+          "size": 402,
+          "orig_offset": 12999
+        },
+        {
+          "index": 42,
+          "name": "HN43",
+          "name_raw": "484e343300000000000000000000000000000000",
+          "file": "042_HN43.bin",
+          "size": 4,
+          "orig_offset": 13401
+        },
+        {
+          "index": 43,
+          "name": "HN44",
+          "name_raw": "484e343400000000000000000000000000000000",
+          "file": "043_HN44.bin",
+          "size": 4,
+          "orig_offset": 13405
+        },
+        {
+          "index": 44,
+          "name": "HN45",
+          "name_raw": "484e343500000000000000000000000000000000",
+          "file": "044_HN45.bin",
+          "size": 451,
+          "orig_offset": 13409
+        },
+        {
+          "index": 45,
+          "name": "HN46",
+          "name_raw": "484e343600000000000000000000000000000000",
+          "file": "045_HN46.bin",
+          "size": 410,
+          "orig_offset": 13860
+        },
+        {
+          "index": 46,
+          "name": "HN47",
+          "name_raw": "484e343700000000000000000000000000000000",
+          "file": "046_HN47.bin",
+          "size": 4,
+          "orig_offset": 14270
+        },
+        {
+          "index": 47,
+          "name": "HN48",
+          "name_raw": "484e343800000000000000000000000000000000",
+          "file": "047_HN48.bin",
+          "size": 4,
+          "orig_offset": 14274
+        },
+        {
+          "index": 48,
+          "name": "HN49",
+          "name_raw": "484e343900000000000000000000000000000000",
+          "file": "048_HN49.bin",
+          "size": 495,
+          "orig_offset": 14278
+        },
+        {
+          "index": 49,
+          "name": "HN50",
+          "name_raw": "484e353000000000000000000000000000000000",
+          "file": "049_HN50.bin",
+          "size": 689,
+          "orig_offset": 14773
+        },
+        {
+          "index": 50,
+          "name": "HN51",
+          "name_raw": "484e353100000000000000000000000000000000",
+          "file": "050_HN51.bin",
+          "size": 4,
+          "orig_offset": 15462
+        },
+        {
+          "index": 51,
+          "name": "HN52",
+          "name_raw": "484e353200000000000000000000000000000000",
+          "file": "051_HN52.bin",
+          "size": 4,
+          "orig_offset": 15466
+        },
+        {
+          "index": 52,
+          "name": "HN53",
+          "name_raw": "484e353300000000000000000000000000000000",
+          "file": "052_HN53.bin",
+          "size": 406,
+          "orig_offset": 15470
+        },
+        {
+          "index": 53,
+          "name": "HN54",
+          "name_raw": "484e353400000000000000000000000000000000",
+          "file": "053_HN54.bin",
+          "size": 490,
+          "orig_offset": 15876
+        },
+        {
+          "index": 54,
+          "name": "HN55",
+          "name_raw": "484e353500000000000000000000000000000000",
+          "file": "054_HN55.bin",
+          "size": 4,
+          "orig_offset": 16366
+        },
+        {
+          "index": 55,
+          "name": "HN56",
+          "name_raw": "484e353600000000000000000000000000000000",
+          "file": "055_HN56.bin",
+          "size": 4,
+          "orig_offset": 16370
+        },
+        {
+          "index": 56,
+          "name": "HN57",
+          "name_raw": "484e353700000000000000000000000000000000",
+          "file": "056_HN57.bin",
+          "size": 16,
+          "orig_offset": 16374
+        },
+        {
+          "index": 57,
+          "name": "HN58",
+          "name_raw": "484e353800000000000000000000000000000000",
+          "file": "057_HN58.bin",
+          "size": 514,
+          "orig_offset": 16390
+        },
+        {
+          "index": 58,
+          "name": "HN59",
+          "name_raw": "484e353900000000000000000000000000000000",
+          "file": "058_HN59.bin",
+          "size": 559,
+          "orig_offset": 16904
+        },
+        {
+          "index": 59,
+          "name": "HN60",
+          "name_raw": "484e363000000000000000000000000000000000",
+          "file": "059_HN60.bin",
+          "size": 4,
+          "orig_offset": 17463
+        },
+        {
+          "index": 60,
+          "name": "HN61",
+          "name_raw": "484e363100000000000000000000000000000000",
+          "file": "060_HN61.bin",
+          "size": 506,
+          "orig_offset": 17467
+        },
+        {
+          "index": 61,
+          "name": "HN62",
+          "name_raw": "484e363200000000000000000000000000000000",
+          "file": "061_HN62.bin",
+          "size": 797,
+          "orig_offset": 17973
+        },
+        {
+          "index": 62,
+          "name": "HN63",
+          "name_raw": "484e363300000000000000000000000000000000",
+          "file": "062_HN63.bin",
+          "size": 4,
+          "orig_offset": 18770
+        },
+        {
+          "index": 63,
+          "name": "HN64",
+          "name_raw": "484e363400000000000000000000000000000000",
+          "file": "063_HN64.bin",
+          "size": 4,
+          "orig_offset": 18774
+        },
+        {
+          "index": 64,
+          "name": "BN01",
+          "name_raw": "424e303100000000000000000000000000000000",
+          "file": "064_BN01.bin",
+          "size": 810,
+          "orig_offset": 18778
+        },
+        {
+          "index": 65,
+          "name": "BN02",
+          "name_raw": "424e303200000000000000000000000000000000",
+          "file": "065_BN02.bin",
+          "size": 4,
+          "orig_offset": 19588
+        },
+        {
+          "index": 66,
+          "name": "BN03",
+          "name_raw": "424e303300000000000000000000000000000000",
+          "file": "066_BN03.bin",
+          "size": 4,
+          "orig_offset": 19592
+        },
+        {
+          "index": 67,
+          "name": "BN04",
+          "name_raw": "424e303400000000000000000000000000000000",
+          "file": "067_BN04.bin",
+          "size": 4,
+          "orig_offset": 19596
+        },
+        {
+          "index": 68,
+          "name": "EN01",
+          "name_raw": "454e303100000000000000000000000000000000",
+          "file": "068_EN01.bin",
+          "size": 153,
+          "orig_offset": 19600
+        },
+        {
+          "index": 69,
+          "name": "EN02",
+          "name_raw": "454e303200000000000000000000000000000000",
+          "file": "069_EN02.bin",
+          "size": 136,
+          "orig_offset": 19753
+        },
+        {
+          "index": 70,
+          "name": "EN03",
+          "name_raw": "454e303300000000000000000000000000000000",
+          "file": "070_EN03.bin",
+          "size": 166,
+          "orig_offset": 19889
+        },
+        {
+          "index": 71,
+          "name": "EN04",
+          "name_raw": "454e303400000000000000000000000000000000",
+          "file": "071_EN04.bin",
+          "size": 173,
+          "orig_offset": 20055
+        },
+        {
+          "index": 72,
+          "name": "EN05",
+          "name_raw": "454e303500000000000000000000000000000000",
+          "file": "072_EN05.bin",
+          "size": 164,
+          "orig_offset": 20228
+        },
+        {
+          "index": 73,
+          "name": "EN06",
+          "name_raw": "454e303600000000000000000000000000000000",
+          "file": "073_EN06.bin",
+          "size": 178,
+          "orig_offset": 20392
+        },
+        {
+          "index": 74,
+          "name": "EN07",
+          "name_raw": "454e303700000000000000000000000000000000",
+          "file": "074_EN07.bin",
+          "size": 181,
+          "orig_offset": 20570
+        },
+        {
+          "index": 75,
+          "name": "EN08",
+          "name_raw": "454e303800000000000000000000000000000000",
+          "file": "075_EN08.bin",
+          "size": 175,
+          "orig_offset": 20751
+        },
+        {
+          "index": 76,
+          "name": "EN09",
+          "name_raw": "454e303900000000000000000000000000000000",
+          "file": "076_EN09.bin",
+          "size": 174,
+          "orig_offset": 20926
+        },
+        {
+          "index": 77,
+          "name": "EN10",
+          "name_raw": "454e313000000000000000000000000000000000",
+          "file": "077_EN10.bin",
+          "size": 157,
+          "orig_offset": 21100
+        },
+        {
+          "index": 78,
+          "name": "EN11",
+          "name_raw": "454e313100000000000000000000000000000000",
+          "file": "078_EN11.bin",
+          "size": 187,
+          "orig_offset": 21257
+        },
+        {
+          "index": 79,
+          "name": "EN12",
+          "name_raw": "454e313200000000000000000000000000000000",
+          "file": "079_EN12.bin",
+          "size": 135,
+          "orig_offset": 21444
+        },
+        {
+          "index": 80,
+          "name": "EN13",
+          "name_raw": "454e313300000000000000000000000000000000",
+          "file": "080_EN13.bin",
+          "size": 141,
+          "orig_offset": 21579
+        },
+        {
+          "index": 81,
+          "name": "EN14",
+          "name_raw": "454e313400000000000000000000000000000000",
+          "file": "081_EN14.bin",
+          "size": 116,
+          "orig_offset": 21720
+        },
+        {
+          "index": 82,
+          "name": "EN15",
+          "name_raw": "454e313500000000000000000000000000000000",
+          "file": "082_EN15.bin",
+          "size": 128,
+          "orig_offset": 21836
+        },
+        {
+          "index": 83,
+          "name": "HPTX",
+          "name_raw": "4850545800000000000000000000000000000000",
+          "file": "083_HPTX.bin",
+          "size": 43785,
+          "orig_offset": 21964
+        },
+        {
+          "index": 84,
+          "name": "FNTX",
+          "name_raw": "464e545800000000000000000000000000000000",
+          "file": "084_FNTX.bin",
+          "size": 2855,
+          "orig_offset": 65749
+        },
+        {
+          "index": 85,
+          "name": "FDTX",
+          "name_raw": "4644545800000000000000000000000000000000",
+          "file": "085_FDTX.bin",
+          "size": 7988,
+          "orig_offset": 68604
+        },
+        {
+          "index": 86,
+          "name": "LNTX",
+          "name_raw": "4c4e545800000000000000000000000000000000",
+          "file": "086_LNTX.bin",
+          "size": 666,
+          "orig_offset": 76592
+        },
+        {
+          "index": 87,
+          "name": "DPTX",
+          "name_raw": "4450545800000000000000000000000000000000",
+          "file": "087_DPTX.bin",
+          "size": 2612,
+          "orig_offset": 77258
+        },
+        {
+          "index": 88,
+          "name": "AITX",
+          "name_raw": "4149545800000000000000000000000000000000",
+          "file": "088_AITX.bin",
+          "size": 13914,
+          "orig_offset": 79870
+        },
+        {
+          "index": 89,
+          "name": "NMTX",
+          "name_raw": "4e4d545800000000000000000000000000000000",
+          "file": "089_NMTX.bin",
+          "size": 54,
+          "orig_offset": 93784
+        },
+        {
+          "index": 90,
+          "name": "QITM",
+          "name_raw": "5149544d00000000000000000000000000000000",
+          "file": "090_QITM.bin",
+          "size": 816,
+          "orig_offset": 93838
+        },
+        {
+          "index": 91,
+          "name": "GOAL",
+          "name_raw": "474f414c00000000000000000000000000000000",
+          "file": "091_GOAL.bin",
+          "size": 138,
+          "orig_offset": 94654
+        },
+        {
+          "index": 92,
+          "name": "QUES",
+          "name_raw": "5155455300000000000000000000000000000000",
+          "file": "092_QUES.bin",
+          "size": 611,
+          "orig_offset": 94792
+        },
+        {
+          "index": 93,
+          "name": "GAMX",
+          "name_raw": "47414d5800000000000000000000000000000000",
+          "file": "093_GAMX.bin",
+          "size": 213,
+          "orig_offset": 95403
+        },
+        {
+          "index": 94,
+          "name": "LOSX",
+          "name_raw": "4c4f535800000000000000000000000000000000",
+          "file": "094_LOSX.bin",
+          "size": 1273,
+          "orig_offset": 95616
+        },
+        {
+          "index": 95,
+          "name": "QEND",
+          "name_raw": "51454e4400000000000000000000000000000000",
+          "file": "095_QEND.bin",
+          "size": 5630,
+          "orig_offset": 96889
+        }
+      ]
+    }
+  ]
+}

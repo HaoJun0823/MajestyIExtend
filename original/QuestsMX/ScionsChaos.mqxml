@@ -1,0 +1,21 @@
+<Majesty>
+	<Quest id="{36305158-0000-0000-0000-000000000000}">
+		<Name>SCIONS_CHAOS</Name>
+		<Description lang="en_US">
+			<Short>Destroy the three scions of Chaos - the Priestess, the Cultist and the Warrior of Discord.[newline][newline](No Temples except those belonging to Krypta and Fervus may be built in this land. No Wizards Guilds, Marketplaces, Non-Human races, Outposts or Embassies may be built, either.)</Short>
+			<Long>"An interesting turn of events, my Liege. Three legendary heroes called 'The Scions of Chaos' have issued a challenge to the champions of our settlement. They call on our heroes to meet them on the field of battle. All three Scions must be defeated before we can truly claim to have bested them."</Long>
+		</Description>
+		<DataConfiguration>
+			<Dataset base="MajestyExpansion">
+				<Load>
+					<Template>Scions_chaos.q</Template>
+				</Load>
+				<Unload>
+					<CAM></CAM>
+					<GPL></GPL>
+					<Constants></Constants>
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

@@ -1,0 +1,21 @@
+<Majesty>
+	<Quest id="{32315551-0000-0000-0000-000000000000}">
+		<Name>FORSAKEN_LANDS</Name>
+		<Description lang="en_US">
+			<Short>Destroy the Evil Castle to win this epic quest.[newline][newline](No Wizards Guild, non-Human races, Palace level 3, or any temples available.)</Short>
+			<Long>"My liege, while this land holds great promise I should point out that there is much that requires your immediate attention. Our town is still beset by the marauding monsters who lurk in this forsaken land.[newline]We will only know true prosperity when these interlopers are kept at bay. It's in your best interest to employ the services of a variety of heroes. With their skills, and the blessings of the gods, we may be able to safeguard this community."</Long>
+		</Description>
+		<DataConfiguration>
+			<Dataset base="Majesty">
+				<Load>
+					<Template>Forsaken.q</Template>
+				</Load>
+				<Unload>
+					<CAM></CAM>
+					<GPL></GPL>
+					<Constants></Constants>
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

@@ -1,0 +1,80 @@
+{
+  "source": "UIData_800_600.dat",
+  "size": 11147,
+  "sha256": "dc9b67bf93be5671c02a6acbfe83f1fedcab64bd34638b660288ac209fdd63e3",
+  "magic": "43594c4250432020",
+  "version": "01000100",
+  "file_dummy": 212,
+  "sections": [
+    {
+      "ext": "SMNU",
+      "ext_raw": "534d4e55",
+      "section_dummy": 0,
+      "files": [
+        {
+          "index": 0,
+          "name": "AP37",
+          "name_raw": "4150333700000000000000000000000000000000",
+          "file": "000_AP37.bin",
+          "size": 2200,
+          "orig_offset": 248
+        },
+        {
+          "index": 1,
+          "name": "APd9",
+          "name_raw": "4150643900000000000000000000000000000000",
+          "file": "001_APd9.bin",
+          "size": 732,
+          "orig_offset": 2448
+        },
+        {
+          "index": 2,
+          "name": "APda",
+          "name_raw": "4150646100000000000000000000000000000000",
+          "file": "002_APda.bin",
+          "size": 2016,
+          "orig_offset": 3180
+        },
+        {
+          "index": 3,
+          "name": "APdc",
+          "name_raw": "4150646300000000000000000000000000000000",
+          "file": "003_APdc.bin",
+          "size": 5472,
+          "orig_offset": 5196
+        }
+      ]
+    },
+    {
+      "ext": "STRT",
+      "ext_raw": "53545254",
+      "section_dummy": 0,
+      "files": [
+        {
+          "index": 0,
+          "name": "APd9",
+          "name_raw": "4150643900000000000000000000000000000000",
+          "file": "000_APd9.bin",
+          "size": 110,
+          "orig_offset": 10668
+        },
+        {
+          "index": 1,
+          "name": "APda",
+          "name_raw": "4150646100000000000000000000000000000000",
+          "file": "001_APda.bin",
+          "size": 167,
+          "orig_offset": 10778
+        },
+        {
+          "index": 2,
+          "name": "APdc",
+          "name_raw": "4150646300000000000000000000000000000000",
+          "file": "002_APdc.bin",
+          "size": 202,
+          "orig_offset": 10945
+        }
+      ]
+    }
+  ]
+}

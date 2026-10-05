@@ -1,0 +1,21 @@
+<Majesty>
+	<Quest id="{34305551-0000-0000-0000-000000000000}">
+		<Name>QUEST_FOR_CROWN</Name>
+		<Description lang="en_US">
+			<Short>Find and destroy the lair that the Crown rests in.</Short>
+			<Long>"An enlightening discovery, your highness! The Crown of Sydrian - the long lost symbol of your family's power - has been located. It is being held in an evil fortress on the frontier.[newline]The recent waves of monster attacks have left your people dispirited. Reclaiming this item would doubtlessly boost your subjects' faith and renew the support of your family's house. I greatly urge you to take advantage of this unexpected opportunity."</Long>
+		</Description>
+		<DataConfiguration>
+			<Dataset base="Majesty">
+				<Load>
+					<Template>QuestforCrown.q</Template>
+				</Load>
+				<Unload>
+					<CAM></CAM>
+					<GPL></GPL>
+					<Constants></Constants>
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

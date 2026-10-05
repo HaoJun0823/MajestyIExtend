@@ -1,0 +1,21 @@
+<Majesty>
+	<Quest id="{32315551-0000-0000-0000-000000000000}">
+		<Name>FORSAKEN_LANDS</Name>
+		<Description lang="en_US">
+			<Short>摧毁邪恶城堡即可完成此史诗任务。[newline][newline]（无法师公会、非人族种族、三级宫殿或任何神殿可用。）</Short>
+			<Long>"殿下，尽管这片土地前景广阔，但我必须指出有许多事需要您立即关注。我们的城镇仍受到潜伏在这片被遗弃之地的掠夺怪物的袭扰。[newline]只有当这些入侵者被挡在外面时，我们才能真正繁荣。善用各类英雄的服务符合您的利益。凭借他们的技能和诸神的庇佑，我们或许能够守护这个社区。"</Long>
+		</Description>
+		<DataConfiguration>
+			<Dataset base="Majesty">
+				<Load>
+					<Template>Forsaken.q</Template>
+				</Load>
+				<Unload>
+					<CAM />
+					<GPL />
+					<Constants />
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

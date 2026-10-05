@@ -1,0 +1,21 @@
+<Majesty>
+	<Quest id="{30315158-0000-0000-0000-000000000000}">
+		<Name>URBAN_RENEWAL</Name>
+		<Description lang="en_US">
+			<Short>Destroy all red Guilds, Elven Lounges and Gambling Halls.[newline][newline](No Rogues Guilds, or Elven Bungalows may be built.)</Short>
+			<Long>"(...sigh...) How can I possibly tell our Sovereign the news?...[newline]Um, Majesty, I have good news and bad. The good news is your uncle died...[newline][newline]No, that won't do...[newline][newline](ahem) My Leige, your late uncle has bequeathed you a town!...of sorts...[newline][newline]Hmm, maybe more positive...[newline][newline]It pleases me to inform you that you've been granted a tremendous opportunity! You can be the first Ardanian sovereign to give the word "slum" a good name!...[newline][newline]Oh, that won't work either. (...sigh...) it's no use...[newline][newline]Majesty, look out the window. Rogues, Elves, and debauchery as far as the eye can see. It's all yours, no thanks to your dead uncle. Think you can clean up that mess?"</Long>
+		</Description>
+		<DataConfiguration>
+			<Dataset base="MajestyExpansion">
+				<Load>
+					<Template>urban_renewal.q</Template>
+				</Load>
+				<Unload>
+					<CAM></CAM>
+					<GPL></GPL>
+					<Constants></Constants>
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

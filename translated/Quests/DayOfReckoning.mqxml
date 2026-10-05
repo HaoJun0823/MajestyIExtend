@@ -1,0 +1,21 @@
+<Majesty>
+	<Quest id="{36305551-0000-0000-0000-000000000000}">
+		<Name>DAY_OF_RECKONING</Name>
+		<Description lang="en_US">
+			<Short>在王国中最邪恶生物的猛攻下存活下来。[newline][newline]（不可建造任何神殿或非人族居所。）</Short>
+			<Long>"腐败从大地中萌发！冥界的军团正纷纷涌现，蹂躏这片土地。这场邪恶的瘟疫定是天界有恙之兆——诸神开战，我们全都身处险境！[newline]王国必须从这场席卷一切的混乱中得到保卫！尽管凡人之力看似脆弱的威慑，但您必须召唤一切可能的力量，与这些污秽与瘟疫的终极化身进行清算。"</Long>
+		</Description>
+		<DataConfiguration>
+			<Dataset base="Majesty">
+				<Load>
+					<Template>day_reckoning.q</Template>
+				</Load>
+				<Unload>
+					<CAM />
+					<GPL />
+					<Constants />
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

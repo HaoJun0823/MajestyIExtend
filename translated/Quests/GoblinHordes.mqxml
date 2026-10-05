@@ -1,0 +1,21 @@
+<Majesty>
+	<Quest id="{33315551-0000-0000-0000-000000000000}">
+		<Name>GOBLIN_HORDES</Name>
+		<Description lang="en_US">
+			<Short>摧毁所有哥布林据点。[newline][newline]（不可建造游侠公会。）</Short>
+			<Long>"可怕的消息！前线的斥候报告说，哥布林正在大规模向这边开来。我们必须在他们淹没并彻底摧毁王国之前遏制这股黑暗浪潮。我建议您招募英雄——尽可能多地——来保护我们的村庄并抵挡这群卑劣的虫群。[newline]恳请您迅速行动！最近一次目击距村庄已不远，而我们对此等入侵毫无准备。"</Long>
+		</Description>
+		<DataConfiguration>
+			<Dataset base="Majesty">
+				<Load>
+					<Template>Goblin_Hordes.q</Template>
+				</Load>
+				<Unload>
+					<CAM />
+					<GPL />
+					<Constants />
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

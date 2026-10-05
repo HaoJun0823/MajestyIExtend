@@ -1,0 +1,664 @@
+{
+  "source": "mx_textdata.cam",
+  "size": 136042,
+  "sha256": "e561fb42e5579188888d1e4ede9fcc7a8bd133bd147d10f5b78238f90309e890",
+  "magic": "43594c4250432020",
+  "version": "01000100",
+  "file_dummy": 2004,
+  "sections": [
+    {
+      "ext": "SMNU",
+      "ext_raw": "534d4e55",
+      "section_dummy": 0,
+      "files": [
+        {
+          "index": 0,
+          "name": "AP03",
+          "name_raw": "4150303300000000000000000000000000000000",
+          "file": "000_AP03.bin",
+          "size": 1208,
+          "orig_offset": 2040
+        },
+        {
+          "index": 1,
+          "name": "AP30",
+          "name_raw": "4150333000000000000000000000000000000000",
+          "file": "001_AP30.bin",
+          "size": 11400,
+          "orig_offset": 3248
+        },
+        {
+          "index": 2,
+          "name": "AP41",
+          "name_raw": "4150343100000000000000000000000000000000",
+          "file": "002_AP41.bin",
+          "size": 1672,
+          "orig_offset": 14648
+        },
+        {
+          "index": 3,
+          "name": "APMK",
+          "name_raw": "41504d4b00000000000000000000000000000000",
+          "file": "003_APMK.bin",
+          "size": 4328,
+          "orig_offset": 16320
+        },
+        {
+          "index": 4,
+          "name": "MX00",
+          "name_raw": "4d58303000000000000000000000000000000000",
+          "file": "004_MX00.bin",
+          "size": 1748,
+          "orig_offset": 20648
+        },
+        {
+          "index": 5,
+          "name": "MX01",
+          "name_raw": "4d58303100000000000000000000000000000000",
+          "file": "005_MX01.bin",
+          "size": 1368,
+          "orig_offset": 22396
+        },
+        {
+          "index": 6,
+          "name": "MX02",
+          "name_raw": "4d58303200000000000000000000000000000000",
+          "file": "006_MX02.bin",
+          "size": 2724,
+          "orig_offset": 23764
+        },
+        {
+          "index": 7,
+          "name": "MX03",
+          "name_raw": "4d58303300000000000000000000000000000000",
+          "file": "007_MX03.bin",
+          "size": 3420,
+          "orig_offset": 26488
+        },
+        {
+          "index": 8,
+          "name": "MX04",
+          "name_raw": "4d58303400000000000000000000000000000000",
+          "file": "008_MX04.bin",
+          "size": 1568,
+          "orig_offset": 29908
+        },
+        {
+          "index": 9,
+          "name": "MX05",
+          "name_raw": "4d58303500000000000000000000000000000000",
+          "file": "009_MX05.bin",
+          "size": 1452,
+          "orig_offset": 31476
+        },
+        {
+          "index": 10,
+          "name": "MX06",
+          "name_raw": "4d58303600000000000000000000000000000000",
+          "file": "010_MX06.bin",
+          "size": 2196,
+          "orig_offset": 32928
+        },
+        {
+          "index": 11,
+          "name": "MX07",
+          "name_raw": "4d58303700000000000000000000000000000000",
+          "file": "011_MX07.bin",
+          "size": 3100,
+          "orig_offset": 35124
+        },
+        {
+          "index": 12,
+          "name": "MX08",
+          "name_raw": "4d58303800000000000000000000000000000000",
+          "file": "012_MX08.bin",
+          "size": 2712,
+          "orig_offset": 38224
+        },
+        {
+          "index": 13,
+          "name": "MX09",
+          "name_raw": "4d58303900000000000000000000000000000000",
+          "file": "013_MX09.bin",
+          "size": 2488,
+          "orig_offset": 40936
+        },
+        {
+          "index": 14,
+          "name": "MX13",
+          "name_raw": "4d58313300000000000000000000000000000000",
+          "file": "014_MX13.bin",
+          "size": 956,
+          "orig_offset": 43424
+        },
+        {
+          "index": 15,
+          "name": "MX14",
+          "name_raw": "4d58313400000000000000000000000000000000",
+          "file": "015_MX14.bin",
+          "size": 908,
+          "orig_offset": 44380
+        },
+        {
+          "index": 16,
+          "name": "MX15",
+          "name_raw": "4d58313500000000000000000000000000000000",
+          "file": "016_MX15.bin",
+          "size": 1060,
+          "orig_offset": 45288
+        },
+        {
+          "index": 17,
+          "name": "MX16",
+          "name_raw": "4d58313600000000000000000000000000000000",
+          "file": "017_MX16.bin",
+          "size": 1060,
+          "orig_offset": 46348
+        },
+        {
+          "index": 18,
+          "name": "MX17",
+          "name_raw": "4d58313700000000000000000000000000000000",
+          "file": "018_MX17.bin",
+          "size": 6452,
+          "orig_offset": 47408
+        },
+        {
+          "index": 19,
+          "name": "MX18",
+          "name_raw": "4d58313800000000000000000000000000000000",
+          "file": "019_MX18.bin",
+          "size": 8388,
+          "orig_offset": 53860
+        },
+        {
+          "index": 20,
+          "name": "MX19",
+          "name_raw": "4d58313900000000000000000000000000000000",
+          "file": "020_MX19.bin",
+          "size": 4920,
+          "orig_offset": 62248
+        },
+        {
+          "index": 21,
+          "name": "AP56",
+          "name_raw": "4150353600000000000000000000000000000000",
+          "file": "021_AP56.bin",
+          "size": 1304,
+          "orig_offset": 67168
+        },
+        {
+          "index": 22,
+          "name": "AP92",
+          "name_raw": "4150393200000000000000000000000000000000",
+          "file": "022_AP92.bin",
+          "size": 3492,
+          "orig_offset": 68472
+        },
+        {
+          "index": 23,
+          "name": "MX20",
+          "name_raw": "4d58323000000000000000000000000000000000",
+          "file": "023_MX20.bin",
+          "size": 2224,
+          "orig_offset": 71964
+        },
+        {
+          "index": 24,
+          "name": "MX21",
+          "name_raw": "4d58323100000000000000000000000000000000",
+          "file": "024_MX21.bin",
+          "size": 2384,
+          "orig_offset": 74188
+        },
+        {
+          "index": 25,
+          "name": "MX22",
+          "name_raw": "4d58323200000000000000000000000000000000",
+          "file": "025_MX22.bin",
+          "size": 2928,
+          "orig_offset": 76572
+        },
+        {
+          "index": 26,
+          "name": "AP42",
+          "name_raw": "4150343200000000000000000000000000000000",
+          "file": "026_AP42.bin",
+          "size": 1360,
+          "orig_offset": 79500
+        },
+        {
+          "index": 27,
+          "name": "AP29",
+          "name_raw": "4150323900000000000000000000000000000000",
+          "file": "027_AP29.bin",
+          "size": 3960,
+          "orig_offset": 80860
+        },
+        {
+          "index": 28,
+          "name": "AP83",
+          "name_raw": "4150383300000000000000000000000000000000",
+          "file": "028_AP83.bin",
+          "size": 6172,
+          "orig_offset": 84820
+        },
+        {
+          "index": 29,
+          "name": "AP84",
+          "name_raw": "4150383400000000000000000000000000000000",
+          "file": "029_AP84.bin",
+          "size": 6180,
+          "orig_offset": 90992
+        },
+        {
+          "index": 30,
+          "name": "AP60",
+          "name_raw": "4150363000000000000000000000000000000000",
+          "file": "030_AP60.bin",
+          "size": 1608,
+          "orig_offset": 97172
+        },
+        {
+          "index": 31,
+          "name": "AP61",
+          "name_raw": "4150363100000000000000000000000000000000",
+          "file": "031_AP61.bin",
+          "size": 1644,
+          "orig_offset": 98780
+        },
+        {
+          "index": 32,
+          "name": "AP50",
+          "name_raw": "4150353000000000000000000000000000000000",
+          "file": "032_AP50.bin",
+          "size": 780,
+          "orig_offset": 100424
+        },
+        {
+          "index": 33,
+          "name": "APc9",
+          "name_raw": "4150633900000000000000000000000000000000",
+          "file": "033_APc9.bin",
+          "size": 1064,
+          "orig_offset": 101204
+        },
+        {
+          "index": 34,
+          "name": "AP44",
+          "name_raw": "4150343400000000000000000000000000000000",
+          "file": "034_AP44.bin",
+          "size": 1488,
+          "orig_offset": 102268
+        }
+      ]
+    },
+    {
+      "ext": "STRT",
+      "ext_raw": "53545254",
+      "section_dummy": 0,
+      "files": [
+        {
+          "index": 0,
+          "name": "AP03",
+          "name_raw": "4150303300000000000000000000000000000000",
+          "file": "000_AP03.bin",
+          "size": 310,
+          "orig_offset": 103756,
+          "strt_json": "000_AP03.json",
+          "strt_count": 10
+        },
+        {
+          "index": 1,
+          "name": "AP30",
+          "name_raw": "4150333000000000000000000000000000000000",
+          "file": "001_AP30.bin",
+          "size": 1892,
+          "orig_offset": 104066,
+          "strt_json": "001_AP30.json",
+          "strt_count": 85
+        },
+        {
+          "index": 2,
+          "name": "AP41",
+          "name_raw": "4150343100000000000000000000000000000000",
+          "file": "002_AP41.bin",
+          "size": 410,
+          "orig_offset": 105958,
+          "strt_json": "002_AP41.json",
+          "strt_count": 14
+        },
+        {
+          "index": 3,
+          "name": "APMK",
+          "name_raw": "41504d4b00000000000000000000000000000000",
+          "file": "003_APMK.bin",
+          "size": 938,
+          "orig_offset": 106368,
+          "strt_json": "003_APMK.json",
+          "strt_count": 33
+        },
+        {
+          "index": 4,
+          "name": "MX00",
+          "name_raw": "4d58303000000000000000000000000000000000",
+          "file": "004_MX00.bin",
+          "size": 526,
+          "orig_offset": 107306,
+          "strt_json": "004_MX00.json",
+          "strt_count": 18
+        },
+        {
+          "index": 5,
+          "name": "MX01",
+          "name_raw": "4d58303100000000000000000000000000000000",
+          "file": "005_MX01.bin",
+          "size": 326,
+          "orig_offset": 107832,
+          "strt_json": "005_MX01.json",
+          "strt_count": 11
+        },
+        {
+          "index": 6,
+          "name": "MX02",
+          "name_raw": "4d58303200000000000000000000000000000000",
+          "file": "006_MX02.bin",
+          "size": 746,
+          "orig_offset": 108158,
+          "strt_json": "006_MX02.json",
+          "strt_count": 28
+        },
+        {
+          "index": 7,
+          "name": "MX03",
+          "name_raw": "4d58303300000000000000000000000000000000",
+          "file": "007_MX03.bin",
+          "size": 624,
+          "orig_offset": 108904,
+          "strt_json": "007_MX03.json",
+          "strt_count": 23
+        },
+        {
+          "index": 8,
+          "name": "MX04",
+          "name_raw": "4d58303400000000000000000000000000000000",
+          "file": "008_MX04.bin",
+          "size": 384,
+          "orig_offset": 109528,
+          "strt_json": "008_MX04.json",
+          "strt_count": 14
+        },
+        {
+          "index": 9,
+          "name": "MX05",
+          "name_raw": "4d58303500000000000000000000000000000000",
+          "file": "009_MX05.bin",
+          "size": 298,
+          "orig_offset": 109912,
+          "strt_json": "009_MX05.json",
+          "strt_count": 11
+        },
+        {
+          "index": 10,
+          "name": "MX06",
+          "name_raw": "4d58303600000000000000000000000000000000",
+          "file": "010_MX06.bin",
+          "size": 556,
+          "orig_offset": 110210,
+          "strt_json": "010_MX06.json",
+          "strt_count": 21
+        },
+        {
+          "index": 11,
+          "name": "MX07",
+          "name_raw": "4d58303700000000000000000000000000000000",
+          "file": "011_MX07.bin",
+          "size": 490,
+          "orig_offset": 110766,
+          "strt_json": "011_MX07.json",
+          "strt_count": 23
+        },
+        {
+          "index": 12,
+          "name": "MX08",
+          "name_raw": "4d58303800000000000000000000000000000000",
+          "file": "012_MX08.bin",
+          "size": 708,
+          "orig_offset": 111256,
+          "strt_json": "012_MX08.json",
+          "strt_count": 28
+        },
+        {
+          "index": 13,
+          "name": "MX09",
+          "name_raw": "4d58303900000000000000000000000000000000",
+          "file": "013_MX09.bin",
+          "size": 676,
+          "orig_offset": 111964,
+          "strt_json": "013_MX09.json",
+          "strt_count": 26
+        },
+        {
+          "index": 14,
+          "name": "MX13",
+          "name_raw": "4d58313300000000000000000000000000000000",
+          "file": "014_MX13.bin",
+          "size": 168,
+          "orig_offset": 112640,
+          "strt_json": "014_MX13.json",
+          "strt_count": 7
+        },
+        {
+          "index": 15,
+          "name": "MX14",
+          "name_raw": "4d58313400000000000000000000000000000000",
+          "file": "015_MX14.bin",
+          "size": 192,
+          "orig_offset": 112808,
+          "strt_json": "015_MX14.json",
+          "strt_count": 6
+        },
+        {
+          "index": 16,
+          "name": "MX15",
+          "name_raw": "4d58313500000000000000000000000000000000",
+          "file": "016_MX15.bin",
+          "size": 200,
+          "orig_offset": 113000,
+          "strt_json": "016_MX15.json",
+          "strt_count": 7
+        },
+        {
+          "index": 17,
+          "name": "MX16",
+          "name_raw": "4d58313600000000000000000000000000000000",
+          "file": "017_MX16.bin",
+          "size": 204,
+          "orig_offset": 113200,
+          "strt_json": "017_MX16.json",
+          "strt_count": 7
+        },
+        {
+          "index": 18,
+          "name": "MX17",
+          "name_raw": "4d58313700000000000000000000000000000000",
+          "file": "018_MX17.bin",
+          "size": 890,
+          "orig_offset": 113404,
+          "strt_json": "018_MX17.json",
+          "strt_count": 39
+        },
+        {
+          "index": 19,
+          "name": "MX18",
+          "name_raw": "4d58313800000000000000000000000000000000",
+          "file": "019_MX18.bin",
+          "size": 298,
+          "orig_offset": 114294,
+          "strt_json": "019_MX18.json",
+          "strt_count": 14
+        },
+        {
+          "index": 20,
+          "name": "MX19",
+          "name_raw": "4d58313900000000000000000000000000000000",
+          "file": "020_MX19.bin",
+          "size": 704,
+          "orig_offset": 114592,
+          "strt_json": "020_MX19.json",
+          "strt_count": 33
+        },
+        {
+          "index": 21,
+          "name": "AP56",
+          "name_raw": "4150353600000000000000000000000000000000",
+          "file": "021_AP56.bin",
+          "size": 212,
+          "orig_offset": 115296,
+          "strt_json": "021_AP56.json",
+          "strt_count": 12
+        },
+        {
+          "index": 22,
+          "name": "AP92",
+          "name_raw": "4150393200000000000000000000000000000000",
+          "file": "022_AP92.bin",
+          "size": 718,
+          "orig_offset": 115508,
+          "strt_json": "022_AP92.json",
+          "strt_count": 29
+        },
+        {
+          "index": 23,
+          "name": "MX20",
+          "name_raw": "4d58323000000000000000000000000000000000",
+          "file": "023_MX20.bin",
+          "size": 278,
+          "orig_offset": 116226,
+          "strt_json": "023_MX20.json",
+          "strt_count": 12
+        },
+        {
+          "index": 24,
+          "name": "MX21",
+          "name_raw": "4d58323100000000000000000000000000000000",
+          "file": "024_MX21.bin",
+          "size": 296,
+          "orig_offset": 116504,
+          "strt_json": "024_MX21.json",
+          "strt_count": 13
+        },
+        {
+          "index": 25,
+          "name": "MX22",
+          "name_raw": "4d58323200000000000000000000000000000000",
+          "file": "025_MX22.bin",
+          "size": 724,
+          "orig_offset": 116800,
+          "strt_json": "025_MX22.json",
+          "strt_count": 27
+        },
+        {
+          "index": 26,
+          "name": "AP42",
+          "name_raw": "4150343200000000000000000000000000000000",
+          "file": "026_AP42.bin",
+          "size": 282,
+          "orig_offset": 117524,
+          "strt_json": "026_AP42.json",
+          "strt_count": 9
+        },
+        {
+          "index": 27,
+          "name": "AP29",
+          "name_raw": "4150323900000000000000000000000000000000",
+          "file": "027_AP29.bin",
+          "size": 664,
+          "orig_offset": 117806,
+          "strt_json": "027_AP29.json",
+          "strt_count": 27
+        },
+        {
+          "index": 28,
+          "name": "AP83",
+          "name_raw": "4150383300000000000000000000000000000000",
+          "file": "028_AP83.bin",
+          "size": 1044,
+          "orig_offset": 118470,
+          "strt_json": "028_AP83.json",
+          "strt_count": 55
+        },
+        {
+          "index": 29,
+          "name": "AP84",
+          "name_raw": "4150383400000000000000000000000000000000",
+          "file": "029_AP84.bin",
+          "size": 1070,
+          "orig_offset": 119514,
+          "strt_json": "029_AP84.json",
+          "strt_count": 56
+        },
+        {
+          "index": 30,
+          "name": "AP60",
+          "name_raw": "4150363000000000000000000000000000000000",
+          "file": "030_AP60.bin",
+          "size": 206,
+          "orig_offset": 120584,
+          "strt_json": "030_AP60.json",
+          "strt_count": 10
+        },
+        {
+          "index": 31,
+          "name": "AP61",
+          "name_raw": "4150363100000000000000000000000000000000",
+          "file": "031_AP61.bin",
+          "size": 254,
+          "orig_offset": 120790,
+          "strt_json": "031_AP61.json",
+          "strt_count": 12
+        },
+        {
+          "index": 32,
+          "name": "AP50",
+          "name_raw": "4150353000000000000000000000000000000000",
+          "file": "032_AP50.bin",
+          "size": 114,
+          "orig_offset": 121044,
+          "strt_json": "032_AP50.json",
+          "strt_count": 5
+        },
+        {
+          "index": 33,
+          "name": "APc9",
+          "name_raw": "4150633900000000000000000000000000000000",
+          "file": "033_APc9.bin",
+          "size": 146,
+          "orig_offset": 121158,
+          "strt_json": "033_APc9.json",
+          "strt_count": 7
+        },
+        {
+          "index": 34,
+          "name": "AP44",
+          "name_raw": "4150343400000000000000000000000000000000",
+          "file": "034_AP44.bin",
+          "size": 448,
+          "orig_offset": 121304,
+          "strt_json": "034_AP44.json",
+          "strt_count": 10
+        },
+        {
+          "index": 35,
+          "name": "GMTX",
+          "name_raw": "474d545800000000000000000000000000000000",
+          "file": "035_GMTX.bin",
+          "size": 14290,
+          "orig_offset": 121752,
+          "strt_json": "035_GMTX.json",
+          "strt_count": 442
+        }
+      ]
+    }
+  ]
+}

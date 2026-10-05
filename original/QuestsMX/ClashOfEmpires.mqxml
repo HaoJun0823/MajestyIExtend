@@ -1,0 +1,21 @@
+<Majesty>
+	<Quest id="{31305158-0000-0000-0000-000000000000}">
+		<Name>CLASH_EMPIRES</Name>
+		<Description lang="en_US">
+			<Short>Destroy all Ratmen and Goblin Lairs.</Short>
+			<Long>"My Liege, I'm pleased to report that our newest northern settlement has been most prosperous. The first season's harvest is in and our Marketplaces are thriving![newline]Ahh... there is one small problem, however. It seems that certain Goblin and Ratmen factions are bent on exterminating each other. While this might normally be cause for celebration, their chosen field of battle seems to be centered rather squarely upon our new village.[newline]I fear that, in their rush to destroy each other, our settlement will be over-run. Your subjects urge you to take action before they are swept away by torrents of these foul vermin."</Long>
+		</Description>
+		<DataConfiguration>
+			<Dataset base="MajestyExpansion">
+				<Load>
+					<Template>Clash_Empires.q</Template>
+				</Load>
+				<Unload>
+					<CAM></CAM>
+					<GPL></GPL>
+					<Constants></Constants>
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

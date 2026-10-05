@@ -3,6 +3,18 @@
 ###############################################################################
 * text=auto
 
+# Binary files — never normalize line endings (would corrupt .bin/.dat)
+*.bin  binary
+*.cam  binary
+*.dat  binary
+*.dds  binary
+*.tuv  binary
+*.dll  binary
+*.asi  binary
+*.zip  binary
+*.lib  binary
+*.pdb  binary
+
 ###############################################################################
 # Set default behavior for command prompt diff.
 #

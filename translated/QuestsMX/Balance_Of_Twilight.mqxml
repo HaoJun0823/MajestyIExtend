@@ -1,0 +1,28 @@
+<Majesty>
+	<Quest id="{31445158-0000-0000-0000-000000000000}">
+		<Name>XQD1</Name>
+		<DisplayName lang="en_US">Balance of Twilight</DisplayName>		
+		<Description lang="en_US">
+			<Short>保卫你的王国免受黑色幻影的侵袭。[newline]找到古代智者的安息之所并使他复生。[newline]重新圣化光明圣坛。[newline]消灭黑色幻影。</Short>
+			<Long>"不知何故，光明圣坛被亵渎了，导致其对立的圣坛力量大增。可怕的黑色幻影被黑暗圣坛的力量所吸引，只要它们被允许汲取其中的力量，就无法被消灭。[newline]据说很久以前有一位古代智者被葬于此地——如果我们能找到他的墓穴并使他复生，或许他会知道如何恢复光明圣坛。[newline]一旦两座圣坛之间的平衡恢复，就应该能消灭黑色幻影，永久根除它们在此地的存在。"</Long>
+		</Description>
+		<DataConfiguration>
+			<Dataset base="MajestyExpansion">
+				<Load>
+					<CAM>$(MajestyExpansionDataPath)/XQD1_intro.cam</CAM>
+					<CAM>$(MajestyExpansionDataPath)/XQD1_MainData.cam</CAM>
+					<CAM>$(MajestyExpansionDataPath)/XQD1_SoundFX.cam</CAM>
+					<CAM>$(MajestyExpansionDataPath)/XQD1_UnitType.cam</CAM>
+					<CAM>$(MajestyExpansionDataPath)/XQD1_Voices.cam</CAM>
+					<GPL>$(MajestyExpansionDataPath)/XQD1_Bytecode.bcd</GPL>
+					<Template>Balance_Of_Twilight.q</Template>
+				</Load>
+				<Unload>
+					<CAM />
+					<GPL />
+					<Constants />
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

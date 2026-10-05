@@ -1,0 +1,21 @@
+<Majesty>
+	<Quest id="{34305158-0000-0000-0000-000000000000}">
+		<Name>LEGENDARY_HEROES</Name>
+		<Description lang="en_US">
+			<Short>Destroy all of the Ancient Barrows within thirty days, or the unstable energies in this realm will reduce your kingdom to rubble.[newline][newline]Buildings can only support one hero at a time.[newline][newline]Heroes start out very experienced.[newline][newline]It takes fewer heroes to upgrade the Palace to levels two and three.[newline][newline]Some lairs in this realm respawn after a duration.</Short>
+			<Long>"Majesty, your populace is ill at ease. We rest on the edge of Krolm's Anvil, an ancient battlefield. Since before recorded time this place has lain desolate. It is said to be haunted by the spirits of those who died here, and many fell creatures lurk in its shadowed barrows and hills. Rangers consider it one of the most dangerous regions in all of Ardania.[newline]It is said that many ancient and powerful artifacts lay scattered where great heroes perished. Regardless of the danger, the recovery of these items would demonstrate your resourcefulness to the inhabitants of these cold Northern Reaches."</Long>
+		</Description>
+		<DataConfiguration>
+			<Dataset base="MajestyExpansion">
+				<Load>
+					<Template>Legendary_Heroes.q</Template>
+				</Load>
+				<Unload>
+					<CAM></CAM>
+					<GPL></GPL>
+					<Constants></Constants>
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

@@ -1,0 +1,121 @@
+{
+  "source": "mx_btdata.cam",
+  "size": 4497906,
+  "sha256": "b101c305fbf1442393971b3b603b157a762e12b21b48c5afc385bf3d23f90907",
+  "magic": "43594c4250432020",
+  "version": "01000100",
+  "file_dummy": 184,
+  "sections": [
+    {
+      "ext": "STRT",
+      "ext_raw": "53545254",
+      "section_dummy": 0,
+      "files": [
+        {
+          "index": 0,
+          "name": "BTDN",
+          "name_raw": "4254444e00000000000000000000000000000000",
+          "file": "000_BTDN.bin",
+          "size": 96,
+          "orig_offset": 376,
+          "strt_json": "000_BTDN.json",
+          "strt_count": 5
+        }
+      ]
+    },
+    {
+      "ext": "BTDT",
+      "ext_raw": "42544454",
+      "section_dummy": 0,
+      "files": [
+        {
+          "index": 0,
+          "name": "BTD1",
+          "name_raw": "4254443100000000000000000000000000000000",
+          "file": "000_BTD1.bin",
+          "size": 16,
+          "orig_offset": 472
+        },
+        {
+          "index": 1,
+          "name": "BTD2",
+          "name_raw": "4254443200000000000000000000000000000000",
+          "file": "001_BTD2.bin",
+          "size": 100,
+          "orig_offset": 488
+        },
+        {
+          "index": 2,
+          "name": "BTD3",
+          "name_raw": "4254443300000000000000000000000000000000",
+          "file": "002_BTD3.bin",
+          "size": 42,
+          "orig_offset": 588
+        },
+        {
+          "index": 3,
+          "name": "BTD4",
+          "name_raw": "4254443400000000000000000000000000000000",
+          "file": "003_BTD4.bin",
+          "size": 150,
+          "orig_offset": 630
+        },
+        {
+          "index": 4,
+          "name": "BTD5",
+          "name_raw": "4254443500000000000000000000000000000000",
+          "file": "004_BTD5.bin",
+          "size": 120,
+          "orig_offset": 780
+        }
+      ]
+    },
+    {
+      "ext": "FONT",
+      "ext_raw": "464f4e54",
+      "section_dummy": 0,
+      "files": [
+        {
+          "index": 0,
+          "name": "fnt2",
+          "name_raw": "666e743200000000000000000000000000000000",
+          "file": "000_fnt2.bin",
+          "size": 783314,
+          "orig_offset": 900
+        },
+        {
+          "index": 1,
+          "name": "fnt4",
+          "name_raw": "666e743400000000000000000000000000000000",
+          "file": "001_fnt4.bin",
+          "size": 547988,
+          "orig_offset": 784214
+        },
+        {
+          "index": 2,
+          "name": "fnt7",
+          "name_raw": "666e743700000000000000000000000000000000",
+          "file": "002_fnt7.bin",
+          "size": 547988,
+          "orig_offset": 1332202
+        },
+        {
+          "index": 3,
+          "name": "fn10",
+          "name_raw": "666e313000000000000000000000000000000000",
+          "file": "003_fn10.bin",
+          "size": 641020,
+          "orig_offset": 1880190
+        },
+        {
+          "index": 4,
+          "name": "fn11",
+          "name_raw": "666e313100000000000000000000000000000000",
+          "file": "004_fn11.bin",
+          "size": 1976696,
+          "orig_offset": 2521210
+        }
+      ]
+    }
+  ]
+}

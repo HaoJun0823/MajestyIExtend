@@ -1,0 +1,6 @@
+<Majesty>
+	<Language id="en_US">
+		<Text id="IDTXT_QUEST_WIN_MESSAGE">You have defeated the vampires!</Text>
+		<Text id="IDTXT_QUEST_LOSS_MESSAGE">You have lost to the vampires!</Text>
+	</Language>
+</Majesty>

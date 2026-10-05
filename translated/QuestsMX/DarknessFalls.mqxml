@@ -1,0 +1,21 @@
+<Majesty>
+	<Quest id="{32305158-0000-0000-0000-000000000000}">
+		<Name>DARKNESS_FALLS</Name>
+		<Description lang="en_US">
+			<Short>消灭邪恶的尸鬼。[newline][newline]（矮人不会迁入此地区，因为他们对此心怀畏惧。）</Short>
+			<Long>"陛下，您可还记得邪恶尸鬼斯提克斯和斯通斯肆虐北境的传说？当地人告诉我们，这些幽影的墓穴就在附近。确实，它们的邪恶影响正渗入这片土地，使亡者不得安息。[newline]只要斯提克斯和斯通斯盘踞于此，我们的扩张就受到威胁。您必须找到这些古老的恐怖存在，将它们从沉睡中唤醒，然后一劳永逸地予以消灭。不幸的是，两人生死相系，如同生前一般密不可分。据说只要其中一个还活着，另一个就无法真正死去。"</Long>
+		</Description>
+		<DataConfiguration>
+			<Dataset base="MajestyExpansion">
+				<Load>
+					<Template>Darkness_Falls.q</Template>
+				</Load>
+				<Unload>
+					<CAM />
+					<GPL />
+					<Constants />
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

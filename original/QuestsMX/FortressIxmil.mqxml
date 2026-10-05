@@ -1,0 +1,21 @@
+<Majesty>
+	<Quest id="{33305158-0000-0000-0000-000000000000}">
+		<Name>FORTRESS_IXMIL</Name>
+		<Description lang="en_US">
+			<Short>Seek out and destroy Ixmil's Fortress.</Short>
+			<Long>"My Liege, a most disturbing development. It seems that Ixmil, a mad arch-mage, has cast a blanket of fear over the Northern Reaches. Ixmil controls an imposing, mystic fortress that moves under its own power, appearing and disappearing from place to place. Each time the fortress appears, it disgorges a great host of hostile creatures.[newline]Ixmil has now turned his eye upon your newly acquired holdings. We must find some way to halt his reign of terror before your subjects become demoralized by his elusive raids. Otherwise we may be forced to retreat from these hard-fought lands."</Long>
+		</Description>
+		<DataConfiguration>
+			<Dataset base="MajestyExpansion">
+				<Load>
+					<Template>Fortress_Ixmil.q</Template>
+				</Load>
+				<Unload>
+					<CAM></CAM>
+					<GPL></GPL>
+					<Constants></Constants>
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

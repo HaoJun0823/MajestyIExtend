@@ -1,0 +1,21 @@
+<Majesty>
+	<Quest id="{32305551-0000-0000-0000-000000000000}">
+		<Name>BELL_BOOK_CANDLE</Name>
+		<Description lang="en_US">
+			<Short>寻回从宫殿中被盗并藏匿于各巢穴中的三件物品。[newline][newline]（本任务中无战士或法师可用。）</Short>
+			<Long>"恕我冒昧，殿下，但我们遭贼了！有人偷走了魔法之钟、圣典和永恒之烛！就在我们眼皮底下，它们被某个恶棍从皇家宝库中卷走。我们必须想办法找回它们！那可是无价之宝。"</Long>
+		</Description>
+		<DataConfiguration>
+			<Dataset base="Majesty">
+				<Load>
+					<Template>Bell_book_candle.q</Template>
+				</Load>
+				<Unload>
+					<CAM />
+					<GPL />
+					<Constants />
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

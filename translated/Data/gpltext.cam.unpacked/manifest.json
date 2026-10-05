@@ -1,0 +1,909 @@
+{
+  "source": "gpltext.cam",
+  "size": 81906,
+  "sha256": "3f215b3ddc273a13e33b32c1284a2d8231f5e1f27b3b657cd76e9cb215f83d6b",
+  "magic": "43594c4250432020",
+  "version": "01000100",
+  "file_dummy": 2696,
+  "sections": [
+    {
+      "ext": "STRT",
+      "ext_raw": "53545254",
+      "section_dummy": 0,
+      "files": [
+        {
+          "index": 0,
+          "name": "HN01",
+          "name_raw": "484e303100000000000000000000000000000000",
+          "file": "000_HN01.bin",
+          "size": 634,
+          "orig_offset": 2724,
+          "strt_json": "000_HN01.json",
+          "strt_count": 35
+        },
+        {
+          "index": 1,
+          "name": "HN02",
+          "name_raw": "484e303200000000000000000000000000000000",
+          "file": "001_HN02.bin",
+          "size": 740,
+          "orig_offset": 3358,
+          "strt_json": "001_HN02.json",
+          "strt_count": 32
+        },
+        {
+          "index": 2,
+          "name": "HN03",
+          "name_raw": "484e303300000000000000000000000000000000",
+          "file": "002_HN03.bin",
+          "size": 4,
+          "orig_offset": 4098
+        },
+        {
+          "index": 3,
+          "name": "HN04",
+          "name_raw": "484e303400000000000000000000000000000000",
+          "file": "003_HN04.bin",
+          "size": 4,
+          "orig_offset": 4102
+        },
+        {
+          "index": 4,
+          "name": "HN05",
+          "name_raw": "484e303500000000000000000000000000000000",
+          "file": "004_HN05.bin",
+          "size": 590,
+          "orig_offset": 4106,
+          "strt_json": "004_HN05.json",
+          "strt_count": 33
+        },
+        {
+          "index": 5,
+          "name": "HN06",
+          "name_raw": "484e303600000000000000000000000000000000",
+          "file": "005_HN06.bin",
+          "size": 694,
+          "orig_offset": 4696,
+          "strt_json": "005_HN06.json",
+          "strt_count": 33
+        },
+        {
+          "index": 6,
+          "name": "HN07",
+          "name_raw": "484e303700000000000000000000000000000000",
+          "file": "006_HN07.bin",
+          "size": 4,
+          "orig_offset": 5390
+        },
+        {
+          "index": 7,
+          "name": "HN08",
+          "name_raw": "484e303800000000000000000000000000000000",
+          "file": "007_HN08.bin",
+          "size": 4,
+          "orig_offset": 5394
+        },
+        {
+          "index": 8,
+          "name": "HN09",
+          "name_raw": "484e303900000000000000000000000000000000",
+          "file": "008_HN09.bin",
+          "size": 516,
+          "orig_offset": 5398,
+          "strt_json": "008_HN09.json",
+          "strt_count": 32
+        },
+        {
+          "index": 9,
+          "name": "HN10",
+          "name_raw": "484e313000000000000000000000000000000000",
+          "file": "009_HN10.bin",
+          "size": 576,
+          "orig_offset": 5914,
+          "strt_json": "009_HN10.json",
+          "strt_count": 33
+        },
+        {
+          "index": 10,
+          "name": "HN11",
+          "name_raw": "484e313100000000000000000000000000000000",
+          "file": "010_HN11.bin",
+          "size": 4,
+          "orig_offset": 6490
+        },
+        {
+          "index": 11,
+          "name": "HN12",
+          "name_raw": "484e313200000000000000000000000000000000",
+          "file": "011_HN12.bin",
+          "size": 4,
+          "orig_offset": 6494
+        },
+        {
+          "index": 12,
+          "name": "HN13",
+          "name_raw": "484e313300000000000000000000000000000000",
+          "file": "012_HN13.bin",
+          "size": 636,
+          "orig_offset": 6498,
+          "strt_json": "012_HN13.json",
+          "strt_count": 32
+        },
+        {
+          "index": 13,
+          "name": "HN14",
+          "name_raw": "484e313400000000000000000000000000000000",
+          "file": "013_HN14.bin",
+          "size": 706,
+          "orig_offset": 7134,
+          "strt_json": "013_HN14.json",
+          "strt_count": 34
+        },
+        {
+          "index": 14,
+          "name": "HN15",
+          "name_raw": "484e313500000000000000000000000000000000",
+          "file": "014_HN15.bin",
+          "size": 4,
+          "orig_offset": 7840
+        },
+        {
+          "index": 15,
+          "name": "HN16",
+          "name_raw": "484e313600000000000000000000000000000000",
+          "file": "015_HN16.bin",
+          "size": 4,
+          "orig_offset": 7844
+        },
+        {
+          "index": 16,
+          "name": "HN17",
+          "name_raw": "484e313700000000000000000000000000000000",
+          "file": "016_HN17.bin",
+          "size": 554,
+          "orig_offset": 7848,
+          "strt_json": "016_HN17.json",
+          "strt_count": 31
+        },
+        {
+          "index": 17,
+          "name": "HN18",
+          "name_raw": "484e313800000000000000000000000000000000",
+          "file": "017_HN18.bin",
+          "size": 682,
+          "orig_offset": 8402,
+          "strt_json": "017_HN18.json",
+          "strt_count": 32
+        },
+        {
+          "index": 18,
+          "name": "HN19",
+          "name_raw": "484e313900000000000000000000000000000000",
+          "file": "018_HN19.bin",
+          "size": 4,
+          "orig_offset": 9084
+        },
+        {
+          "index": 19,
+          "name": "HN20",
+          "name_raw": "484e323000000000000000000000000000000000",
+          "file": "019_HN20.bin",
+          "size": 4,
+          "orig_offset": 9088
+        },
+        {
+          "index": 20,
+          "name": "HN21",
+          "name_raw": "484e323100000000000000000000000000000000",
+          "file": "020_HN21.bin",
+          "size": 626,
+          "orig_offset": 9092,
+          "strt_json": "020_HN21.json",
+          "strt_count": 32
+        },
+        {
+          "index": 21,
+          "name": "HN22",
+          "name_raw": "484e323200000000000000000000000000000000",
+          "file": "021_HN22.bin",
+          "size": 660,
+          "orig_offset": 9718,
+          "strt_json": "021_HN22.json",
+          "strt_count": 32
+        },
+        {
+          "index": 22,
+          "name": "HN23",
+          "name_raw": "484e323300000000000000000000000000000000",
+          "file": "022_HN23.bin",
+          "size": 4,
+          "orig_offset": 10378
+        },
+        {
+          "index": 23,
+          "name": "HN24",
+          "name_raw": "484e323400000000000000000000000000000000",
+          "file": "023_HN24.bin",
+          "size": 4,
+          "orig_offset": 10382
+        },
+        {
+          "index": 24,
+          "name": "HN25",
+          "name_raw": "484e323500000000000000000000000000000000",
+          "file": "024_HN25.bin",
+          "size": 590,
+          "orig_offset": 10386,
+          "strt_json": "024_HN25.json",
+          "strt_count": 34
+        },
+        {
+          "index": 25,
+          "name": "HN26",
+          "name_raw": "484e323600000000000000000000000000000000",
+          "file": "025_HN26.bin",
+          "size": 98,
+          "orig_offset": 10976,
+          "strt_json": "025_HN26.json",
+          "strt_count": 5
+        },
+        {
+          "index": 26,
+          "name": "HN27",
+          "name_raw": "484e323700000000000000000000000000000000",
+          "file": "026_HN27.bin",
+          "size": 4,
+          "orig_offset": 11074
+        },
+        {
+          "index": 27,
+          "name": "HN28",
+          "name_raw": "484e323800000000000000000000000000000000",
+          "file": "027_HN28.bin",
+          "size": 4,
+          "orig_offset": 11078
+        },
+        {
+          "index": 28,
+          "name": "HN29",
+          "name_raw": "484e323900000000000000000000000000000000",
+          "file": "028_HN29.bin",
+          "size": 562,
+          "orig_offset": 11082,
+          "strt_json": "028_HN29.json",
+          "strt_count": 31
+        },
+        {
+          "index": 29,
+          "name": "HN30",
+          "name_raw": "484e333000000000000000000000000000000000",
+          "file": "029_HN30.bin",
+          "size": 504,
+          "orig_offset": 11644,
+          "strt_json": "029_HN30.json",
+          "strt_count": 24
+        },
+        {
+          "index": 30,
+          "name": "HN31",
+          "name_raw": "484e333100000000000000000000000000000000",
+          "file": "030_HN31.bin",
+          "size": 4,
+          "orig_offset": 12148
+        },
+        {
+          "index": 31,
+          "name": "HN32",
+          "name_raw": "484e333200000000000000000000000000000000",
+          "file": "031_HN32.bin",
+          "size": 4,
+          "orig_offset": 12152
+        },
+        {
+          "index": 32,
+          "name": "HN33",
+          "name_raw": "484e333300000000000000000000000000000000",
+          "file": "032_HN33.bin",
+          "size": 468,
+          "orig_offset": 12156,
+          "strt_json": "032_HN33.json",
+          "strt_count": 27
+        },
+        {
+          "index": 33,
+          "name": "HN34",
+          "name_raw": "484e333400000000000000000000000000000000",
+          "file": "033_HN34.bin",
+          "size": 548,
+          "orig_offset": 12624,
+          "strt_json": "033_HN34.json",
+          "strt_count": 27
+        },
+        {
+          "index": 34,
+          "name": "HN35",
+          "name_raw": "484e333500000000000000000000000000000000",
+          "file": "034_HN35.bin",
+          "size": 4,
+          "orig_offset": 13172
+        },
+        {
+          "index": 35,
+          "name": "HN36",
+          "name_raw": "484e333600000000000000000000000000000000",
+          "file": "035_HN36.bin",
+          "size": 4,
+          "orig_offset": 13176
+        },
+        {
+          "index": 36,
+          "name": "HN37",
+          "name_raw": "484e333700000000000000000000000000000000",
+          "file": "036_HN37.bin",
+          "size": 514,
+          "orig_offset": 13180,
+          "strt_json": "036_HN37.json",
+          "strt_count": 28
+        },
+        {
+          "index": 37,
+          "name": "HN38",
+          "name_raw": "484e333800000000000000000000000000000000",
+          "file": "037_HN38.bin",
+          "size": 410,
+          "orig_offset": 13694,
+          "strt_json": "037_HN38.json",
+          "strt_count": 19
+        },
+        {
+          "index": 38,
+          "name": "HN39",
+          "name_raw": "484e333900000000000000000000000000000000",
+          "file": "038_HN39.bin",
+          "size": 4,
+          "orig_offset": 14104
+        },
+        {
+          "index": 39,
+          "name": "HN40",
+          "name_raw": "484e343000000000000000000000000000000000",
+          "file": "039_HN40.bin",
+          "size": 4,
+          "orig_offset": 14108
+        },
+        {
+          "index": 40,
+          "name": "HN41",
+          "name_raw": "484e343100000000000000000000000000000000",
+          "file": "040_HN41.bin",
+          "size": 24,
+          "orig_offset": 14112,
+          "strt_json": "040_HN41.json",
+          "strt_count": 1
+        },
+        {
+          "index": 41,
+          "name": "HN42",
+          "name_raw": "484e343200000000000000000000000000000000",
+          "file": "041_HN42.bin",
+          "size": 492,
+          "orig_offset": 14136,
+          "strt_json": "041_HN42.json",
+          "strt_count": 22
+        },
+        {
+          "index": 42,
+          "name": "HN43",
+          "name_raw": "484e343300000000000000000000000000000000",
+          "file": "042_HN43.bin",
+          "size": 4,
+          "orig_offset": 14628
+        },
+        {
+          "index": 43,
+          "name": "HN44",
+          "name_raw": "484e343400000000000000000000000000000000",
+          "file": "043_HN44.bin",
+          "size": 4,
+          "orig_offset": 14632
+        },
+        {
+          "index": 44,
+          "name": "HN45",
+          "name_raw": "484e343500000000000000000000000000000000",
+          "file": "044_HN45.bin",
+          "size": 542,
+          "orig_offset": 14636,
+          "strt_json": "044_HN45.json",
+          "strt_count": 29
+        },
+        {
+          "index": 45,
+          "name": "HN46",
+          "name_raw": "484e343600000000000000000000000000000000",
+          "file": "045_HN46.bin",
+          "size": 416,
+          "orig_offset": 15178,
+          "strt_json": "045_HN46.json",
+          "strt_count": 19
+        },
+        {
+          "index": 46,
+          "name": "HN47",
+          "name_raw": "484e343700000000000000000000000000000000",
+          "file": "046_HN47.bin",
+          "size": 4,
+          "orig_offset": 15594
+        },
+        {
+          "index": 47,
+          "name": "HN48",
+          "name_raw": "484e343800000000000000000000000000000000",
+          "file": "047_HN48.bin",
+          "size": 4,
+          "orig_offset": 15598
+        },
+        {
+          "index": 48,
+          "name": "HN49",
+          "name_raw": "484e343900000000000000000000000000000000",
+          "file": "048_HN49.bin",
+          "size": 610,
+          "orig_offset": 15602,
+          "strt_json": "048_HN49.json",
+          "strt_count": 34
+        },
+        {
+          "index": 49,
+          "name": "HN50",
+          "name_raw": "484e353000000000000000000000000000000000",
+          "file": "049_HN50.bin",
+          "size": 734,
+          "orig_offset": 16212,
+          "strt_json": "049_HN50.json",
+          "strt_count": 34
+        },
+        {
+          "index": 50,
+          "name": "HN51",
+          "name_raw": "484e353100000000000000000000000000000000",
+          "file": "050_HN51.bin",
+          "size": 4,
+          "orig_offset": 16946
+        },
+        {
+          "index": 51,
+          "name": "HN52",
+          "name_raw": "484e353200000000000000000000000000000000",
+          "file": "051_HN52.bin",
+          "size": 4,
+          "orig_offset": 16950
+        },
+        {
+          "index": 52,
+          "name": "HN53",
+          "name_raw": "484e353300000000000000000000000000000000",
+          "file": "052_HN53.bin",
+          "size": 500,
+          "orig_offset": 16954,
+          "strt_json": "052_HN53.json",
+          "strt_count": 26
+        },
+        {
+          "index": 53,
+          "name": "HN54",
+          "name_raw": "484e353400000000000000000000000000000000",
+          "file": "053_HN54.bin",
+          "size": 540,
+          "orig_offset": 17454,
+          "strt_json": "053_HN54.json",
+          "strt_count": 24
+        },
+        {
+          "index": 54,
+          "name": "HN55",
+          "name_raw": "484e353500000000000000000000000000000000",
+          "file": "054_HN55.bin",
+          "size": 4,
+          "orig_offset": 17994
+        },
+        {
+          "index": 55,
+          "name": "HN56",
+          "name_raw": "484e353600000000000000000000000000000000",
+          "file": "055_HN56.bin",
+          "size": 4,
+          "orig_offset": 17998
+        },
+        {
+          "index": 56,
+          "name": "HN57",
+          "name_raw": "484e353700000000000000000000000000000000",
+          "file": "056_HN57.bin",
+          "size": 16,
+          "orig_offset": 18002,
+          "strt_json": "056_HN57.json",
+          "strt_count": 1
+        },
+        {
+          "index": 57,
+          "name": "HN58",
+          "name_raw": "484e353800000000000000000000000000000000",
+          "file": "057_HN58.bin",
+          "size": 650,
+          "orig_offset": 18018,
+          "strt_json": "057_HN58.json",
+          "strt_count": 31
+        },
+        {
+          "index": 58,
+          "name": "HN59",
+          "name_raw": "484e353900000000000000000000000000000000",
+          "file": "058_HN59.bin",
+          "size": 524,
+          "orig_offset": 18668,
+          "strt_json": "058_HN59.json",
+          "strt_count": 26
+        },
+        {
+          "index": 59,
+          "name": "HN60",
+          "name_raw": "484e363000000000000000000000000000000000",
+          "file": "059_HN60.bin",
+          "size": 4,
+          "orig_offset": 19192
+        },
+        {
+          "index": 60,
+          "name": "HN61",
+          "name_raw": "484e363100000000000000000000000000000000",
+          "file": "060_HN61.bin",
+          "size": 590,
+          "orig_offset": 19196,
+          "strt_json": "060_HN61.json",
+          "strt_count": 32
+        },
+        {
+          "index": 61,
+          "name": "HN62",
+          "name_raw": "484e363200000000000000000000000000000000",
+          "file": "061_HN62.bin",
+          "size": 722,
+          "orig_offset": 19786,
+          "strt_json": "061_HN62.json",
+          "strt_count": 34
+        },
+        {
+          "index": 62,
+          "name": "HN63",
+          "name_raw": "484e363300000000000000000000000000000000",
+          "file": "062_HN63.bin",
+          "size": 4,
+          "orig_offset": 20508
+        },
+        {
+          "index": 63,
+          "name": "HN64",
+          "name_raw": "484e363400000000000000000000000000000000",
+          "file": "063_HN64.bin",
+          "size": 4,
+          "orig_offset": 20512
+        },
+        {
+          "index": 64,
+          "name": "BN01",
+          "name_raw": "424e303100000000000000000000000000000000",
+          "file": "064_BN01.bin",
+          "size": 678,
+          "orig_offset": 20516,
+          "strt_json": "064_BN01.json",
+          "strt_count": 32
+        },
+        {
+          "index": 65,
+          "name": "BN02",
+          "name_raw": "424e303200000000000000000000000000000000",
+          "file": "065_BN02.bin",
+          "size": 4,
+          "orig_offset": 21194
+        },
+        {
+          "index": 66,
+          "name": "BN03",
+          "name_raw": "424e303300000000000000000000000000000000",
+          "file": "066_BN03.bin",
+          "size": 4,
+          "orig_offset": 21198
+        },
+        {
+          "index": 67,
+          "name": "BN04",
+          "name_raw": "424e303400000000000000000000000000000000",
+          "file": "067_BN04.bin",
+          "size": 4,
+          "orig_offset": 21202
+        },
+        {
+          "index": 68,
+          "name": "EN01",
+          "name_raw": "454e303100000000000000000000000000000000",
+          "file": "068_EN01.bin",
+          "size": 132,
+          "orig_offset": 21206,
+          "strt_json": "068_EN01.json",
+          "strt_count": 6
+        },
+        {
+          "index": 69,
+          "name": "EN02",
+          "name_raw": "454e303200000000000000000000000000000000",
+          "file": "069_EN02.bin",
+          "size": 106,
+          "orig_offset": 21338,
+          "strt_json": "069_EN02.json",
+          "strt_count": 5
+        },
+        {
+          "index": 70,
+          "name": "EN03",
+          "name_raw": "454e303300000000000000000000000000000000",
+          "file": "070_EN03.bin",
+          "size": 122,
+          "orig_offset": 21444,
+          "strt_json": "070_EN03.json",
+          "strt_count": 6
+        },
+        {
+          "index": 71,
+          "name": "EN04",
+          "name_raw": "454e303400000000000000000000000000000000",
+          "file": "071_EN04.bin",
+          "size": 126,
+          "orig_offset": 21566,
+          "strt_json": "071_EN04.json",
+          "strt_count": 6
+        },
+        {
+          "index": 72,
+          "name": "EN05",
+          "name_raw": "454e303500000000000000000000000000000000",
+          "file": "072_EN05.bin",
+          "size": 152,
+          "orig_offset": 21692,
+          "strt_json": "072_EN05.json",
+          "strt_count": 7
+        },
+        {
+          "index": 73,
+          "name": "EN06",
+          "name_raw": "454e303600000000000000000000000000000000",
+          "file": "073_EN06.bin",
+          "size": 142,
+          "orig_offset": 21844,
+          "strt_json": "073_EN06.json",
+          "strt_count": 7
+        },
+        {
+          "index": 74,
+          "name": "EN07",
+          "name_raw": "454e303700000000000000000000000000000000",
+          "file": "074_EN07.bin",
+          "size": 124,
+          "orig_offset": 21986,
+          "strt_json": "074_EN07.json",
+          "strt_count": 7
+        },
+        {
+          "index": 75,
+          "name": "EN08",
+          "name_raw": "454e303800000000000000000000000000000000",
+          "file": "075_EN08.bin",
+          "size": 144,
+          "orig_offset": 22110,
+          "strt_json": "075_EN08.json",
+          "strt_count": 7
+        },
+        {
+          "index": 76,
+          "name": "EN09",
+          "name_raw": "454e303900000000000000000000000000000000",
+          "file": "076_EN09.bin",
+          "size": 134,
+          "orig_offset": 22254,
+          "strt_json": "076_EN09.json",
+          "strt_count": 7
+        },
+        {
+          "index": 77,
+          "name": "EN10",
+          "name_raw": "454e313000000000000000000000000000000000",
+          "file": "077_EN10.bin",
+          "size": 146,
+          "orig_offset": 22388,
+          "strt_json": "077_EN10.json",
+          "strt_count": 7
+        },
+        {
+          "index": 78,
+          "name": "EN11",
+          "name_raw": "454e313100000000000000000000000000000000",
+          "file": "078_EN11.bin",
+          "size": 132,
+          "orig_offset": 22534,
+          "strt_json": "078_EN11.json",
+          "strt_count": 7
+        },
+        {
+          "index": 79,
+          "name": "EN12",
+          "name_raw": "454e313200000000000000000000000000000000",
+          "file": "079_EN12.bin",
+          "size": 146,
+          "orig_offset": 22666,
+          "strt_json": "079_EN12.json",
+          "strt_count": 7
+        },
+        {
+          "index": 80,
+          "name": "EN13",
+          "name_raw": "454e313300000000000000000000000000000000",
+          "file": "080_EN13.bin",
+          "size": 116,
+          "orig_offset": 22812,
+          "strt_json": "080_EN13.json",
+          "strt_count": 6
+        },
+        {
+          "index": 81,
+          "name": "EN14",
+          "name_raw": "454e313400000000000000000000000000000000",
+          "file": "081_EN14.bin",
+          "size": 134,
+          "orig_offset": 22928,
+          "strt_json": "081_EN14.json",
+          "strt_count": 6
+        },
+        {
+          "index": 82,
+          "name": "EN15",
+          "name_raw": "454e313500000000000000000000000000000000",
+          "file": "082_EN15.bin",
+          "size": 110,
+          "orig_offset": 23062,
+          "strt_json": "082_EN15.json",
+          "strt_count": 6
+        },
+        {
+          "index": 83,
+          "name": "HPTX",
+          "name_raw": "4850545800000000000000000000000000000000",
+          "file": "083_HPTX.bin",
+          "size": 30808,
+          "orig_offset": 23172,
+          "strt_json": "083_HPTX.json",
+          "strt_count": 129
+        },
+        {
+          "index": 84,
+          "name": "FNTX",
+          "name_raw": "464e545800000000000000000000000000000000",
+          "file": "084_FNTX.bin",
+          "size": 2642,
+          "orig_offset": 53980,
+          "strt_json": "084_FNTX.json",
+          "strt_count": 81
+        },
+        {
+          "index": 85,
+          "name": "FDTX",
+          "name_raw": "4644545800000000000000000000000000000000",
+          "file": "085_FDTX.bin",
+          "size": 5800,
+          "orig_offset": 56622,
+          "strt_json": "085_FDTX.json",
+          "strt_count": 81
+        },
+        {
+          "index": 86,
+          "name": "LNTX",
+          "name_raw": "4c4e545800000000000000000000000000000000",
+          "file": "086_LNTX.bin",
+          "size": 626,
+          "orig_offset": 62422,
+          "strt_json": "086_LNTX.json",
+          "strt_count": 29
+        },
+        {
+          "index": 87,
+          "name": "DPTX",
+          "name_raw": "4450545800000000000000000000000000000000",
+          "file": "087_DPTX.bin",
+          "size": 2146,
+          "orig_offset": 63048,
+          "strt_json": "087_DPTX.json",
+          "strt_count": 49
+        },
+        {
+          "index": 88,
+          "name": "AITX",
+          "name_raw": "4149545800000000000000000000000000000000",
+          "file": "088_AITX.bin",
+          "size": 10074,
+          "orig_offset": 65194,
+          "strt_json": "088_AITX.json",
+          "strt_count": 177
+        },
+        {
+          "index": 89,
+          "name": "NMTX",
+          "name_raw": "4e4d545800000000000000000000000000000000",
+          "file": "089_NMTX.bin",
+          "size": 46,
+          "orig_offset": 75268,
+          "strt_json": "089_NMTX.json",
+          "strt_count": 2
+        },
+        {
+          "index": 90,
+          "name": "QITM",
+          "name_raw": "5149544d00000000000000000000000000000000",
+          "file": "090_QITM.bin",
+          "size": 828,
+          "orig_offset": 75314,
+          "strt_json": "090_QITM.json",
+          "strt_count": 16
+        },
+        {
+          "index": 91,
+          "name": "GOAL",
+          "name_raw": "474f414c00000000000000000000000000000000",
+          "file": "091_GOAL.bin",
+          "size": 114,
+          "orig_offset": 76142,
+          "strt_json": "091_GOAL.json",
+          "strt_count": 4
+        },
+        {
+          "index": 92,
+          "name": "QUES",
+          "name_raw": "5155455300000000000000000000000000000000",
+          "file": "092_QUES.bin",
+          "size": 462,
+          "orig_offset": 76256,
+          "strt_json": "092_QUES.json",
+          "strt_count": 20
+        },
+        {
+          "index": 93,
+          "name": "GAMX",
+          "name_raw": "47414d5800000000000000000000000000000000",
+          "file": "093_GAMX.bin",
+          "size": 252,
+          "orig_offset": 76718,
+          "strt_json": "093_GAMX.json",
+          "strt_count": 7
+        },
+        {
+          "index": 94,
+          "name": "LOSX",
+          "name_raw": "4c4f535800000000000000000000000000000000",
+          "file": "094_LOSX.bin",
+          "size": 924,
+          "orig_offset": 76970,
+          "strt_json": "094_LOSX.json",
+          "strt_count": 22
+        },
+        {
+          "index": 95,
+          "name": "QEND",
+          "name_raw": "51454e4400000000000000000000000000000000",
+          "file": "095_QEND.bin",
+          "size": 4012,
+          "orig_offset": 77894,
+          "strt_json": "095_QEND.json",
+          "strt_count": 21
+        }
+      ]
+    }
+  ]
+}

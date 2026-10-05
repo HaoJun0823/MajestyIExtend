@@ -1,0 +1,23 @@
+<Majesty>
+	<Quest id="{504D4156-0000-0000-0000-000000000000}">
+		<Name>VAMPIRIC_REVENGE</Name>
+		<DisplayName lang="en_US">Vampiric Revenge</DisplayName>
+		<Description lang="en_US">
+			<Short>-Construct a small kingdom and recruit Heroes in order to establish a foothold in this region.[newline]-Destroy the Dark Castle, and dispose of its vile inhabitants...</Short>
+			<Long>"Your Majesty![newline]Rumors of a life draining menace are spreading through the countryside like wildfire. You must lead a heroic crusade to drive this evil presence from our fair land!"</Long>
+		</Description>
+		<DataConfiguration>
+			<Dataset base="Majesty">
+				<Load>
+					<Template>Vampiric_Revenge.q</Template>
+					<Strings>VampiricRevenge_Text.xml</Strings>
+				</Load>
+				<Unload>
+					<CAM></CAM>
+					<GPL></GPL>
+					<Constants></Constants>
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

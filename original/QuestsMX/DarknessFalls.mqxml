@@ -1,0 +1,21 @@
+<Majesty>
+	<Quest id="{32305158-0000-0000-0000-000000000000}">
+		<Name>DARKNESS_FALLS</Name>
+		<Description lang="en_US">
+			<Short>Destroy the evil Wights.[newline][newline](The Dwarves will not move into this area, as they regard it with fear.)</Short>
+			<Long>"Majesty, do you recall the legend of the evil wights, Styx and Stones, who terrorized the Northern Reaches? Well, the locals inform us that the crypts of these shades are nearby. Indeed, their evil influence can be felt seeping into the land, causing the dead to rest uneasily.[newline]As long as Styx and Stones dwell in this region, our expansion is threatened. You must find these ancient horrors, wrest them from their slumber, and dispatch them, once and for all. Unfortunately, the two are as inextricably linked in death as they were in life. It is said that while one lives, the other cannot truly die."</Long>
+		</Description>
+		<DataConfiguration>
+			<Dataset base="MajestyExpansion">
+				<Load>
+					<Template>Darkness_Falls.q</Template>
+				</Load>
+				<Unload>
+					<CAM></CAM>
+					<GPL></GPL>
+					<Constants></Constants>
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

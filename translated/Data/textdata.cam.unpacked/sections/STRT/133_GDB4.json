@@ -1,0 +1,114 @@
+[
+  {
+    "id": 0,
+    "text": "Function Body"
+  },
+  {
+    "id": 1,
+    "text": "全局标识管理"
+  },
+  {
+    "id": 2,
+    "text": "C 属性"
+  },
+  {
+    "id": 3,
+    "text": "Set Value"
+  },
+  {
+    "id": 4,
+    "text": "调试器"
+  },
+  {
+    "id": 5,
+    "text": "属性"
+  },
+  {
+    "id": 6,
+    "text": "Script Files"
+  },
+  {
+    "id": 7,
+    "text": "Identifiers"
+  },
+  {
+    "id": 8,
+    "text": "Order Stacks"
+  },
+  {
+    "id": 9,
+    "text": "Object Types"
+  },
+  {
+    "id": 10,
+    "text": "Attrib. Sets"
+  },
+  {
+    "id": 11,
+    "text": "Scripts"
+  },
+  {
+    "id": 12,
+    "text": "Constants"
+  },
+  {
+    "id": 13,
+    "text": "Gpl-Attribs."
+  },
+  {
+    "id": 14,
+    "text": "Goal Value"
+  },
+  {
+    "id": 15,
+    "text": "Attribute"
+  },
+  {
+    "id": 16,
+    "text": "Value"
+  },
+  {
+    "id": 17,
+    "text": "Goal Value"
+  },
+  {
+    "id": 18,
+    "text": "(Press TAB  to auto-complete from list)"
+  },
+  {
+    "id": 19,
+    "text": "Units Players Spells Groups..."
+  },
+  {
+    "id": 20,
+    "text": "User defined constants"
+  },
+  {
+    "id": 21,
+    "text": "Gpl coded scripts"
+  },
+  {
+    "id": 22,
+    "text": "Add"
+  },
+  {
+    "id": 23,
+    "text": "Select the last item (ADD New) to add"
+  },
+  {
+    "id": 24,
+    "text": "Constant"
+  },
+  {
+    "id": 25,
+    "text": "Auto and user defined sets"
+  },
+  {
+    "id": 26,
+    "text": "Tracking"
+  },
+  {
+    "id": 27,
+    "text": "Output"
+  }
+]

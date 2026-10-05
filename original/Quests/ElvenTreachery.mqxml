@@ -1,0 +1,21 @@
+<Majesty>
+	<Quest id="{30315551-0000-0000-0000-000000000000}">
+		<Name>ELVEN_TREACHERY</Name>
+		<Description lang="en_US">
+			<Short>Make 50,000 gold in 30 days to pay the ransom,[newline][newline]OR[newline][newline]Defeat the Elves, all enemy heroes and buildings, before that time.[newline][newline](No Elves will join your city in this quest.)</Short>
+			<Long>"Majesty? It grieves me to be the bearer of such intolerable news. An Elvish miscreant has just left the castle. He came to deliver the message that his disreputable brethren have taken your son hostage! Apparently they see only the size of your treasury, not the depth of your skilled leadership.[newline]These foul opportunists demand you pay a ransom or, they say, you'll never again see your son alive. How shall we deal with this Elvish impudence, my Liege?"</Long>
+		</Description>
+		<DataConfiguration>
+			<Dataset base="Majesty">
+				<Load>
+					<Template>Elven_Treachery.q</Template>
+				</Load>
+				<Unload>
+					<CAM></CAM>
+					<GPL></GPL>
+					<Constants></Constants>
+				</Unload>
+			</Dataset>
+		</DataConfiguration>
+	</Quest>
+</Majesty>

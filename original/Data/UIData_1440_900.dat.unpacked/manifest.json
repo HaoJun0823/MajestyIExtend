@@ -1,0 +1,120 @@
+{
+  "source": "UIData_1440_900.dat",
+  "size": 40016,
+  "sha256": "842fc061ab43b52cf7240b684a7b75d87254237c41254a369aaf7cfabc8aef89",
+  "magic": "43594c4250432020",
+  "version": "01000100",
+  "file_dummy": 352,
+  "sections": [
+    {
+      "ext": "SMNU",
+      "ext_raw": "534d4e55",
+      "section_dummy": 0,
+      "files": [
+        {
+          "index": 0,
+          "name": "AP37",
+          "name_raw": "4150333700000000000000000000000000000000",
+          "file": "000_AP37.bin",
+          "size": 2200,
+          "orig_offset": 388
+        },
+        {
+          "index": 1,
+          "name": "APd9",
+          "name_raw": "4150643900000000000000000000000000000000",
+          "file": "001_APd9.bin",
+          "size": 732,
+          "orig_offset": 2588
+        },
+        {
+          "index": 2,
+          "name": "APda",
+          "name_raw": "4150646100000000000000000000000000000000",
+          "file": "002_APda.bin",
+          "size": 2016,
+          "orig_offset": 3320
+        },
+        {
+          "index": 3,
+          "name": "APMK",
+          "name_raw": "41504d4b00000000000000000000000000000000",
+          "file": "003_APMK.bin",
+          "size": 6864,
+          "orig_offset": 5336
+        },
+        {
+          "index": 4,
+          "name": "APdb",
+          "name_raw": "4150646200000000000000000000000000000000",
+          "file": "004_APdb.bin",
+          "size": 13412,
+          "orig_offset": 12200
+        },
+        {
+          "index": 5,
+          "name": "APdc",
+          "name_raw": "4150646300000000000000000000000000000000",
+          "file": "005_APdc.bin",
+          "size": 5472,
+          "orig_offset": 25612
+        },
+        {
+          "index": 6,
+          "name": "AP29",
+          "name_raw": "4150323900000000000000000000000000000000",
+          "file": "006_AP29.bin",
+          "size": 5352,
+          "orig_offset": 31084
+        }
+      ]
+    },
+    {
+      "ext": "STRT",
+      "ext_raw": "53545254",
+      "section_dummy": 0,
+      "files": [
+        {
+          "index": 0,
+          "name": "APd9",
+          "name_raw": "4150643900000000000000000000000000000000",
+          "file": "000_APd9.bin",
+          "size": 110,
+          "orig_offset": 36436
+        },
+        {
+          "index": 1,
+          "name": "APda",
+          "name_raw": "4150646100000000000000000000000000000000",
+          "file": "001_APda.bin",
+          "size": 167,
+          "orig_offset": 36546
+        },
+        {
+          "index": 2,
+          "name": "APdb",
+          "name_raw": "4150646200000000000000000000000000000000",
+          "file": "002_APdb.bin",
+          "size": 2403,
+          "orig_offset": 36713
+        },
+        {
+          "index": 3,
+          "name": "APdc",
+          "name_raw": "4150646300000000000000000000000000000000",
+          "file": "003_APdc.bin",
+          "size": 202,
+          "orig_offset": 39116
+        },
+        {
+          "index": 4,
+          "name": "AP29",
+          "name_raw": "4150323900000000000000000000000000000000",
+          "file": "004_AP29.bin",
+          "size": 698,
+          "orig_offset": 39318
+        }
+      ]
+    }
+  ]
+}

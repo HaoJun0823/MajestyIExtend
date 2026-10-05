@@ -259,3 +259,16 @@ paket-files/
 # Python Tools for Visual Studio (PTVS)
 __pycache__/
 *.pyc
+# === Majesty HD CHS release pipeline ===
+# CI / local build output
+build_out/
+release/
+# Python cache
+tools/__pycache__/
+**/__pycache__/
+*.pyc
+# msvc-wine (CI only, never committed)
+.msvc/
+.msvc-wine/
+# Unpacked working dirs (not the committed original/ translated/ trees)
+.temp/
