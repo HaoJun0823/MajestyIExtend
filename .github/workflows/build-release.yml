@@ -68,20 +68,20 @@ jobs:
 
     steps:
       - name: 检出仓库
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7.0.1
 
       # ★ 必须完整 checkout msvc-wine（不能只下 vsdownload.py）：
       #   install.sh 要用仓库里的 lowercase / fixinclude / wrappers /
       #   msvctricks.cpp。
       - name: 检出 msvc-wine
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7.0.1
         with:
           repository: mstorsjo/msvc-wine
           ref: ${{ env.MSVCWINE_REF }}
           path: .msvc-wine
 
       - name: 配置 Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7.0.0
         with:
           python-version: '3.12'
 
@@ -95,7 +95,7 @@ jobs:
 
       # ── 工具链缓存（VC 14.16 + SDK 26100 合并后约 4GB）──────────────
       - name: 还原 MSVC 工具链缓存
-        uses: actions/cache@v6
+        uses: actions/cache@v6.1.0
         with:
           path: .msvc
           key: mj1-msvcwine-v141-x86-sdk26100-${{ env.MSVCWINE_REF }}-v1
@@ -233,8 +233,8 @@ jobs:
             exit 1
           fi
 
-      # ── asi 体积闸门：杜绝错 DLL 流入发布 ──────────────────────────
-      # 正确 v141_xp + SDK 26100 asi = **34816B**
+      # ── S8 体积指纹：asi 体积闸门，杜绝错 DLL 流入发布 ──────────────
+      # 正确 v141_xp (MSVC 14.16) + SDK 26100 asi = **34816B**（精确相等，非区间）
       - name: 校验 asi 体积（必须为 34816B v141_xp）
         run: |
           set -euo pipefail
@@ -263,7 +263,7 @@ jobs:
 
       # ── 上传 Artifact ─────────────────────────────────────────────
       - name: 上传 CHS 发布包
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7.0.2
         with:
           name: majestyhd-chs
           path: build_out/MajestyHD-CHS-*.zip
@@ -282,23 +282,153 @@ jobs:
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - name: 检出仓库（git tag 需要）
-        uses: actions/checkout@v4
+      # ★ fetch-depth: 0 —— release_notes 要算「自上次 Release 起的提交」，
+      #   默认 depth=1 会取不到历史，git log 范围为空。
+      - name: 检出仓库（git tag / 提交记录需要）
+        uses: actions/checkout@v7.0.1
+        with:
+          fetch-depth: 0
+
       - name: 下载 CHS zip
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8.0.2
         with:
           path: dist
-      - name: 打日期 tag + 发布 Release
-        shell: bash
+
+      - name: 计算 tag（汉化补丁- 前缀，上海时区）
+        id: tag
         run: |
           set -euo pipefail
           # tag：面向玩家的 CJK 前缀标签（统一标准 §5 汉化补丁-YYYY-MM-DD-HH-MM-SS）。
           # 附件名走 glob（指本地已生成的 zip，原样上传，不受 ASCII 限制），故不拆 stamp。
           tag="汉化补丁-$(TZ=Asia/Shanghai date +%Y-%m-%d-%H-%M-%S)"
-          echo "创建 Release: $tag (target $GITHUB_SHA)"
+          # 极小概率同秒重复推送：若 tag 已存在则追加运行号
+          if gh api "repos/${{ github.repository }}/git/ref/tags/$tag" >/dev/null 2>&1; then
+            tag="${tag}-${GITHUB_RUN_NUMBER}"
+          fi
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "将使用 tag: $tag"
+
+      # ── 生成 Release 说明：三段结构（下载表 + 必读说明 + 提交记录）────────
+      - name: 生成 Release 说明（下载表 + 必读说明 + 提交记录）
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="${{ steps.tag.outputs.tag }}"
+          slug="${{ github.repository }}"
+          repo_url="https://github.com/$slug"
+
+          # 附件名即本地 zip 名（glob 上传原样保留），动态取出以免与实际不符
+          zip_chs="$(basename "$(ls dist/majestyhd-chs/MajestyHD-CHS-*.zip 2>/dev/null | head -1)")"
+          if [ -z "$zip_chs" ]; then echo "!! 未找到 CHS zip" >&2; exit 1; fi
+
+          # 提交范围：自上次 Release 的 commit 起。
+          # ★ 不用 git log <上次tag>..HEAD：checkout 默认不拉 tag 对象，会报 unknown revision。
+          latest="$(gh api "repos/$slug/releases/latest" 2>/dev/null || true)"
+          prev_tag="$(printf '%s' "$latest" | jq -r '.tag_name // empty' 2>/dev/null || true)"
+          prev_sha="$(printf '%s' "$latest" | jq -r '.commit.sha // empty' 2>/dev/null || true)"
+          if [ -z "$prev_sha" ] && [ -n "$prev_tag" ]; then
+            prev_sha="$(gh api "repos/$slug/git/refs/tags/$prev_tag" --jq '.object.sha // empty' 2>/dev/null || true)"
+            if [ "$(git cat-file -t "$prev_sha" 2>/dev/null || true)" = "tag" ]; then
+              prev_sha="$(gh api "repos/$slug/git/refs/tags/$prev_tag" --jq '.object.object.sha // empty' 2>/dev/null || true)"
+            fi
+          fi
+          if [ -n "$prev_sha" ] && git cat-file -e "${prev_sha}^{commit}" 2>/dev/null; then
+            base="$prev_sha"; base_label="$prev_tag"
+          else
+            base="$(git rev-list --max-parents=0 HEAD)"; base_label="首个提交"
+          fi
+
+          # ★ 必须用 tformat：format 末尾无换行，read 在 EOF 会丢弃「恰好 1 条」的行
+          : > commits.md
+          git log --no-merges --max-count=60 --pretty=tformat:'%H%x09%s' "$base..HEAD" \
+            | while IFS=$'\t' read -r h s; do
+                if [ -z "$h" ]; then continue; fi
+                printf -- '- [`%s`](%s/commit/%s) %s\n' "${h:0:7}" "$repo_url" "$h" "$s" >> commits.md
+              done
+          n=$(grep -c '^- ' commits.md || true)
+          echo "本次提交记录：$n 条（基准 $base_label）"
+
+          cat > release_notes.md <<'EOF'
+          ## 《Majesty HD》简体中文汉化补丁 · `@@TAG@@`
+
+          下载 zip，**把包内全部文件解压覆盖到游戏根目录**（即 `MajestyHD.exe`
+          所在目录）。安装、卸载与常见问题见下方「必读说明」。
+
+          > ⚠️ 本补丁仅适用于 **Steam 版**《Majesty HD》，其它来源会导致字库注入失败。
+          > 不要使用 `MajestyHD - Old.exe` 启动，会注入失败崩溃或死机。
+          > 本补丁为运行时注入式汉化，删除 `winmm.dll` 与 `update` 即可还原英文原版。
+          EOF
+
+          {
+            echo
+            echo "### 🧾 本次更新（自 \`$base_label\` 起，共 ${n} 条提交）"
+            echo
+            if [ -s commits.md ]; then cat commits.md; else echo "(本次构建无新增提交)"; fi
+          } >> release_notes.md
+
+          {
+            echo
+            echo "### 📦 下载"
+            echo
+            echo "| 附件名 | 内容 |"
+            echo "|---|---|"
+            echo "| \`$zip_chs\` | Majesty HD 简体中文汉化包（解压到游戏根目录） |"
+            echo
+            echo "### 📖 必读说明（安装 / 卸载 / 常见问题）"
+          } >> release_notes.md
+
+          {
+            echo
+            if [ -f "dist/majestyhd-chs/必读说明.txt" ]; then
+              echo "<details><summary>展开完整必读说明（与包内 必读说明.txt 一致）</summary>"
+              echo
+              echo "<pre>"
+              tr -d '\r' < "dist/majestyhd-chs/必读说明.txt"
+              echo "</pre>"
+              echo
+              echo "</details>"
+            else
+              echo "> ⚠️ 未找到必读说明，本次未附带。"
+            fi
+            echo
+            echo "---"
+            echo
+            echo "源码仓库：<https://github.com/HaoJun0823/MajestyIExtend>　·　作者主页：<https://www.haojun0823.xyz/>"
+          } >> release_notes.md
+
+          sed -i "s/@@TAG@@/$tag/g" release_notes.md
+          if grep -q '@@TAG@@' release_notes.md; then
+            echo "!! 仍有未替换的 @@TAG@@" >&2; exit 1
+          fi
+          echo "── release_notes.md 生成完毕（$(wc -l < release_notes.md) 行）──"
+
+      - name: 创建 Release 并校验 body
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="${{ steps.tag.outputs.tag }}"
+          slug="${{ github.repository }}"
+
+          if [ ! -f release_notes.md ]; then echo "!! 未找到 release_notes.md" >&2; exit 1; fi
+          # 三段结构预检：下载表 / 必读说明 / 提交记录
+          for sec in "### 📦 下载" "### 📖 必读说明" "### 🧾 本次更新"; do
+            if ! grep -qF "$sec" release_notes.md; then
+              echo "!! release_notes.md 缺少段落「$sec」" >&2; exit 1
+            fi
+          done
+          echo "✓ release_notes.md 三段预检通过"
+
           gh release create "$tag" \
             dist/majestyhd-chs/MajestyHD-CHS-*.zip \
             --target "$GITHUB_SHA" \
             --title "Majesty HD 简体中文汉化补丁 $tag" \
-            --notes "自动构建 CHS 汉化补丁。详见仓库 README。"
+            --notes-file release_notes.md
+
+          # body 自检：非空、非占位符、首行符合预期
+          body="$(gh release view "$tag" --repo "$slug" --json body --jq .body)"
+          body_head="${body%%$'\n'*}"
+          if [ -z "$body_head" ] || [[ "$body_head" != "## 《Majesty HD》简体中文汉化补丁"* ]]; then
+            echo "!! Release body 异常（首行=[$body_head]）" >&2; exit 1
+          fi
+          echo "✓ Release body 已写入（首行：${body_head}…）"
           echo "✅ 已发布: $tag"
