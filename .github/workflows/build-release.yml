@@ -386,16 +386,19 @@ jobs:
 
           {
             echo
-            if [ -f "dist/majestyhd-chs/必读说明.txt" ]; then
+            # ★ 必读说明在 zip 内部（artifact 只上传 zip，不含独立的说明文件），
+            #   故从 zip 里取 —— 这样 Release 正文与玩家实际拿到的包内说明逐字一致。
+            unzip -p "$zip_chs_path" '必读说明.txt' 2>/dev/null | tr -d '\r' > readme_embed.txt || true
+            if [ -s readme_embed.txt ]; then
               echo "<details><summary>展开完整必读说明（与包内 必读说明.txt 一致）</summary>"
               echo
               echo "<pre>"
-              tr -d '\r' < "dist/majestyhd-chs/必读说明.txt"
+              cat readme_embed.txt
               echo "</pre>"
               echo
               echo "</details>"
             else
-              echo "> ⚠️ 未找到必读说明，本次未附带。"
+              echo "> ⚠️ 未能从 zip 内取出 必读说明.txt，本次未附带。"
             fi
             echo
             echo "---"
