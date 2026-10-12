@@ -3,8 +3,8 @@
 """Majesty HD 简体中文汉化包 —— 发布装配脚本。
 
 将仓库里展开存储的 translated/*.unpacked 目录重新打包为 CAM/DAT 二进制，
-连同 dist/ 预编译产物（winmm.dll、读我.txt、TextFix.ini）与 CI 编译的
-StrFix.asi 装配成可分发的 zip（结构与 V4 包一致，排除 .bak 备份文件）。
+连同 dist/ 预编译产物（winmm.dll、必读说明.txt、两份 AI 辅助文件、TextFix.ini）
+与 CI 编译的 StrFix.asi 装配成可分发的 zip（结构与 V4 包一致，排除 .bak 备份文件）。
 
 用法:
     python tools/build_release.py                          # 完整流程（含 zip）
@@ -15,7 +15,11 @@ StrFix.asi 装配成可分发的 zip（结构与 V4 包一致，排除 .bak 备�
 产物目录结构（与 V4 一致）::
     build_out/
       winmm.dll
-      读我.txt
+      必读说明.txt
+      如果不会安装，请把该文件发给AI，让AI教你.txt
+      将此文件交给AI，让AI协助完善本项目.txt
+      LICENSE
+      License.txt
       update/
         Data/          gpltext.cam, textdata.cam, InterfaceStrings.xml, UIData_*.dat (13)
         DataMX/        mx_btdata.cam, mx_gpltext.cam, mx_rgstext.cam, mx_textdata.cam
@@ -27,7 +31,9 @@ StrFix.asi 装配成可分发的 zip（结构与 V4 包一致，排除 .bak 备�
 设计要点:
     - translated/*.unpacked → CAM/DAT: 用 tools_packer.pack_from_dir 字节级精确重建
     - Quests / InterfaceStrings.xml: 文本文件直接复制（无需打包）
-    - dist/: winmm.dll(ASI loader) + 读我.txt + MajestyI_TextFix.ini（预编译产物）
+    - dist/: winmm.dll(ASI loader) + 必读说明.txt + 两份 AI 辅助文件
+             + MajestyI_TextFix.ini（预编译产物）
+    - 许可: 根 LICENSE 原样复制；Licenses/*.txt 合并为 License.txt
     - asi: CI 编译的 StrFix.asi（34816B 体积闸门）
     - .bak 文件不纳入发布
 """
@@ -75,11 +81,20 @@ TEXT_FILES = {
 TEXT_DIRS = ['Quests', 'QuestsMX']
 
 # 预编译产物
+# S11：包内说明一律叫「必读说明.txt」（原「读我.txt」已改名）
+# S12/S13：两份 AI 辅助文件随包分发到包根
 DIST_FILES = {
     'winmm.dll': '',           # root
-    '读我.txt': '',             # root
+    '必读说明.txt': '',         # root
+    '如果不会安装，请把该文件发给AI，让AI教你.txt': '',   # root
+    '将此文件交给AI，让AI协助完善本项目.txt': '',         # root
     'MajestyI_TextFix.ini': 'update',  # update/
 }
+
+# 许可文件：仓库根 LICENSE -> 包根 LICENSE；Licenses/*.txt 合并 -> 包根 License.txt
+LICENSE_SRC = 'LICENSE'
+LICENSE_DIR = 'Licenses'
+LICENSE_ORDER = ['ASILoader.txt', 'GPLv3.txt']
 
 # asi 体积闸门
 ASI_EXPECTED_SIZE = 34816
@@ -172,9 +187,19 @@ def verify_release(out_root):
     # winmm.dll
     if not os.path.isfile(os.path.join(out_root, 'winmm.dll')):
         errors.append('missing root/winmm.dll')
-    # 读我.txt
-    if not os.path.isfile(os.path.join(out_root, '读我.txt')):
-        errors.append('missing root/读我.txt')
+    # 必读说明.txt（S11 统一命名）
+    if not os.path.isfile(os.path.join(out_root, '必读说明.txt')):
+        errors.append('missing root/必读说明.txt')
+    # 两份 AI 辅助文件（S12/S13）
+    for ai in ('如果不会安装，请把该文件发给AI，让AI教你.txt',
+               '将此文件交给AI，让AI协助完善本项目.txt'):
+        if not os.path.isfile(os.path.join(out_root, ai)):
+            errors.append('missing root/%s' % ai)
+    # 许可文件（分发义务）
+    if not os.path.isfile(os.path.join(out_root, 'LICENSE')):
+        errors.append('missing root/LICENSE')
+    if not os.path.isfile(os.path.join(out_root, 'License.txt')):
+        errors.append('missing root/License.txt')
     # asi
     asi = os.path.join(out_root, 'update', 'MajestyI_StrFix.asi')
     if not os.path.isfile(asi):
@@ -200,6 +225,46 @@ def verify_release(out_root):
     else:
         errors.append('missing update/Quests/')
     return errors
+
+
+def copy_licenses(repo_root, out_root):
+    """复制根 LICENSE 并把 Licenses/*.txt 合并为 License.txt。
+
+    与 HardTruckApocalypse / SR_GAME_CHINESE 的做法一致：
+      - 包根 LICENSE      = 项目主许可（含游戏版权声明）
+      - 包根 License.txt  = 各第三方许可原文合并（顺序固定 → 产物可复现）
+    返回复制的文件数。
+    """
+    n = 0
+    root_lic = os.path.join(repo_root, LICENSE_SRC)
+    if os.path.isfile(root_lic):
+        shutil.copy2(root_lic, os.path.join(out_root, 'LICENSE'))
+        n += 1
+    else:
+        print('  WARNING: 缺少仓库根 %s' % LICENSE_SRC)
+
+    lic_dir = os.path.join(repo_root, LICENSE_DIR)
+    if not os.path.isdir(lic_dir):
+        print('  WARNING: 缺少 %s/ 目录' % LICENSE_DIR)
+        return n
+    files = sorted(f for f in os.listdir(lic_dir) if f.lower().endswith('.txt'))
+    if not files:
+        print('  WARNING: %s/ 下没有 .txt' % LICENSE_DIR)
+        return n
+    known = [f for f in LICENSE_ORDER if f in files]
+    rest = [f for f in files if f not in LICENSE_ORDER]
+    parts = []
+    for i, f in enumerate(known + rest):
+        txt = open(os.path.join(lic_dir, f), encoding='utf-8').read()
+        if i:
+            parts.append('\n\n' + '=' * 78 + '\n\n')
+        parts.append(txt)
+    with open(os.path.join(out_root, 'License.txt'), 'wb') as fh:
+        fh.write(''.join(parts).replace('\r\n', '\n').replace('\n', '\r\n')
+                 .encode('utf-8'))
+    n += 1
+    print('  License.txt 合并 %d 份：%s' % (len(files), ', '.join(known + rest)))
+    return n
 
 
 def pack_zip(out_root, zip_path):
@@ -250,10 +315,16 @@ def main():
     text_count = copy_text_files(translated_dir, out_root)
     print('  Copied %d text files' % text_count)
 
-    # STEP 3: Copy dist/ (winmm.dll, 读我.txt, TextFix.ini)
+    # STEP 3: Copy dist/ (winmm.dll, 必读说明.txt, 两份 AI 辅助文件, TextFix.ini)
     print('\n--- STEP 3: Copy dist/ ---')
     dist_count = copy_dist(REPO, out_root)
     print('  Copied %d dist files' % dist_count)
+
+    # STEP 3b: 许可文件（分发义务）
+    #   根 LICENSE 原样复制；Licenses/*.txt 按固定顺序合并成 License.txt。
+    print('\n--- STEP 3b: Copy licenses ---')
+    lic_count = copy_licenses(REPO, out_root)
+    print('  Copied %d license files' % lic_count)
 
     # STEP 4: Deploy StrFix.asi
     print('\n--- STEP 4: Deploy StrFix.asi ---')

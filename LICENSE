@@ -1,0 +1,65 @@
+HaoJun0823 Project License
+Copyright (c) 2026 Haojun (HaoJun0823) (Randerion). All rights reserved.
+Homepage: https://www.haojun0823.xyz
+Github: https://github.com/HaoJun0823
+ORCID: https://orcid.org/0000-0002-2285-0503
+
+----------------------------------------------------------------------
+Main License
+----------------------------------------------------------------------
+
+This project (the Chinese translation data, documentation, build scripts
+and tools authored for it) is licensed under:
+
+    GNU General Public License v3.0 or later
+
+SPDX-License-Identifier: GPL-3.0-or-later
+
+The full license text is available at:
+    ./Licenses/GPLv3.txt
+
+----------------------------------------------------------------------
+Game Copyright Notice (Majesty HD)
+----------------------------------------------------------------------
+
+This project is an independent, fan-made Chinese localization ("translation
+patch") for the video game "Majesty HD" (the Steam re-release of Majesty:
+The Fantasy Kingdom Sim and its expansions). It is not affiliated with,
+endorsed by, or sponsored by the copyright holders of that game.
+
+Majesty HD and all related titles, characters, artwork, music, and
+trademarks are the property of their respective copyright holders,
+including but not limited to:
+
+    - Cyberlore Studios, Inc. (original developer)
+    - Microprose / Infogrames / Atari (publishers)
+    - Paradox Interactive (current publisher on Steam)
+
+Copyright (c) their respective owners. All rights reserved.
+
+This project distributes NO copyrighted game assets. It provides only
+translation text and a runtime injection loader that users must apply to
+their own legally acquired copies of the game. The game itself is not
+redistributed by this project and remains governed by its own license.
+
+----------------------------------------------------------------------
+Third-party Components
+----------------------------------------------------------------------
+
+This patch bundles or depends on the following third-party components.
+Their licenses are reproduced verbatim in ./Licenses/ and merged into
+License.txt inside each distributed package:
+
+    - Ultimate ASI Loader (winmm.dll), by ThirteenAG
+      MIT License. See ./Licenses/ASILoader.txt
+
+The compiled binary produced by this project (MajestyI_StrFix.asi) is a
+derived work of this project's own source and is distributed under the
+same GPL-3.0-or-later terms as above.
+
+----------------------------------------------------------------------
+Disclaimer
+----------------------------------------------------------------------
+
+This software is provided "as is", without warranty of any kind. See the
+GPL v3.0 text (./Licenses/GPLv3.txt) sections 15, 16 and 17.
