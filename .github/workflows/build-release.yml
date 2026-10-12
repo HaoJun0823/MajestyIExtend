@@ -292,7 +292,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          tag="v$(date -u '+%Y%m%d-%H%M%S')"
+          # tag：面向玩家的 CJK 前缀标签（统一标准 §5 汉化补丁-YYYY-MM-DD-HH-MM-SS）。
+          # 附件名走 glob（指本地已生成的 zip，原样上传，不受 ASCII 限制），故不拆 stamp。
+          tag="汉化补丁-$(TZ=Asia/Shanghai date +%Y-%m-%d-%H-%M-%S)"
           echo "创建 Release: $tag (target $GITHUB_SHA)"
           gh release create "$tag" \
             dist/majestyhd-chs/MajestyHD-CHS-*.zip \
