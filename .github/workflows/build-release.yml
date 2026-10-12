@@ -317,9 +317,16 @@ jobs:
           slug="${{ github.repository }}"
           repo_url="https://github.com/$slug"
 
-          # 附件名即本地 zip 名（glob 上传原样保留），动态取出以免与实际不符
-          zip_chs="$(basename "$(ls dist/majestyhd-chs/MajestyHD-CHS-*.zip 2>/dev/null | head -1)")"
-          if [ -z "$zip_chs" ]; then echo "!! 未找到 CHS zip" >&2; exit 1; fi
+          # 附件名即本地 zip 名（glob 上传原样保留）。
+          # ★ 用 find 而非硬编码 dist/<artifact>/：download-artifact 大版本之间
+          #   落盘层级会变（v4 → v8 实测不同），find 对两种布局都成立。
+          zip_chs_path="$(find dist -name 'MajestyHD-CHS-*.zip' -print -quit 2>/dev/null || true)"
+          if [ -z "$zip_chs_path" ]; then
+            echo "!! 未找到 CHS zip；dist 实际内容：" >&2
+            ls -R dist >&2 || true
+            exit 1
+          fi
+          zip_chs="$(basename "$zip_chs_path")"
 
           # 提交范围：自上次 Release 的 commit 起。
           # ★ 不用 git log <上次tag>..HEAD：checkout 默认不拉 tag 对象，会报 unknown revision。
@@ -418,8 +425,16 @@ jobs:
           done
           echo "✓ release_notes.md 三段预检通过"
 
+          # 同上：用 find 定位，兼容 download-artifact 的落盘层级差异
+          zip_chs_path="$(find dist -name 'MajestyHD-CHS-*.zip' -print -quit 2>/dev/null || true)"
+          if [ -z "$zip_chs_path" ]; then
+            echo "!! 未找到 CHS zip；dist 实际内容：" >&2
+            ls -R dist >&2 || true
+            exit 1
+          fi
+
           gh release create "$tag" \
-            dist/majestyhd-chs/MajestyHD-CHS-*.zip \
+            "$zip_chs_path" \
             --target "$GITHUB_SHA" \
             --title "Majesty HD 简体中文汉化补丁 $tag" \
             --notes-file release_notes.md
