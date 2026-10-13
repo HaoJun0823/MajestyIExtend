@@ -739,8 +739,10 @@ static const MxNameEntry g_mxNames[] = {
     {"Ratman Shaman", "鼠精萨满"},           // BVs1
     {"Rhoden the Rat King", "鼠王罗登"},     // BVt1
     {"Shadowbeast", "暗影兽"},              // BVu1
-    {"Stones", "石块"},                     // BVv1
+    {"Stones", "斯通斯"},                     // BVv1
     {"Styx", "斯蒂克斯"},                    // BVw1
+    {"Shrine of Light", "光明神殿"},         // Shrine(Light) 建造名牌
+    {"Shrine of Dark", "黑暗神殿"},          // Shrine(Dark) 建造名牌
     {"Yeti", "雪人"},                       // BVx1
     {"Wendigo", "温迪戈"},                   // BVy1
     {"Gate", "传送门"},                      // WVh1
