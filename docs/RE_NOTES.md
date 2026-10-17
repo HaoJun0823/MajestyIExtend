@@ -1,14 +1,3 @@
----
-AIGC:
-  ContentProducer: '001191110102MAD55U9H0F10002'
-  ContentPropagator: '001191110102MAD55U9H0F10002'
-  Label: '1'
-  ProduceID: 'a7125c6c-c81c-49d8-947a-a2dbc5844923'
-  PropagateID: 'a7125c6c-c81c-49d8-947a-a2dbc5844923'
-  ReservedCode1: '59e107d6-b71c-4b13-906c-35852ed95da8'
-  ReservedCode2: '59e107d6-b71c-4b13-906c-35852ed95da8'
----
-
 # Majesty HD 逆向工程笔记 (RE_NOTES)
 
 > 基于 MajestyHD.exe (Steam 版) 的 IDA 逆向分析，用于驱动 ASI 汉化 DLL (MajestyI_Text_Fix) 的开发。
