@@ -33,7 +33,7 @@
     - Quests / InterfaceStrings.xml: 文本文件直接复制（无需打包）
     - dist/: winmm.dll(ASI loader) + 必读说明.txt + 两份 AI 辅助文件
              + MajestyI_TextFix.ini（预编译产物）
-    - 许可: 根 LICENSE 原样复制；Licenses/*.txt 合并为 License.txt
+    - 许可: 根 LICENSE 原样复制；LICENSES/*.txt 合并为 License.txt
     - asi: CI 编译的 StrFix.asi（34816B 体积闸门）
     - .bak 文件不纳入发布
 """
@@ -91,10 +91,12 @@ DIST_FILES = {
     'MajestyI_TextFix.ini': 'update',  # update/
 }
 
-# 许可文件：仓库根 LICENSE -> 包根 LICENSE；Licenses/*.txt 合并 -> 包根 License.txt
+# 许可文件：仓库根 LICENSE -> 包根 LICENSE；LICENSES/*.txt 合并 -> 包根 License.txt
+# ★ 全大写 LICENSES/（REUSE 规范）。CI 跑在 Linux 上大小写敏感，
+#   写成 Licenses/ 在 Windows 本地能过、上 CI 必挂。
 LICENSE_SRC = 'LICENSE'
-LICENSE_DIR = 'Licenses'
-LICENSE_ORDER = ['ASILoader.txt', 'GPLv3.txt']
+LICENSE_DIR = 'LICENSES'
+LICENSE_ORDER = ['ASILoader.txt', 'Apache-2.0.txt']
 
 # asi 体积闸门
 ASI_EXPECTED_SIZE = 34816
@@ -228,7 +230,7 @@ def verify_release(out_root):
 
 
 def copy_licenses(repo_root, out_root):
-    """复制根 LICENSE 并把 Licenses/*.txt 合并为 License.txt。
+    """复制根 LICENSE 并把 LICENSES/*.txt 合并为 License.txt。
 
     与 HardTruckApocalypse / SR_GAME_CHINESE 的做法一致：
       - 包根 LICENSE      = 项目主许可（含游戏版权声明）
@@ -321,7 +323,7 @@ def main():
     print('  Copied %d dist files' % dist_count)
 
     # STEP 3b: 许可文件（分发义务）
-    #   根 LICENSE 原样复制；Licenses/*.txt 按固定顺序合并成 License.txt。
+    #   根 LICENSE 原样复制；LICENSES/*.txt 按固定顺序合并成 License.txt。
     print('\n--- STEP 3b: Copy licenses ---')
     lic_count = copy_licenses(REPO, out_root)
     print('  Copied %d license files' % lic_count)
